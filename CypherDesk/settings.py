@@ -25,12 +25,13 @@ SECRET_KEY = '#r394am$y(&xrwvxye27ny%d45_f-*g3sc7t7203nwp71%$7n%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['isyn.tk', '192.168.1.105']
+ALLOWED_HOSTS = ['isyn.tk', '192.168.1.105', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'LandPage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
