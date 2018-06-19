@@ -25,13 +25,25 @@ SECRET_KEY = '#r394am$y(&xrwvxye27ny%d45_f-*g3sc7t7203nwp71%$7n%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['isyn.tk', '195.123.225.209', '127.0.0.1']
+ALLOWED_HOSTS = ['isyn.tk', '192.168.1.105']
 
+#EMAIL settings
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'cypherdesk.isyn@gmail.com'
+EMAIL_HOST_PASSWORD = 'HackersChoose1syn'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+#GOOGLE RECAPTCHA
+GOOGLE_RECAPTCHA_SITE_KEY = '6LdFjF8UAAAAAF7w-ZN0QNLIgMyCLjBvZE4_FLlO'
+GOOGLE_RECAPTCHA_SECRET_KEY = '6LdFjF8UAAAAAHVxsXjpm7ZHKjMrxc5pUM9bc2v3'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'g_recaptcha',
     'LandPage',
+    'Feedback',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
