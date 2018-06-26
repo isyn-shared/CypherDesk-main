@@ -1,4 +1,4 @@
-$("#message_title").keyup( function () {
+$("#message_title").keyup(() => {
 
     $.ajax({
         type: "GET",
@@ -11,14 +11,13 @@ $("#message_title").keyup( function () {
         dataType: "text",
         cache: false,
 
-        success: function (data)
-        {
-            var titles = data.split("~");
-            var result = "";
+        success: data => {
+            let titles = data.split("~");
+            let result = "";
 
-            for(var i = 0; i < titles.length; i++)
-                if(titles[i] != "" && titles[i] != " ")
-                    result += "<h5>Title " + (i + 1).toString() + ": " + titles [i] + "</h5>";
+            for (let i = 0; i < titles.length; i++)
+                if (titles[i] != "" && titles[i] != " ")
+                    result += `<h5>Title ${i + 1} : ${titles[i]}</h5>`;
 
             $("div.hint_titles").html(result);
         }
