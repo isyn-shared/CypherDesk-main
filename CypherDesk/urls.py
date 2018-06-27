@@ -6,4 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('LandPage.urls')),
     path('feedback/', include('Feedback.urls')),
+    path('news/', include('News.urls')),
+    path('telegram/', include('TelegramBot.urls')),
 ]
