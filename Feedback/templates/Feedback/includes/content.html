@@ -31,8 +31,15 @@
                     <h4>Тема</h4>
                     <hr>
                     <input type="text" class="text" required placeholder="Старайтесь сформулировать тему кратко"
-                           id = "message_title" name = "message_title" style="width: 70%;">
+                           id = "message_title" name = "message_title" style="width: 70%;"
+                           onblur="$('.hint_titles_wrapper').addClass('hidden');">
                 </fieldset>
+                <fieldset class="hint_titles_wrapper hidden">
+                        <h2>Пользователи уже спрашивали: </h2>
+                        <div class="hint_titles">
+        
+                        </div>
+                </fieldset> 
                 <fieldset>
                     <h4>Опишите Вашу проблему</h4>
                     <hr>
@@ -44,9 +51,8 @@
                         aria-multiline="true" id = "message_text" name = "message_text" required></div>
                 </fieldset>
                 <div class="g-recaptcha" data-sitekey="6LdFjF8UAAAAAF7w-ZN0QNLIgMyCLjBvZE4_FLlO"></div>
-                <input type="submit" id = "send_feedback_form" style="margin-top: 5px; font-size: 20px;" placeholder="Отправить">
+                <button id="send_feedback_form" style="margin-top: 5px; font-size: 20px;" onclick="return false">Отправить</button>
             </form>
-            <div class="hint_titles"></div>
         </div>
     </div>
 </div>
