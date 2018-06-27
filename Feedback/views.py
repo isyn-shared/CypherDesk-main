@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
 from Feedback.models import FeedbackRecord
 from difflib import get_close_matches
 from django.core.mail import send_mail, BadHeaderError, EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from g_recaptcha.validate_recaptcha import validate_captcha
+import requests, re
 
 context = {
     'GOOGLE_RECAPTCHA_SITE_KEY': settings.GOOGLE_RECAPTCHA_SITE_KEY,
@@ -14,35 +14,49 @@ context = {
 def index (request):
     return render (request, 'Feedback/wrapper.html')
 
-@validate_captcha
+#@validate_captcha
 def send (request):
     if request.POST:
-        HttpResponseRedirect("/")
+        successful_mail = True
+        result_mail_message = ""
+
         feedback_data = request.POST
         user_name = feedback_data['user_name']
         user_email = feedback_data['user_email']
         message_title = feedback_data['message_title']
-        message_text = "Hello WORLD!!! My name is " +  user_name   #feedback_data['message_text']
+        message_text = "Your project is a fucking shit"   #feedback_data['message_text']
 
         """sending emails"""
-        email_subject = "Что-то там " + message_title
-        email_text_content = "Здороу, " + user_name
         from_email = "cypherdesk.isyn@gmail.com"
-        email_html_content = "<h1> KekLOL </h1>"
+        email_subject = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/title.txt").read()
+        re.sub("{TITLE}", message_text, email_subject)
+        email_html_content = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/body.html").read()
+        email_text_content = ""
 
-        msg = EmailMultiAlternatives(email_subject, email_text_content, from_email, [user_email, from_email])
+        msg = EmailMultiAlternatives(email_subject, email_text_content, from_email, [user_email,])
         msg.attach_alternative(email_html_content, "text/html")
 
-        if email_subject and email_text_content and from_email and user_email:
+        """post request on telegram app"""
+        telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nMessage: " + message_text
+        url = settings.HOSTNAME + 'telegram/send/'
+        data = {'chat_name': 'feedback', 'token_name': 'feedback', 'text': telegram_message}
+        result_telegram_mes = requests.post(url, data=data).text
+
+
+        if email_subject and email_html_content and from_email and user_email:
             try:
                 msg.send()
             except BadHeaderError:
-                return HttpResponse('Invalid header found.')
-            return HttpResponse('Thanks, your email was sended')
+                result_mail_message = 'Invalid header found.'
+                successful_mail = False
+            result_mail_message = 'Thanks, your email was sent'
         else:
             # In reality we'd use a form class
             # to get proper validation errors.
-            return HttpResponse('Make sure all fields are entered and valid.')
+            result_mail_message = 'Make sure all fields are entered and valid.'
+            successful_mail = False
+
+        return HttpResponse("<h5>Mail: " + result_mail_message + "</h5><h5>Telegram: " + result_telegram_mes + "</h5>")
 
 def found_titles (request):
     if request.GET:
