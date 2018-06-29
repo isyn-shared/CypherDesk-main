@@ -21,8 +21,6 @@ $("#message_title").keyup(() => {
 
             $("div.hint_titles").html(result);
 
-            console.log(titles.length);
-
             if (titles.length == 1) $('.hint_titles_wrapper').addClass('hidden');
             else $('.hint_titles_wrapper').removeClass('hidden');
         }

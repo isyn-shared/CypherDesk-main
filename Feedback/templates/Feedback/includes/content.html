@@ -21,7 +21,7 @@
         <div class="container">
             <h2>Заполните форму</h2>
             <h4>Убедитесь, что E-mail введен корректно</h4>
-            <form method="post" action = "{% url 'send_feedback' %}">
+            <form>
                 {% csrf_token %}
                 <fieldset>
                     <h4>Контактная информация</h4>
@@ -51,7 +51,7 @@
                         aria-multiline="true" id = "message_text" name = "message_text" required></div>
                 </fieldset>
                 <div class="g-recaptcha" data-sitekey="6LdFjF8UAAAAAF7w-ZN0QNLIgMyCLjBvZE4_FLlO"></div>
-                <button id="send_feedback_form" style="margin-top: 5px; font-size: 20px;" onclick="return false">Отправить</button>
+                <button type="submit" id="send_feedback_form" style="margin-top: 5px; font-size: 20px;" onclick="return false">Отправить</button>
             </form>
         </div>
     </div>

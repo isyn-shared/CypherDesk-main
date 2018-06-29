@@ -6,8 +6,6 @@ $('#send_feedback_form').click(() => {
         title = $('#message_title').val(),
         text = $('.pseudotextarea').text();
 
-    alert(name + " " + email + " " + title + " " + text);
-
     let body = 'user_name=' + encodeURI(name) +
       '&user_email=' + encodeURI(email) +
       '&message_title=' + encodeURI(title) +

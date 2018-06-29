@@ -1,0 +1,7 @@
+{% for post in news %}
+    <h1>{{post.title}}</h1>
+    <p><b>Короткая новость:</b> {{post.short_news}}</p>
+    <p><b>Нормальная новость:</b> {{post.news}}</p>
+    <p><b>Дата публикации:</b> {{post.date|date:"d-m-Y h:m"}}</p>
+    <hr />
+{% endfor %}
