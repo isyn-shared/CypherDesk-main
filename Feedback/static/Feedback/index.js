@@ -1,12 +1,12 @@
 $('#send_feedback_form').click(() => {
     let xhr = new XMLHttpRequest();
 
-    let name = $('#user_name').text(),
-        email = $('#user_email').text(),
-        title = $('#message_title').text(),
+    let name = $('#user_name').val(),
+        email = $('#user_email').val(),
+        title = $('#message_title').val(),
         text = $('.pseudotextarea').text();
 
-    console.log(name, email, title, text);
+    alert(name + " " + email + " " + title + " " + text);
 
     let body = 'user_name=' + encodeURI(name) +
       '&user_email=' + encodeURI(email) +
@@ -21,10 +21,7 @@ $('#send_feedback_form').click(() => {
     
     xhr.onreadystatechange = event => {
         if (xhr.readyState == 4) {
-            console.log(xhr.status, event.currentTarget.responseText);
             if (xhr.status != 200) return;
-
-            // Do stuff
         }
     };
     

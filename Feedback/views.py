@@ -24,7 +24,7 @@ def send (request):
         user_name = feedback_data['user_name']
         user_email = feedback_data['user_email']
         message_title = feedback_data['message_title']
-        message_text = "Your project is a fucking shit"   #feedback_data['message_text']
+        message_text = feedback_data['message_text']
 
         """sending emails"""
         from_email = "cypherdesk.isyn@gmail.com"
