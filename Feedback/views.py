@@ -29,7 +29,7 @@ def send (request):
         """sending emails"""
         from_email = "cypherdesk.isyn@gmail.com"
         email_subject = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/title.txt").read()
-        email_subject = re.sub("{TITLE}", message_text, email_subject)
+        email_subject = re.sub("{TITLE}", message_title, email_subject)
         email_html_content = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/body.html").read()
         email_text_content = ""
 
