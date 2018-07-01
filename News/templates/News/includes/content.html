@@ -1,7 +1,8 @@
 {% for post in news %}
-    <h1>{{post.title}}</h1>
-    <p><b>Короткая новость:</b> {{post.short_news}}</p>
-    <p><b>Нормальная новость:</b> {{post.news}}</p>
-    <p><b>Дата публикации:</b> {{post.date|date:"d-m-Y h:m"}}</p>
-    <hr />
+    <div class="container py-5 whitebox show show{{forloop.counter}}" style="margin-top: 20px">
+        <a href="./full/?id={{post.id}}"><h2>{{post.title}}</h2></a>
+        <p><b>Коротко:</b> {{post.short_news}}</p>
+        <p><b>Дата публикации:</b> {{post.date|date:"d-m-Y h:m"}}</p>
+        <hr />
+    </div>
 {% endfor %}

@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href = "{% static 'css/bootstrap4-business-tycoon.min.css' %}">
-    <link rel="stylesheet" href = "{% static 'News/mycss.css' %}">
+    <link rel="stylesheet" href = "{% static 'News/Full/mycss.css' %}">
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
 
     <title> CypherDesk - Ваш выбор среди систем документооборота для предприятий </title>
@@ -19,8 +19,8 @@
 
 <body>
 
-    {% block header %} {% include "News/includes/header.html" %} {% endblock %}
-    {% block content %} {% include "News/includes/content.html" %} {% endblock %}
+    {% block header %} {% include "News/Full/includes/header.html" %} {% endblock %}
+    {% block content %} {% include "News/Full/includes/content.html" %} {% endblock %}
     {% block footer %} {% include "LandPage/includes/footer.html" %} {% endblock %}
 
         <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
