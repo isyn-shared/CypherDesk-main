@@ -18,18 +18,18 @@ def index (request):
 def send (request):
     if request.POST:
         successful_mail = True
-        result_mail_message = ""
+        #esult_mail_message = ""
 
         feedback_data = request.POST
         user_name = feedback_data['user_name']
         user_email = feedback_data['user_email']
         message_title = feedback_data['message_title']
-        message_text = "Your project is a fucking shit"   #feedback_data['message_text']
+        message_text = feedback_data['message_text']
 
         """sending emails"""
         from_email = "cypherdesk.isyn@gmail.com"
         email_subject = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/title.txt").read()
-        re.sub("{TITLE}", message_text, email_subject)
+        email_subject = re.sub("{TITLE}", message_title, email_subject)
         email_html_content = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/body.html").read()
         email_text_content = ""
 
@@ -47,16 +47,17 @@ def send (request):
             try:
                 msg.send()
             except BadHeaderError:
-                result_mail_message = 'Invalid header found.'
+                #result_mail_message = 'Invalid header found.'
                 successful_mail = False
-            result_mail_message = 'Thanks, your email was sent'
+            #result_mail_message = 'Thanks, your email was sent'
         else:
             # In reality we'd use a form class
             # to get proper validation errors.
-            result_mail_message = 'Make sure all fields are entered and valid.'
+            #result_mail_message = 'Make sure all fields are entered and valid.'
             successful_mail = False
 
-        return HttpResponse("<h5>Mail: " + result_mail_message + "</h5><h5>Telegram: " + result_telegram_mes + "</h5>")
+        #result = {'result_mail_message': result_mail_message, 'result_telegram': result_telegram_mes}
+        return HttpResponse(successful_mail)
 
 def found_titles (request):
     if request.GET:

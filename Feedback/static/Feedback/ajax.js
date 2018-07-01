@@ -17,9 +17,12 @@ $("#message_title").keyup(() => {
 
             for (let i = 0; i < titles.length; i++)
                 if (titles[i] != "" && titles[i] != " ")
-                    result += `<h5>Title ${i + 1} : ${titles[i]}</h5>`;
+                    result += `<h3>${titles[i]}</h3>`;
 
             $("div.hint_titles").html(result);
+
+            if (titles.length == 1) $('.hint_titles_wrapper').addClass('hidden');
+            else $('.hint_titles_wrapper').removeClass('hidden');
         }
     });
 });

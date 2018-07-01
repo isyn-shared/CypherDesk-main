@@ -2,6 +2,10 @@ h1 {
     font-size: 50px;
 }
 
+h2 {
+    font-size: 45px;
+}
+
 p {
     font-size: 30px;
 }
@@ -28,7 +32,7 @@ input.text {
     text-align: center;
     margin-bottom: 10px;
     font-size: 1.5em;
-    //height: 1em;
+    height: 1em;
     box-shadow: none;
     transition: box-shadow .33s ease-out;
 }
@@ -62,6 +66,19 @@ body {
 
 .solidbackground {
     background-color: rgba(255, 255, 255, 1) !important;
+}
+
+.hint_titles_wrapper {
+    text-align: center;
+    display: block;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.hint_titles {
+    text-align: center;
 }
 
 .pseudotextarea {
