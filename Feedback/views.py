@@ -31,6 +31,9 @@ def send (request):
         email_subject = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/title.txt").read()
         email_subject = re.sub("{TITLE}", message_title, email_subject)
         email_html_content = open(settings.BASE_DIR + "/Feedback/templates/Feedback/mail/body.html").read()
+        email_html_content = re.sub("{TITLE}", message_title, email_html_content)
+        email_html_content = re.sub("{USERNAME}", user_name, email_html_content)
+        email_html_content = re.sub("{CONTACTLINK}", "Пока нигде, кек)", email_html_content)
         email_text_content = ""
 
         msg = EmailMultiAlternatives(email_subject, email_text_content, from_email, [user_email,])
