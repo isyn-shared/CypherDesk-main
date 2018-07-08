@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from . import TelegramBotClass
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from  django.http import HttpResponse, HttpResponseRedirect
+from  django.http import HttpResponse
 
 @csrf_exempt
 def send(request):
@@ -19,5 +18,5 @@ def send(request):
         telegram_bot_obj = TelegramBotClass.TelegramBot(token)
         result = telegram_bot_obj.send_message(chat_id, text)
 
-        return HttpResponse("Success")
-    return HttpResponse("Error")
+        return HttpResponse(True)
+    return HttpResponse(False)

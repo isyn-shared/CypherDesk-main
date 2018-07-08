@@ -45,6 +45,7 @@ FEEDBACK_TELEGRAM_CHAT_ID = {'feedback': -1001173635794, }
 # Application definition
 
 INSTALLED_APPS = [
+    'MailAgent',
     'TelegramBot',
     'News',
     'g_recaptcha',

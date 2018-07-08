@@ -12,6 +12,8 @@ $("#message_title").keyup(() => {
         cache: false,
 
         success: data => {
+            //alert(data[5]);
+
             let titles = data.split("~");
             let result = "";
 
