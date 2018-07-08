@@ -5,7 +5,9 @@ def index(request):
     return render(request, 'LandPage/wrapper.html')
 
 def error_500(request):
-    return HttpResponse("500, дебил")
+    data = {}
+    return render(request, 'LandPage/500/error_500.html', data)
 
-def error_404(request):
-    return HttpResponse("404, дебил")
+def error_404(request, exception):
+    data = {}
+    return render(request,'LandPage/404/error_404.html', data)

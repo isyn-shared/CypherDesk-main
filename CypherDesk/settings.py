@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#r394am$y(&xrwvxye27ny%d45_f-*g3sc7t7203nwp71%$7n%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['isyn.tk', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 #EMAIL settings
 EMAIL_HOST = 'smtp.gmail.com'
