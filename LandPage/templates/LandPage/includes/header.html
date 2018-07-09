@@ -1,20 +1,34 @@
-{% block header %}
+{% block header %} {% load staticfiles %}
 
-{% load staticfiles %}
+<div class="jumbotron bg-dark text-white mb-0 show show1">
+    <div class="container">
 
-    <div class="jumbotron bg-dark text-white mb-0 show show1">
-        <div class="container">
-            <h1 class="display-3 text-light">CypherDesk</h1>
-            <h2 class="mb-2 display-5">Ваш выбор среди систем документооборота для предприятий</h2>
-            <div class="mt-4">
-                <a href="/download" class="btn btn-primary btn-lg my-2 mr-2">
-                    <span>Скачать CypherDesk</span>
-                </a>
+        <ul class="nav nav-pills" style="float: right;">
+            <li class="nav-item">
+                <a class="nav-link active" href="#!">Главная страница</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/news">Новости</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/feedback">Обратная связь</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#!">Контакты</a>
+            </li>
+        </ul>
 
-                <a href="/login" class="btn btn-outline-light btn-hover-text-light btn-lg my-2">
-                    <span>Регистрация / Логин</span>
-                </a>
-            </div>
+        <h1 class="display-3 text-light">CypherDesk</h1>
+        <h2 class="mb-2 display-5">Ваш выбор среди систем документооборота для предприятий</h2>
+        <div class="mt-4">
+            <a href="/download" class="btn btn-primary btn-lg my-2 mr-2">
+                <span>Скачать CypherDesk</span>
+            </a>
+
+            <a href="/login" class="btn btn-outline-light btn-hover-text-light btn-lg my-2">
+                <span>Регистрация / Логин</span>
+            </a>
         </div>
     </div>
+</div>
 {% endblock %}
