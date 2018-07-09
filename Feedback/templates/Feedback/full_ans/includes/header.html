@@ -1,10 +1,10 @@
 {% block header %}
- 
+
 {% load staticfiles %}
- 
+
     <div class="jumbotron bg-dark text-white mb-0 show show1">
         <div class="container">
- 
+
             <ul class="nav nav-pills" style="float: right">
                 <li class="nav-item">
                     <a class="nav-link" href="../">Главная страница</a>
@@ -19,16 +19,17 @@
                     <a class="nav-link disabled" href="#!">Контакты</a>
                 </li>
             </ul>          
- 
-            <h1 class="display-3 text-light">{{post.title}}</h1>
-            <h2 class="mb-2 display-5">{{post.short_news}}</h2>
- 
+
+            <h1 class="display-4 text-light" style="margin-top: 20px">Ответ на вопрос:</h1>
+            <h2 class="display-4 mb-2" style="margin-top: 20px">{{ans.title}}</h2>
+
             <div class="mt-4">
-                <a href="../" class="btn btn-primary btn-lg my-2 mr-2">
-                    <span>Назад к новостям</span>
+                <!-- Люблю костылики)00 -->
+                <a href="../../../" class="btn btn-primary btn-lg my-2 mr-2">
+                    <span>На главную</span>
                 </a>
             </div>
- 
+
         </div>
     </div>
 {% endblock %}

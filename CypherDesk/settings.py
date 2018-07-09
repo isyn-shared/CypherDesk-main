@@ -23,22 +23,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#r394am$y(&xrwvxye27ny%d45_f-*g3sc7t7203nwp71%$7n%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-#EMAIL settings
+# EMAIL settings
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'cypherdesk.isyn@gmail.com'
 EMAIL_HOST_PASSWORD = 'HackersChoose1syn'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-#GOOGLE RECAPTCHA
+# GOOGLE RECAPTCHA
 GOOGLE_RECAPTCHA_SITE_KEY = '6LdFjF8UAAAAAF7w-ZN0QNLIgMyCLjBvZE4_FLlO'
 GOOGLE_RECAPTCHA_SECRET_KEY = '6LdFjF8UAAAAAHVxsXjpm7ZHKjMrxc5pUM9bc2v3'
 
-#Telegram Bot
+# Telegram Bot
 FEEDBACK_TELEGRAM_BOT_KEY = {'feedback': '502481144:AAF0Nww9QBmwCJMKAtmuCwR_RZ7NpGqPBsQ', }
 FEEDBACK_TELEGRAM_CHAT_ID = {'feedback': -1001173635794, }
 
