@@ -12,18 +12,16 @@ $("#message_title").keyup(() => {
         cache: false,
 
         success: data => {
-            //alert(data[5]);
+            data = JSON.parse(data);
 
-            let titles = data.split("~");
             let result = "";
 
-            for (let i = 0; i < titles.length; i++)
-                if (titles[i] != "" && titles[i] != " ")
-                    result += `<h3>${titles[i]}</h3>`;
+            for (let element of data)
+                result += `<h2><a href="./answer/?id=${element.id}">${element.title}</a></h2>`;
 
             $("div.hint_titles").html(result);
 
-            if (titles.length == 1) $('.hint_titles_wrapper').addClass('hidden');
+            if (!data.length) $('.hint_titles_wrapper').addClass('hidden');
             else $('.hint_titles_wrapper').removeClass('hidden');
         }
     });

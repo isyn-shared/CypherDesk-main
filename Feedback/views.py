@@ -53,12 +53,12 @@ def found_titles (request):
         records = FeedbackRecord.objects.all()
         context = dict(records=records)
         current_title = request.GET['message_title']
-        result = {}
+        result = []
 
         for record in records:
             dis = ComparsionTitles(current_title, record.title)
             if dis >= 0.6:
-                result[record.id] = {'title': record.title, 'dis': dis}
+                result.append({'id': record.id, 'title': record.title, 'dis': dis})
 
         result = simplejson.dumps(result)
         return HttpResponse(result)

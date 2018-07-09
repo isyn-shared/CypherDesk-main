@@ -15,8 +15,8 @@ def error_500(request):
 
     data['telegram'] = result_telegram
 
-    return render(request, 'LandPage/500/error_500.html', data)
+    return render(request, '500/error_500.html', data)
 
 def error_404(request, exception):
     data = {}
-    return render(request,'LandPage/404/error_404.html', data)
+    return render(request,'404/error_404.html', data)
