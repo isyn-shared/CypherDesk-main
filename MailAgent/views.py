@@ -1,9 +1,15 @@
 from django.core.mail import BadHeaderError, EmailMultiAlternatives
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 @csrf_exempt
 def send(request):
+    client_ip = str(request.META['REMOTE_ADDR'])
+    if client_ip != '127.0.0.1':
+        return PermissionDenied
+
     if request.POST:
         mail_res = False
         from_mail = request.POST['from']
@@ -37,4 +43,4 @@ def send(request):
             mail_res = False
 
         return HttpResponse(mail_res)
-    return HttpResponse(False)
+    return HttpResponseRedirect(settings.HOSTNAME + '404/')
