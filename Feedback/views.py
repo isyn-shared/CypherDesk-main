@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from Feedback.models import FeedbackRecord
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.conf import settings
 from g_recaptcha.validate_recaptcha import validate_captcha
 import requests, re, distance, simplejson
@@ -46,7 +46,7 @@ def send (request):
         result_mail = requests.post(url, data=data).text
 
         return HttpResponse(result_mail and result_telegram)
-    return HttpResponse(False)
+    raise Http404()
 
 def found_titles (request):
     if request.GET:
@@ -62,6 +62,7 @@ def found_titles (request):
 
         result = simplejson.dumps(result)
         return HttpResponse(result)
+    raise Http404()
 
 def ComparsionTitles (s1, s2):
     arr1 = s1.split(' ')
@@ -78,16 +79,12 @@ def ComparsionTitles (s1, s2):
     return(sum_dis)
 
 def get_answer(request):
+    result = {}
     if request.GET:
-        result = {}
         id = request.GET['id']
 
         if FeedbackRecord.objects.filter(id=id):
             ans = FeedbackRecord.objects.filter(id=id)[0]
             result['ans'] = ans
             return render(request, 'Feedback/full_ans/wrapper.html', result)
-
-        else:
-            return HttpResponse("Нет такой новости!")
-
-    return HttpResponse("Error")
+    return HttpResponseRedirect(settings.HOSTNAME + '404/')
