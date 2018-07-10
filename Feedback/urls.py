@@ -6,4 +6,5 @@ urlpatterns = [
     path('send/', views.send, name='send_feedback'),
     path('found_titles/', views.found_titles, name='found_titles'),
     path('answer/', views.get_answer, name='answer'),
+    path('faq/', views.faq, name='faq'),
 ]

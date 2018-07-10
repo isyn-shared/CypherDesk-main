@@ -1,12 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from News.models import NewsRecord
+from django.conf import settings
 
 def index(request):
     records = NewsRecord.objects.all()
     result = {}
     result['news'] = []
-
     for record in records:
         result['news'].insert(0, {'title': record.title, 'short_news': record.short_news, 'news': record.news, 'date': record.date, 'id': record.id})
 
@@ -21,4 +21,4 @@ def full(request):
         result['post'] = post
         return render(request, 'News/Full/wrapper.html', result)
     
-    return HttpResponse('Ошибка 404 - Вы Кек')
+    return HttpResponseRedirect(settings.HOSTNAME + '404/')

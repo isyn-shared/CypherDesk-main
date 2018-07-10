@@ -51,7 +51,6 @@ def send (request):
 def found_titles (request):
     if request.GET:
         records = FeedbackRecord.objects.all()
-        context = dict(records=records)
         current_title = request.GET['message_title']
         result = []
 
@@ -88,3 +87,12 @@ def get_answer(request):
             result['ans'] = ans
             return render(request, 'Feedback/full_ans/wrapper.html', result)
     return HttpResponseRedirect(settings.HOSTNAME + '404/')
+
+def faq(request):
+    records = FeedbackRecord.objects.all()
+    result = []
+
+    for record in records:
+        result.append({'id': record.id, 'title': record.title})
+
+    return HttpResponse(result)
