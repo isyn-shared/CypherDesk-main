@@ -90,9 +90,10 @@ def get_answer(request):
 
 def faq(request):
     records = FeedbackRecord.objects.all()
-    result = []
+    result = {}
+    result['faq'] = []
 
     for record in records:
-        result.append({'id': record.id, 'title': record.title})
+        result['faq'].append({'id': record.id, 'title': record.title})
 
-    return HttpResponse(result)
+    return render(request, 'Feedback/faq/wrapper.html', result)

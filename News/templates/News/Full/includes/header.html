@@ -3,9 +3,18 @@
 {% load staticfiles %}
  
     <div class="jumbotron bg-dark text-white mb-0 show show1">
-        <div class="container">
+        <div class="container">         
  
-            <ul class="nav nav-pills" style="float: right">
+            <h1 class="display-3 text-light">{{post.title}}</h1>
+            <h2 class="mb-2 display-5">{{post.short_news}}</h2>
+ 
+            <div class="mt-4">
+                <a href="../" class="btn btn-primary btn-lg my-2 mr-2">
+                    <span>Назад к новостям</span>
+                </a>
+            </div>
+
+            <ul class="nav nav-pills" style="float: right;">
                 <li class="nav-item">
                     <a class="nav-link" href="../">Главная страница</a>
                 </li>
@@ -18,16 +27,7 @@
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#!">Контакты</a>
                 </li>
-            </ul>          
- 
-            <h1 class="display-3 text-light">{{post.title}}</h1>
-            <h2 class="mb-2 display-5">{{post.short_news}}</h2>
- 
-            <div class="mt-4">
-                <a href="../" class="btn btn-primary btn-lg my-2 mr-2">
-                    <span>Назад к новостям</span>
-                </a>
-            </div>
+            </ul> 
  
         </div>
     </div>
