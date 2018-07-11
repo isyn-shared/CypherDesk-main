@@ -45,6 +45,7 @@ FEEDBACK_TELEGRAM_CHAT_ID = {'feedback': -1001173635794, }
 # Application definition
 
 INSTALLED_APPS = [
+    'AdminPanel',
     'MailAgent',
     'TelegramBot',
     'News',
@@ -134,6 +135,8 @@ USE_L10N = True
 USE_TZ = True
 
 CSRF_COOKIE_SECURE = True
+
+#SESSION_SAVE_EVERY_REQUEST = True
 
 
 # Static files (CSS, JavaScript, Images)

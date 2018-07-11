@@ -13,13 +13,13 @@ $('#send_feedback_form').click(() => {
       '&user_email=' + encodeURI(email) +
       '&message_title=' + encodeURI(title) +
       '&message_text=' + encodeURI(text);
-    
+
     xhr.open("POST", '/feedback/send/', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     let csrftoken = Cookies.get('csrftoken');
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    
+
     xhr.onreadystatechange = event => {
         if (xhr.readyState == 4) {
             console.log(xhr.status, xhr.response);
@@ -39,6 +39,6 @@ $('#send_feedback_form').click(() => {
             }
         }
     };
-    
+
     xhr.send(body);
 });

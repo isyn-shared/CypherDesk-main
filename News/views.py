@@ -17,8 +17,10 @@ def full(request):
 
     if (request.GET):
         id = request.GET['id']
-        post = NewsRecord.objects.filter(id=id)[0]
-        result['post'] = post
-        return render(request, 'News/Full/wrapper.html', result)
+
+        if NewsRecord.objects.filter(id=id):
+            post = NewsRecord.objects.filter(id=id)[0]
+            result['post'] = post
+            return render(request, 'News/Full/wrapper.html', result)
     
     return HttpResponseRedirect(settings.HOSTNAME + '404/')

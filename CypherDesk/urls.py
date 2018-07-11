@@ -5,7 +5,8 @@ from LandPage import views as Landpage_views
 
 urlpatterns = [
     path('', include('LandPage.urls')),
-    path('admin/', admin.site.urls),
+    path('custom_admin/', include('AdminPanel.urls')),
+    path('standart_admin/', admin.site.urls),
     path('feedback/', include('Feedback.urls')),
     path('news/', include('News.urls')),
     path('telegram/', include('TelegramBot.urls')),
