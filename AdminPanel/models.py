@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 import hashlib
 
 class AdminPanelUser (models.Model):
@@ -21,4 +22,13 @@ class AdminPanelUser (models.Model):
             md5.update(sha256.hexdigest().encode('utf-8'))
             self.password = md5.hexdigest()
 
+            if AdminPanelUser.chkUserName(self.username):
+                raise ValidationError('Такой логин уже существует!')
+
         super(AdminPanelUser, self).save(args, kwargs)
+
+    @staticmethod
+    def chkUserName(username):
+        if AdminPanelUser.objects.filter(username=username):
+            return True
+        return False
