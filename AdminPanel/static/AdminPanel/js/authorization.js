@@ -1,7 +1,6 @@
 $('#send_authorization_form').click(() => {
     $("#send_authorization_form").attr('disabled', 'true');
     swal('Секундочку...', 'Проходит авторизация', 'info');
-
     let xhr = new XMLHttpRequest();
 
     let login = $("#login").val(),
