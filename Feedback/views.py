@@ -48,16 +48,25 @@ def send (request):
         return HttpResponse(result_mail and result_telegram)
     raise Http404()
 
+def sort_col(i):
+    return i['dis']
+
 def found_titles (request):
+    TITLES_LIMIT = 5
     if request.GET:
         records = FeedbackRecord.objects.all()
         current_title = request.GET['message_title']
         result = []
 
         for record in records:
-            dis = ComparsionTitles(current_title, record.title)
-            if dis >= 0.6:
-                result.append({'id': record.id, 'title': record.title, 'dis': dis})
+            cnt = ComparsionTitles(current_title, record.title)
+            if cnt >= 1:
+                result.append({'id': record.id, 'title': record.title, 'dis': cnt})
+
+        result.sort(key=sort_col, reverse=True)
+
+        if len(result) > TITLES_LIMIT:
+            result = result[:TITLES_LIMIT]
 
         result = simplejson.dumps(result)
         return HttpResponse(result)
@@ -67,15 +76,17 @@ def ComparsionTitles (s1, s2):
     arr1 = s1.split(' ')
     arr2 = s2.split(' ')
 
-    sum_dis = 0
-    for word1 in arr1:
-        tmp_dis = 0
-        for word2 in arr2:
-            tmp_dis = max(tmp_dis, 1 - distance.jaccard(word1.lower(), word2.lower()))
-        sum_dis += tmp_dis
+    exc_dict = ['at', 'in', 'is']
 
-    sum_dis = sum_dis / min(len(arr1), len(arr2))
-    return(sum_dis)
+    cnt = 0
+    for word1 in arr1:
+        for word2 in arr2:
+            if word1 in exc_dict or word2 in exc_dict or len(word1) < 2  or len(word2) < 2:
+                continue
+            tmp_dis = 1 - distance.jaccard(word1.lower(), word2.lower())
+            if tmp_dis >= 0.8:
+                cnt += 1
+    return(cnt)
 
 def get_answer(request):
     result = {}

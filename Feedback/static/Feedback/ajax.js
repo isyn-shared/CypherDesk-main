@@ -15,9 +15,6 @@ $("#message_title").keyup(() => {
             data = JSON.parse(data);
 
             let result = "";
-            data.sort((a, b) => (a.dis <= b.dis ? 1 : 0));
-
-            // console.log(data);
 
             for (let element of data)
                 result += `<h2><a href="./answer/?id=${element.id}">${element.title}</a></h2>`;
