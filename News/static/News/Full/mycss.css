@@ -1,0 +1,29 @@
+pre {
+    font-size: 24px;
+    white-space: pre-line;
+}
+
+.whitebox {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+}
+
+.newsbox {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f5f5f5
+}
+
+body {
+    background-image: url("img/background.jpg");
+    background-position-x: 30%;
+    background-repeat: repeat-y;
+}
+
+.show {
+    display: none;
+}
+
+.solidbackground {
+    background-color: rgba(255, 255, 255, 1) !important;
+}

@@ -1,0 +1,36 @@
+<!-- {% load staticfiles %} -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ошибка 500 - CypherDesk</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href = "{% static 'css/bootstrap4-business-tycoon.min.css' %}">
+    <link rel="stylesheet" href = "{% static 'LandPage/mycss.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" />
+</head>
+
+<body>
+    <div class="container wrapper">
+        <div class="whitebox box p-3" style="text-align: center; margin-top: calc(45% - 175px)">
+            <h1 class="display-1"> 500 </h1>
+            <p>При обработке Вашего запроса что-то пошло катастрофически не так.</p>
+            <p>Наша команда уже работает над данной проблемой</p>
+            <a href="#!" id="homeBtn" class="btn btn-primary">Вернуться на главную</a>
+        </div>
+    </div>
+
+    <script>
+        let hostName = document.URL.split('/')[2];
+        let homePage = `http://${hostName}/`;
+        document.getElementById('homeBtn').href = homePage;
+    </script>
+</body>
+
+</html>

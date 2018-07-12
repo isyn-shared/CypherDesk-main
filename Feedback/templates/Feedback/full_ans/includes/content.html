@@ -1,0 +1,13 @@
+{% block content %}
+
+{% load staticfiles %}
+
+<div class="container py-5 whitebox show show2" style="margin-top: 20px">
+    <h1>Проблема:</h1>
+    <pre class="mb-2 display-5 newsbox">{{ans.problem}}</pre>
+    <hr >
+    <h1>Ответ администрации:</h1>
+    <pre class="mb-2 display-5 newsbox">{{ans.answer}}</pre>
+</div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% block header %}
+
+{% load staticfiles %}
+
+    <div class="jumbotron bg-dark text-white mb-0 show show1">
+        <div class="container">
+
+            <ul class="nav nav-pills" style="float: right">
+                <li class="nav-item">
+                    <a class="nav-link" href="../../">Главная страница</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../news">Новости</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#!">Обратная связь</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contacts">Контакты</a>
+                </li>
+            </ul>            
+
+            <h1 class="display-3 text-light">Частые вопросы</h1>
+            <h2 class="mb-2 display-5">В этом разделе публикуются часто задаваемые вопросы пользователей</h2>
+
+            <div class="mt-4">
+                <a href="../" class="btn btn-primary btn-lg my-2 mr-2">
+                    <span>Назад к обратной связи</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

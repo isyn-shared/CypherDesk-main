@@ -1,0 +1,115 @@
+h1 {
+    font-size: 50px;
+}
+
+h2 {
+    font-size: 45px;
+}
+
+p.bigfont {
+    font-size: 30px;
+}
+
+label {
+    font-size: 20px;
+}
+
+fieldset {
+    border: 2px groove rgb(212, 212, 212);
+    border-radius: 4px;
+    padding: 8px;
+}
+
+input.text {
+    background: transparent;
+    padding: 10px;
+    padding-bottom: 20px;
+    border-top: none;
+    border-left: none;
+    border-bottom: 1px solid;
+    border-right: none;
+    border-color: gray;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    height: 1em;
+    box-shadow: none;
+    transition: box-shadow .33s ease-out;
+}
+
+input:focus {
+    box-shadow: 0 5px 0 -4px currentColor;
+    outline: none;
+}
+
+#form {
+    margin-top: 40px;
+    border-radius: 0;
+    text-align: center;
+    padding: 4px;
+    margin-bottom: 100px;
+}
+
+.whitebox {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+}
+
+body {
+    background-position-x: 30%;
+    background-repeat: repeat-y;
+}
+
+.show {
+    display: none;
+}
+
+.solidbackground {
+    background-color: rgba(255, 255, 255, 1) !important;
+}
+
+.hint_titles_wrapper {
+    text-align: center;
+    display: block;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.hint_titles {
+    text-align: center;
+}
+
+.pseudotextarea {
+    text-align: left;
+    background-color: #eeeeee;
+    padding: 3px;
+    width: 100%;
+    min-height: 100px;
+    max-height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    user-select: text;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 24px;
+    line-height: 20px;
+    vertical-align: baseline;
+}
+
+.pseudotextarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pseudotextarea::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+}
+
+.pseudotextarea::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+}

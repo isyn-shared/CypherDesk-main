@@ -1,0 +1,35 @@
+{% block header %}
+
+{% load staticfiles %}
+
+    <div class="jumbotron bg-dark text-white mb-0 show show1">
+        <div class="container">
+
+            <ul class="nav nav-pills" style="float: right">
+                <li class="nav-item">
+                    <a class="nav-link" href="../../">Главная страница</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../news">Новости</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#!">Обратная связь</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contacts">Контакты</a>
+                </li>
+            </ul>          
+
+            <h1 class="display-4 text-light" style="margin-top: 20px">Ответ на вопрос:</h1>
+            <h2 class="display-4 mb-2" style="margin-top: 20px">{{ans.title}}</h2>
+
+            <div class="mt-4">
+                <!-- Люблю костылики)00 -->
+                <a href="../faq" class="btn btn-primary btn-lg my-2 mr-2">
+                    <span>Назад к вопросам</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

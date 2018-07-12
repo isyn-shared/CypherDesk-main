@@ -1,3 +1,4 @@
 from django.contrib import admin
+from LandPage.models import Error500Record
 
-# Register your models here.
+admin.site.register(Error500Record)
