@@ -35,7 +35,6 @@ def full(request):
                 tmp_include = re.sub("{SRC}", post.image1.url, img_html_template)
                 tmp_include = re.sub("{A_SRC}", A_SRC, tmp_include)
                 text = text.replace(im_tem1, tmp_include)
-                print(text)
             if post.image2:
                 A_SRC = settings.HOSTNAME + post.image2.url[1:]
                 tmp_include = re.sub("{SRC}", post.image2.url, img_html_template)

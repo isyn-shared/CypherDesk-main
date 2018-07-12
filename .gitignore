@@ -2,6 +2,7 @@
 *.pyc
 *.cpython-36.pyc
 *.cpython-36
+/.idea/*
 */__pycache__/*
 /.vs/*
 /.vscode/*
