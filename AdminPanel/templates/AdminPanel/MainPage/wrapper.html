@@ -1,3 +1,56 @@
-<h1>Админ панель</h1>
-<a href="/custom_admin/news/">Новости</a> <br />
-<a href="/custom_admin/feedback/">Обратная связь</a>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Админ Панель - Cypher Desk</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/bootstrap4-business-tycoon.min.css' %}">
+</head>
+
+<body>
+    <div class="jumbotron bg-dark text-center">
+        <h1 class="display-3 text-light text-center">Админ панель</h1>
+        <a href="./out" class="btn btn-primary btn-lg my-2 mr-2">
+            <span>Выход из аккаунта</span>
+        </a>
+
+        <nav class="navbar navbar-dark bg-primary" style="position: absolute; left: 10px; top: 10px;">
+            <a class="navbar-brand" href="#">Навигация</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">Главная <span class="sr-only">(текущая)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom_admin/news">Новости</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom_admin/feedback/">Обратная связь</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2"></script>
+</body>
+
+</html>

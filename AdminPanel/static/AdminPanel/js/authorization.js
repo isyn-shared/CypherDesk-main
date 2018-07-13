@@ -1,3 +1,10 @@
+$("form").keyup(event => {
+    if (event.keyCode == 13) {
+        event.preventDefault();
+        $('#send_authorization_form').click();
+    }
+});
+
 $('#send_authorization_form').click(() => {
     $("#send_authorization_form").attr('disabled', 'true');
     swal('Секундочку...', 'Проходит авторизация', 'info');
