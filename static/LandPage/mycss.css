@@ -1,0 +1,22 @@
+p.bigfont {
+    font-size: 24px;
+}
+
+.whitebox {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+}
+
+body {
+    background-image: url("img/background.jpg");
+    background-position-x: 30%;
+    background-repeat: repeat-y;
+}
+
+.show {
+    display: none;
+}
+
+.solidbackground {
+    background-color: rgba(255, 255, 255, 1) !important;
+}
