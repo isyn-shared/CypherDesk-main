@@ -134,9 +134,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-CSRF_COOKIE_SECURE = True
-
-#SESSION_SAVE_EVERY_REQUEST = True
+# мы ПОКА не гарантируем, что cookies передаются по https, поэтому, чтобы не вылетала ошибка 403 или csrf-exception, оставляем значение False
+CSRF_COOKIE_SECURE = False
+# SESSION_SAVE_EVERY_REQUEST = True
 
 
 # Static files (CSS, JavaScript, Images)
