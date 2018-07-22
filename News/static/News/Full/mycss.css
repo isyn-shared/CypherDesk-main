@@ -20,7 +20,7 @@ body {
     background-repeat: repeat-y;
 }
 
-.show {
+.showBase {
     display: none;
 }
 

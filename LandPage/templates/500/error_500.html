@@ -11,18 +11,49 @@
 
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href = "{% static 'css/bootstrap4-business-tycoon.min.css' %}">
-    <link rel="stylesheet" href = "{% static 'LandPage/mycss.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap4-business-tycoon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'LandPage/mycss.css' %}">
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" />
+
+    <style>
+        #wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .outer {
+            display: table;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        .middle {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .inner {
+            margin-left: auto;
+            margin-right: auto;
+            width: 400px;
+            /*whatever width you want*/
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container wrapper">
-        <div class="whitebox box p-3" style="text-align: center; margin-top: calc(45% - 175px)">
-            <h1 class="display-1"> 500 </h1>
-            <p>При обработке Вашего запроса что-то пошло катастрофически не так.</p>
-            <p>Наша команда уже работает над данной проблемой</p>
-            <a href="#!" id="homeBtn" class="btn btn-primary">Вернуться на главную</a>
+    <div class="outer">
+        <div class="middle">
+            <div class="inner">
+                <div class="whitebox box p-3" style="text-align: center; margin-top: calc(45% - 175px)">
+                    <h1 class="display-1"> 500 </h1>
+                    <p>При обработке Вашего запроса что-то пошло катастрофически не так.</p>
+                    <p>Наша команда уже работает над данной проблемой</p>
+                    <a href="#!" id="homeBtn" class="btn btn-primary">Вернуться на главную</a>
+                </div>
+            </div>
         </div>
     </div>
 
