@@ -23,7 +23,7 @@ class AdminPanelUser (models.Model):
             self.password = md5.hexdigest()
 
             if AdminPanelUser.chkUserName(self.username):
-                raise ValidationError('Такой логин уже существует!')
+                return
 
         super(AdminPanelUser, self).save(args, kwargs)
 

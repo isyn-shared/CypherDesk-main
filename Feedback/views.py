@@ -33,6 +33,9 @@ def send (request):
                                     email_html_content)
         email_text_content = ""
 
+        FeedbackRecord.objects.create(title=message_title, problem=message_text, answer="", user_name=user_name,
+                                      user_email=user_email)
+
         """post request on telegram app"""
         telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nMessage: " + message_text
         url = settings.HOSTNAME + 'telegram/send/'
@@ -59,6 +62,8 @@ def found_titles (request):
         result = []
 
         for record in records:
+            if record.answer == "":
+                continue
             cnt = ComparsionTitles(current_title, record.title)
             if cnt >= 1:
                 result.append({'id': record.id, 'title': record.title, 'dis': cnt})
@@ -105,6 +110,9 @@ def faq(request):
     result['faq'] = []
 
     for record in records:
+        if record.answer == "":
+            continue
         result['faq'].append({'id': record.id, 'title': record.title})
 
+    print (result['faq'])
     return render(request, 'Feedback/faq/wrapper.html', result)
