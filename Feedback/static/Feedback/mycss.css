@@ -1,4 +1,4 @@
-h1 {
+ h1 {
     font-size: 50px;
 }
 
@@ -60,7 +60,7 @@ body {
     background-repeat: repeat-y;
 }
 
-.show {
+.showBase {
     display: none;
 }
 
@@ -112,4 +112,6 @@ body {
 .pseudotextarea::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-}
+} */
+
+.navbar-collapse.collapse.in { display: block!important; }
