@@ -1,13 +1,18 @@
-{% load static %}
+{% load static %} {% block content %}
 
-{% block content %}
+<style>
+    .g-recaptcha {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+</style>
 
-<div class = "show show2">
- <div class="container py-5 whitebox solidbackground" style="margin-top: 20px" class = "show">
+<div class="show show2">
+    <div class="container py-5 whitebox solidbackground" style="margin-top: 20px" class="show">
         <h1>Правила, касающиеся обратной связи</h1>
         <p class="bigfont">
-            Просим Вас убедиться, что Ваш вопрос не находится в списке часто задаваемых вопросов перед тем, как 
-            оставлять его через форму обратной связи!
+            Просим Вас убедиться, что Ваш вопрос не находится в списке часто задаваемых вопросов перед тем, как оставлять его через форму
+            обратной связи!
         </p>
         <p class="bigfont">
             (Просмотреть список можно, кликнув на кнопку выше)
@@ -26,30 +31,35 @@
                 <fieldset>
                     <h4>Контактная информация</h4>
                     <hr>
-                    <input type="text" class="text" required placeholder="Ваше Имя" id = "user_name" name = "user_name">
-                    <input type="email" class="text" required placeholder="Ваш E-mail" id = "user_email" name = "user_email">
+                    <input type="text" class="text" required placeholder="Ваше Имя" id="user_name" name="user_name">
+                    <input type="email" class="text" required placeholder="Ваш E-mail" id="user_email" name="user_email">
                     <h4>Тема</h4>
                     <hr>
-                    <input type="text" class="text" required placeholder="Старайтесь сформулировать тему кратко"
-                           id = "message_title" name = "message_title" style="width: 70%;">
+                    <input type="text" class="text" required placeholder="Старайтесь сформулировать тему кратко" id="message_title" name="message_title"
+                        style="width: 70%;">
                 </fieldset>
                 <fieldset class="hint_titles_wrapper hidden">
-                        <h2>Пользователи уже спрашивали: </h2>
-                        <div class="hint_titles">
-        
-                        </div>
-                </fieldset> 
+                    <h2>Пользователи уже спрашивали: </h2>
+                    <div class="hint_titles">
+
+                    </div>
+                </fieldset>
                 <fieldset>
                     <h4>Опишите Вашу проблему</h4>
                     <hr>
-                    <div class="pseudotextarea" 
-                        contenteditable="true"
-                        spellcheck="true"
-                        dir="auto"
-                        role="textbox"
-                        aria-multiline="true" id = "message_text" name = "message_text" required></div>
+                    <div class="pseudotextarea" contenteditable="true" spellcheck="true" dir="auto" role="textbox" aria-multiline="true" id="message_text"
+                        name="message_text" required></div>
+                    <!-- <hr>
+                    <h4>Прикрепите файл/файлы (если необходимо)</h4>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile">
+                        <label class="custom-file-label" for="customFile">Прикрепите файл</label>
+                    </div> -->
+
                 </fieldset>
-                <div class="g-recaptcha" data-sitekey="6LdFjF8UAAAAAF7w-ZN0QNLIgMyCLjBvZE4_FLlO"></div>
+                <center>
+                    <div class="g-recaptcha" data-sitekey="6LdFjF8UAAAAAF7w-ZN0QNLIgMyCLjBvZE4_FLlO"></div>
+                </center>
                 <button type="submit" id="send_feedback_form" style="margin-top: 5px; font-size: 20px;" onclick="return false">Отправить</button>
             </form>
         </div>
