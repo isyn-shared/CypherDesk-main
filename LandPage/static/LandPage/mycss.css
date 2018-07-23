@@ -25,6 +25,16 @@ body {
     background-color: rgba(255, 255, 255, 1) !important;
 }
 
+@media (max-width: 400px) {
+    .mobileLogo {
+        font-size: 3.5rem;
+    }
+
+    .mobileCenter {
+        text-align: center;
+    }
+}
+
 /* .carousel-inner > .item > img {
     margin: 0 auto;
 } */

@@ -1,18 +1,16 @@
 {% block header %} {% load staticfiles %}
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
-        aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand" href="#!">Навигация</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler"
+        aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="#!">Навигация</a>
 
-    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+    <div class="collapse navbar-collapse" id="navbarToggler">
         <ul class="navbar-nav mr-auto mt-2 mt-md-0">
-            <li class="nav-item active">
-                <a class="nav-link" href="#!">Главная страница
-                    <span class="sr-only">(current)</span>
-                </a>
+            <li class="nav-item">
+                <a class="nav-link active" href="#!">Главная страница</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/news">Новости</a>
@@ -32,9 +30,9 @@
 
 
 <div class="jumbotron bg-dark text-white mb-0 showBase show2">
-    <div class="container">
+    <div class="container mobileCenter">
 
-        <h1 class="display-3 text-light">CypherDesk</h1>
+        <h1 class="display-3 text-light mobileLogo">CypherDesk</h1>
         <h2 class="mb-2 display-5">Ваш выбор среди систем документооборота для предприятий</h2>
         <div class="mt-4">
             <a href="/download" class="btn btn-primary btn-lg my-2 mr-2">
