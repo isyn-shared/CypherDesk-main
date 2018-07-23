@@ -54,7 +54,7 @@ def send (request):
                                       user_email=user_email)
 
         """post request on telegram app"""
-        telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nMessage: " + message_text
+        telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nTitle: " + message_title + "\nMessage: " + message_text
         url = settings.HOSTNAME + 'telegram/send/'
         data = {'chat_name': 'feedback', 'token_name': 'feedback', 'text': telegram_message}
         result_telegram = requests.post(url, data=data).text

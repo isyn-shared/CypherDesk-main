@@ -14,11 +14,11 @@ pre {
     background-color: #f5f5f5
 }
 
-body {
+/* body {
     background-image: url("img/background.jpg");
     background-position-x: 30%;
     background-repeat: repeat-y;
-}
+} */
 
 .showBase {
     display: none;
@@ -26,4 +26,31 @@ body {
 
 .solidbackground {
     background-color: rgba(255, 255, 255, 1) !important;
+}
+
+@media (max-width: 400px) {
+    .mobileLogo {
+        font-size: 3.5rem;
+    }
+
+    .mobileCenter {
+        text-align: center;
+    }
+
+    .divMobileCenter {
+        /* width: 100%; */
+        text-align: center;
+    }
+
+    .floatRightDesktop {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+@media (min-width: 401px) {
+    .floatRightDesktop {
+        width: auto;
+        float: right;
+    }
 }
