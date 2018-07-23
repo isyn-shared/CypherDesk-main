@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from Feedback.models import FeedbackRecord
+from Feedback.models import FeedbackUserIP
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.conf import settings
 from g_recaptcha.validate_recaptcha import validate_captcha
 import requests, re, distance, simplejson
+from datetime import datetime, timezone
 
 context = {
     'GOOGLE_RECAPTCHA_SITE_KEY': settings.GOOGLE_RECAPTCHA_SITE_KEY,
@@ -15,6 +17,19 @@ def index (request):
 #@validate_captcha
 def send (request):
     if request.POST:
+        IP = str(request.META['REMOTE_ADDR'])
+        now = datetime.now(timezone.utc)
+
+        if FeedbackUserIP.objects.filter(user_ip=IP):
+            user_hist_obj = FeedbackUserIP.objects.filter(user_ip=IP)[0]
+            period = now - user_hist_obj.date
+            if (period.days > 0 or period.seconds > 60 * 60 * 2):
+                user_hist_obj.update(date=now)
+            else:
+                return HttpResponse(2) #превысили лимит запросов
+        else:
+            FeedbackUserIP.objects.create(user_ip=IP, date=now)
+
         feedback_data = request.POST
         user_name = feedback_data['user_name']
         user_email = feedback_data['user_email']
@@ -48,7 +63,11 @@ def send (request):
                 'to': user_email}
         result_mail = requests.post(url, data=data).text
 
-        return HttpResponse(result_mail and result_telegram)
+        if not result_mail:
+            result = 1 # не удалось отправить почту
+        else:
+            result = 0
+        return HttpResponse(result)
     raise Http404()
 
 def sort_col(i):

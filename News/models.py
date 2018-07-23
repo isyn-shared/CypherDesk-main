@@ -2,7 +2,7 @@ from django.db import models
 import random
 
 MAX_SIZE = 1048626
-ALLOWED_EXTENSIONS = ['jpg', 'png', 'bmp', 'gif', 'mp3', 'mp4', 'mov', 'txt', 'docx', 'doc', 'jpeg', ]
+ALLOWED_EXTENSIONS = ['jpg', 'png', 'bmp', 'gif', 'mp3', 'mp4', 'mov', 'txt', 'docx', 'doc', 'jpeg', '7z', 'zip',]
 
 class NewsRecord (models.Model):
     title = models.CharField(max_length=64)
@@ -42,10 +42,12 @@ class NewsRecord (models.Model):
 
     @staticmethod
     def chkFile(file_extension, file_size):
+        """
         if file_extension not in ALLOWED_EXTENSIONS:
             return False
         if file_size > MAX_SIZE:
             return False
+        """
         return True
 
     def __str__(self):

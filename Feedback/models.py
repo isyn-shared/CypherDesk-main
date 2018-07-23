@@ -9,3 +9,10 @@ class FeedbackRecord (models.Model):
 
     def __str__(self):
         return 'FeedbackRecord: {}'.format(self.title)
+
+class FeedbackUserIP (models.Model):
+    user_ip = models.CharField(max_length=64)
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return 'Feedback users IP`s: {}'.format(self.user_ip)
