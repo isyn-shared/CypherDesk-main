@@ -1,13 +1,20 @@
 $('#send_feedback_form').click(() => {
-    $("#send_feedback_form").attr('disabled', 'true');
-    swal('Спасибо!', 'Ваш запрос был отправлен серверу на рассмотрение. Пожалуйста, подождите (Обычно это занимает около минуты).', 'info');
-
-    let xhr = new XMLHttpRequest();
-
     let name = $('#user_name').val(),
         email = $('#user_email').val(),
         title = $('#message_title').val(),
         text = $('.pseudotextarea').text();
+
+    if (!name || !email || !title || !text)
+        return swal("Постойте!", "Заполните все поля перед отправкой", "warning");
+
+    if (!validateEmail(email)) 
+        return swal("Постойте!", "Вы уверены в правильном написании Вашей почты?", "warning");
+
+
+    $("#send_feedback_form").attr('disabled', 'true');
+    swal('Спасибо!', 'Ваш запрос был отправлен серверу на рассмотрение. Пожалуйста, подождите (Обычно это занимает около минуты).', 'info');
+
+    let xhr = new XMLHttpRequest();
 
     let body = 'user_name=' + encodeURI(name) +
       '&user_email=' + encodeURI(email) +
@@ -42,3 +49,9 @@ $('#send_feedback_form').click(() => {
 
     xhr.send(body);
 });
+
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
