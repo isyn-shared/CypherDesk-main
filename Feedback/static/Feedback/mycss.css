@@ -115,3 +115,18 @@ body {
 } */
 
 .navbar-collapse.collapse.in { display: block!important; }
+
+@media (max-width: 400px) {
+    .mobileLogo {
+        font-size: 3.5rem;
+    }
+
+    .mobileCenter {
+        text-align: center;
+    }
+
+    .mobileQuestionTheme {
+        width: 100%!important;
+        font-size: 15px!important;
+    }
+}
