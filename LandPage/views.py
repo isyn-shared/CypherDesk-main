@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
 from LandPage.models import Error500Record
-import datetime
+from datetime import datetime, timezone, timedelta
 
 import requests
 
@@ -19,7 +19,7 @@ def error_500(request):
         data = {'chat_name': 'feedback', 'token_name': 'feedback', 'text': telegram_message}
         result_telegram = requests.post(url, data=data).text
         data['telegram'] = result_telegram
-        now = datetime.datetime.now()
+        now = datetime.now(timezone.utc) + timedelta(minutes=180)
         error500_insert = Error500Record.objects.create(url=page_error, date=now)
         data['insertion'] = error500_insert
 

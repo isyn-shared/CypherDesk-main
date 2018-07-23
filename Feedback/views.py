@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.conf import settings
 from g_recaptcha.validate_recaptcha import validate_captcha
 import requests, re, distance, simplejson
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 context = {
     'GOOGLE_RECAPTCHA_SITE_KEY': settings.GOOGLE_RECAPTCHA_SITE_KEY,
@@ -17,18 +17,20 @@ def index (request):
 #@validate_captcha
 def send (request):
     if request.POST:
+        ADD_IP_F = False
+        UPDATE_IP_F = False
         IP = str(request.META['REMOTE_ADDR'])
-        now = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc) + timedelta(minutes=180)
 
         if FeedbackUserIP.objects.filter(user_ip=IP):
-            user_hist_obj = FeedbackUserIP.objects.filter(user_ip=IP)[0]
-            period = now - user_hist_obj.date
+            user_hist_date = FeedbackUserIP.objects.filter(user_ip=IP)[0].date
+            period = now - user_hist_date
             if (period.days > 0 or period.seconds > 60 * 60 * 2):
-                user_hist_obj.update(date=now)
+                UPDATE_IP_F = True
             else:
                 return HttpResponse(2) #превысили лимит запросов
         else:
-            FeedbackUserIP.objects.create(user_ip=IP, date=now)
+            ADD_IP_F = True
 
         feedback_data = request.POST
         user_name = feedback_data['user_name']
@@ -66,6 +68,10 @@ def send (request):
         if not result_mail:
             result = 1 # не удалось отправить почту
         else:
+            if UPDATE_IP_F:
+                FeedbackUserIP.objects.filter(user_ip=IP).update(date=now)
+            if ADD_IP_F:
+                FeedbackUserIP.objects.create(user_ip=IP, date=now)
             result = 0
         return HttpResponse(result)
     raise Http404()
