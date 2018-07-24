@@ -11,8 +11,21 @@ context = {
     'GOOGLE_RECAPTCHA_SITE_KEY': settings.GOOGLE_RECAPTCHA_SITE_KEY,
 }
 
+def now():
+    return datetime.now(timezone.utc) + timedelta(minutes=180)
+
 def index (request):
-    return render (request, 'Feedback/wrapper.html')
+    IP = str(request.META['REMOTE_ADDR'])
+    result = {}
+    result['ready'] = True
+    if FeedbackUserIP.objects.filter(user_ip=IP):
+        user_hist_date = FeedbackUserIP.objects.filter(user_ip=IP)[0].date
+        period = now() - user_hist_date
+        if period.days == 0 and period.seconds < 60 * 60 * 2:
+            result['ready'] = False
+
+    print(result)
+    return render(request, 'Feedback/wrapper.html', result)
 
 #@validate_captcha
 def send (request):
@@ -20,12 +33,11 @@ def send (request):
         ADD_IP_F = False
         UPDATE_IP_F = False
         IP = str(request.META['REMOTE_ADDR'])
-        now = datetime.now(timezone.utc) + timedelta(minutes=180)
 
         if FeedbackUserIP.objects.filter(user_ip=IP):
             user_hist_date = FeedbackUserIP.objects.filter(user_ip=IP)[0].date
-            period = now - user_hist_date
-            if (period.days > 0 or period.seconds > 60 * 60 * 2):
+            period = now() - user_hist_date
+            if period.days > 0 or period.seconds > 60 * 60 * 2:
                 UPDATE_IP_F = True
             else:
                 return HttpResponse(2) #превысили лимит запросов
@@ -69,9 +81,9 @@ def send (request):
             result = 1 # не удалось отправить почту
         else:
             if UPDATE_IP_F:
-                FeedbackUserIP.objects.filter(user_ip=IP).update(date=now)
+                FeedbackUserIP.objects.filter(user_ip=IP).update(date=now())
             if ADD_IP_F:
-                FeedbackUserIP.objects.create(user_ip=IP, date=now)
+                FeedbackUserIP.objects.create(user_ip=IP, date=now())
             result = 0
         return HttpResponse(result)
     raise Http404()
