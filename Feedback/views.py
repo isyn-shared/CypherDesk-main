@@ -24,7 +24,6 @@ def index (request):
         if period.days == 0 and period.seconds < 60 * 60 * 2:
             result['ready'] = False
 
-    print(result)
     return render(request, 'Feedback/wrapper.html', result)
 
 #@validate_captcha

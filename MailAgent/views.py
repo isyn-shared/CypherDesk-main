@@ -11,7 +11,7 @@ def send(request):
         return PermissionDenied
 
     if request.POST:
-        mail_res = False
+        mail_res = True
         from_mail = request.POST['from']
         subject = request.POST['subject']
         html_content = request.POST['html_content']
@@ -23,18 +23,20 @@ def send(request):
         text_content = request.POST['text_content']
 
         msg = EmailMultiAlternatives(subject, text_content, from_mail, to)
+        connection = msg.get_connection()
         msg.attach_alternative(html_content, "text/html")
 
         if subject and html_content and from_mail and to:
             try:
                 msg.send()
-                mail_res = True
                 # message: 'Thanks, your email was sent'
             except BadHeaderError:
                 # message: 'Invalid header found.'
                 mail_res = False
             except AttributeError:
                 # Неправильно указана почта
+                mail_res = False
+            except:
                 mail_res = False
         else:
             # In reality we'd use a form class

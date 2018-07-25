@@ -17,7 +17,7 @@
     <div class="jumbotron bg-dark text-center">
         <h1 class="display-3 text-light text-center">Админ панель</h1>
         <a href="./out" class="btn btn-primary btn-lg my-2 mr-2">
-            <span>Выход из аккаунта</span>
+            <span>Выход из аккаунта ({{username}})</span>
         </a>
 
         <nav class="navbar navbar-dark bg-primary" style="position: absolute; left: 10px; top: 10px;">
@@ -32,15 +32,33 @@
                         <a class="nav-link" href="#!">Главная <span class="sr-only">(текущая)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/custom_admin/news">Новости</a>
+                        <a class="nav-link" href="/custom_admin/news">News</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/custom_admin/feedback/">Обратная связь</a>
+                        <a class="nav-link" href="/custom_admin/feedback/">Feedback</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom_admin/error_500">Error 500</a>
+                    </li>
+                    {% if allow_admin_table == True %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/custom_admin/admin">AdminPanel</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
     </div>
+
+    <center><strong>Личные данные:</strong></center>
+    <p>Имя: {{first_name}} {{last_name}}</p>
+    <p>Почта: {{mail}}</p>
+    <p>Статус: {{status}}</p>
+
+    <center><strong>Объявления: </strong></center>
+    {% for ad in ads %}
+        <p>{{ad.text}}</p>
+    {% endfor %}
 
     <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
