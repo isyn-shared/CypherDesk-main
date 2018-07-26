@@ -130,3 +130,9 @@ body {
         font-size: 15px!important;
     }
 }
+
+@media (min-width: 401px) {
+    .desktopPadding {
+        padding: 1.5rem!important;
+    }
+}

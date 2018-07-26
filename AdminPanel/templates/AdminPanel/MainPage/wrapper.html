@@ -11,25 +11,53 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/bootstrap4-business-tycoon.min.css' %}">
+
+    <style>
+        .bigfont {
+            font-size: 25px;
+        }
+
+        @media (max-width: 400px) {
+            .marginMobile {
+                margin-top: 50px;
+            }
+            .fullWidthMobile {
+                width: 94.5% !important;
+            }
+            .myCard {
+                width: 95%;
+            }
+        }
+
+        @media (min-width: 401px) {
+            .myCard {
+                width: 400px;
+                font-size: 20px
+            }
+        }
+    </style>
 </head>
 
 <body>
     <div class="jumbotron bg-dark text-center">
-        <h1 class="display-3 text-light text-center">Админ панель</h1>
+        <h1 class="display-3 text-light text-center marginMobile">Админ панель</h1>
         <a href="./out" class="btn btn-primary btn-lg my-2 mr-2">
             <span>Выход из аккаунта ({{username}})</span>
         </a>
 
-        <nav class="navbar navbar-dark bg-primary" style="position: absolute; left: 10px; top: 10px;">
+        <nav class="navbar navbar-dark bg-primary fullWidthMobile" style="width: 200px; position: absolute; left: 10px; top: 10px;">
             <a class="navbar-brand" href="#">Навигация</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#!">Главная <span class="sr-only">(текущая)</span></a>
+                        <a class="nav-link" href="#!">Главная
+                            <span class="sr-only">(текущая)</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/custom_admin/news">News</a>
@@ -41,24 +69,49 @@
                         <a class="nav-link" href="/custom_admin/error_500">Error 500</a>
                     </li>
                     {% if allow_admin_table == True %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/custom_admin/admin">AdminPanel</a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom_admin/admin">AdminPanel</a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
         </nav>
     </div>
 
-    <center><strong>Личные данные:</strong></center>
-    <p>Имя: {{first_name}} {{last_name}}</p>
-    <p>Почта: {{mail}}</p>
-    <p>Статус: {{status}}</p>
+    <div class="container">
 
-    <center><strong>Объявления: </strong></center>
-    {% for ad in ads %}
-        <p>{{ad.text}}</p>
-    {% endfor %}
+        <center>
+            <div class="card myCard">
+                <div class="card-header">
+                    <b>Личные данные:</b>
+                </div>
+                <div class="card-body">
+                    <blockquote class="card-blockquote">
+                        <p>Имя:
+                            <b>{{first_name}} {{last_name}}</b>
+                        </p>
+                        <p>Почта:
+                            <b>{{mail}}</b>
+                        </p>
+                        <p>Статус:
+                            <b>{{status}}</b>
+                        </p>
+                    </blockquote>
+                </div>
+            </div>
+        </center>
+
+        <p class="bigfont text-center" style="margin-top: 30px">
+            <b>Объявления:</b>
+        </p>
+
+        {% for ad in ads %}
+            <div class="alert alert-primary" role="alert">
+                <h4 class="alert-heading">Уведомление</h4>
+                {{ad.text}}
+            </div>
+        {% endfor %}
+    </div>
 
     <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>

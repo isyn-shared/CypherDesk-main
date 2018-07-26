@@ -23,6 +23,7 @@
     </div>
 
     <div class="whitebox" id="form">
+        {% if ready == "True" %}
         <div class="container">
             <h2>Заполните форму</h2>
             <h4>Убедитесь, что E-mail введен корректно</h4>
@@ -63,6 +64,16 @@
                 <button type="submit" id="send_feedback_form" style="margin-top: 5px; font-size: 20px;" onclick="return false">Отправить</button>
             </form>
         </div>
+        {% else %}
+        <div class="container desktopPadding">
+            <h2>Здравствуйте!</h2>
+            <h2>Спасибо за отправку Вашего отзыва!</h2>
+            <p class="bigfont">Вы видите это сообщение, потому что с Вашего IP адреса была произведена отправка проблемы
+                в течении этих двух часов. Если Вы считаете, что это ошибка и Вы ничего не отправляли, или же
+                сообщение, что вы отправили, содержало ошибку, пожалуйста, напишите нам <a href="#contacts">сюда</a>.
+            </p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
