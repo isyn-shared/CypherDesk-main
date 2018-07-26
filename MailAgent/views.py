@@ -7,7 +7,7 @@ from django.conf import settings
 @csrf_exempt
 def send(request):
     client_ip = str(request.META['REMOTE_ADDR'])
-    if client_ip != '127.0.0.1':
+    if client_ip != settings.SERVER_IP:
         return PermissionDenied
 
     if request.POST:
