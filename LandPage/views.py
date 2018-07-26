@@ -28,3 +28,7 @@ def error_500(request):
 def error_404(request, exception):
     data = {}
     return render(request,'404/error_404.html', data)
+
+def error_403(request):
+    data = {"reason": "Извините, вы не имеете доступа к этим данным"}
+    return render(request,'403/error_403.html', data)
