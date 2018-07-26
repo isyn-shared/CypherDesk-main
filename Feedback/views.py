@@ -1,20 +1,48 @@
 from django.shortcuts import render
 from Feedback.models import FeedbackRecord
+from Feedback.models import FeedbackUserIP
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.conf import settings
 from g_recaptcha.validate_recaptcha import validate_captcha
 import requests, re, distance, simplejson
+from datetime import datetime, timezone, timedelta
 
 context = {
     'GOOGLE_RECAPTCHA_SITE_KEY': settings.GOOGLE_RECAPTCHA_SITE_KEY,
 }
 
+def now():
+    return datetime.now(timezone.utc) + timedelta(minutes=180)
+
 def index (request):
-    return render (request, 'Feedback/wrapper.html')
+    IP = str(request.META['REMOTE_ADDR'])
+    result = {}
+    result['ready'] = True
+    if FeedbackUserIP.objects.filter(user_ip=IP):
+        user_hist_date = FeedbackUserIP.objects.filter(user_ip=IP)[0].date
+        period = now() - user_hist_date
+        if period.days == 0 and period.seconds < 60 * 60 * 2:
+            result['ready'] = False
+
+    return render(request, 'Feedback/wrapper.html', result)
 
 #@validate_captcha
 def send (request):
     if request.POST:
+        ADD_IP_F = False
+        UPDATE_IP_F = False
+        IP = str(request.META['REMOTE_ADDR'])
+
+        if FeedbackUserIP.objects.filter(user_ip=IP):
+            user_hist_date = FeedbackUserIP.objects.filter(user_ip=IP)[0].date
+            period = now() - user_hist_date
+            if period.days > 0 or period.seconds > 60 * 60 * 2:
+                UPDATE_IP_F = True
+            else:
+                return HttpResponse(2) #превысили лимит запросов
+        else:
+            ADD_IP_F = True
+
         feedback_data = request.POST
         user_name = feedback_data['user_name']
         user_email = feedback_data['user_email']
@@ -33,8 +61,11 @@ def send (request):
                                     email_html_content)
         email_text_content = ""
 
+        FeedbackRecord.objects.create(title=message_title, problem=message_text, answer="", user_name=user_name,
+                                      user_email=user_email)
+
         """post request on telegram app"""
-        telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nMessage: " + message_text
+        telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nTitle: " + message_title + "\nMessage: " + message_text
         url = settings.HOSTNAME + 'telegram/send/'
         data = {'chat_name': 'feedback', 'token_name': 'feedback', 'text': telegram_message}
         result_telegram = requests.post(url, data=data).text
@@ -45,7 +76,15 @@ def send (request):
                 'to': user_email}
         result_mail = requests.post(url, data=data).text
 
-        return HttpResponse(result_mail and result_telegram)
+        if not result_mail:
+            result = 1 # не удалось отправить почту
+        else:
+            if UPDATE_IP_F:
+                FeedbackUserIP.objects.filter(user_ip=IP).update(date=now())
+            if ADD_IP_F:
+                FeedbackUserIP.objects.create(user_ip=IP, date=now())
+            result = 0
+        return HttpResponse(result)
     raise Http404()
 
 def sort_col(i):
@@ -59,6 +98,8 @@ def found_titles (request):
         result = []
 
         for record in records:
+            if record.answer == "":
+                continue
             cnt = ComparsionTitles(current_title, record.title)
             if cnt >= 1:
                 result.append({'id': record.id, 'title': record.title, 'dis': cnt})
@@ -105,6 +146,9 @@ def faq(request):
     result['faq'] = []
 
     for record in records:
+        if record.answer == "":
+            continue
         result['faq'].append({'id': record.id, 'title': record.title})
 
+    print (result['faq'])
     return render(request, 'Feedback/faq/wrapper.html', result)

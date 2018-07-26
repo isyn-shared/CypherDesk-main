@@ -1,34 +1,45 @@
-{% block header %}
+{% block header %} {% load staticfiles %}
 
-{% load staticfiles %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#!">Навигация</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
+        aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <div class="jumbotron bg-dark text-white mb-0 show show1">
-        <div class="container">
-
-            <ul class="nav nav-pills" style="float: right">
-                <li class="nav-item">
-                    <a class="nav-link" href="../../">Главная страница</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../../news">Новости</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="#!">Обратная связь</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contacts">Контакты</a>
-                </li>
-            </ul>            
-
-            <h1 class="display-3 text-light">Частые вопросы</h1>
-            <h2 class="mb-2 display-5">В этом разделе публикуются часто задаваемые вопросы пользователей</h2>
-
-            <div class="mt-4">
-                <a href="../" class="btn btn-primary btn-lg my-2 mr-2">
-                    <span>Назад к обратной связи</span>
-                </a>
-            </div>
-
-        </div>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+        <ul class="navbar-nav mr-auto mt-2 mt-md-0">
+            <li class="nav-item">
+                <a class="nav-link" href="../../">Главная страница</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../../news">Новости</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#!">Обратная связь</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#contacts">Контакты</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search">
+        </form>
     </div>
+</nav>
+
+<div class="jumbotron bg-dark text-white mb-0 showBase show1">
+    <div class="container mobileCenter">
+
+        <h1 class="display-3 text-light">Частые вопросы</h1>
+        <h2 class="mb-2 display-5">В этом разделе публикуются часто задаваемые вопросы пользователей</h2>
+
+        <div class="mt-4">
+            <a href="../" class="btn btn-primary btn-lg my-2 mr-2">
+                <span>Назад к обратной связи</span>
+            </a>
+        </div>
+
+    </div>
+</div>
 {% endblock %}

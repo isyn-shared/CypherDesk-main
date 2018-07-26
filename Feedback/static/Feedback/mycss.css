@@ -1,4 +1,4 @@
-h1 {
+ h1 {
     font-size: 50px;
 }
 
@@ -60,7 +60,7 @@ body {
     background-repeat: repeat-y;
 }
 
-.show {
+.showBase {
     display: none;
 }
 
@@ -112,4 +112,27 @@ body {
 .pseudotextarea::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 20px;
+} */
+
+.navbar-collapse.collapse.in { display: block!important; }
+
+@media (max-width: 400px) {
+    .mobileLogo {
+        font-size: 3.5rem;
+    }
+
+    .mobileCenter {
+        text-align: center;
+    }
+
+    .mobileQuestionTheme {
+        width: 100%!important;
+        font-size: 15px!important;
+    }
+}
+
+@media (min-width: 401px) {
+    .desktopPadding {
+        padding: 1.5rem!important;
+    }
 }

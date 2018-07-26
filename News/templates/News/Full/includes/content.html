@@ -1,13 +1,15 @@
-{% block content %} 
+{% block content %} {% load staticfiles %}
 
-{% load staticfiles %}
-
-<div class="container py-5 whitebox show show2" style="margin-top: 20px">
+<div class="container py-5 whitebox showBase show2" style="margin-top: 20px">
     <h1>Новость: </h1>
-    <div class="py-5 whitebox show show2 newsbox">
+    <div class="py-5 whitebox showBase show2 newsbox">
         <pre style="margin-left: 30px">{{post.news|safe}}</pre>
     </div>
-    <h3 style="float: right; margin-top: 20px"><b>Дата</b>: {{post.date|date:"d-m-Y h:m"}}</h3>
+    <div class="floatRightDesktop">
+        <h3 style="margin-top: 20px" class="floatRightDesktop">
+            <b>Дата</b>: {{post.date|date:"d-m-Y h:m"}}
+        </h3>
+    </div>
 </div>
 
 {% endblock %}

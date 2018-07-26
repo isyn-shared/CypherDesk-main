@@ -23,7 +23,7 @@ class AdminPanelUser (models.Model):
             self.password = md5.hexdigest()
 
             if AdminPanelUser.chkUserName(self.username):
-                raise ValidationError('Такой логин уже существует!')
+                return
 
         super(AdminPanelUser, self).save(args, kwargs)
 
@@ -32,3 +32,12 @@ class AdminPanelUser (models.Model):
         if AdminPanelUser.objects.filter(username=username):
             return True
         return False
+
+class AdminPanelAd (models.Model):
+    admin_id = models.BigIntegerField()
+    ad_text = models.TextField()
+    date_start = models.DateTimeField()
+    date_stop = models.DateTimeField()
+
+    def __str__(self):
+        return 'AdminPanelAd: {}'.format(self.ad_text)
