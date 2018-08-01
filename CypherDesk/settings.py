@@ -91,7 +91,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'CypherDesk.wsgi.application'
-
+DEFAULT_CHARSET = 'utf-8'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases

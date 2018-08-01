@@ -26,6 +26,12 @@ def index (request):
 
     return render(request, 'Feedback/wrapper.html', result)
 
+def regexMail(mail):
+    p = re.compile(r'([\w\.-]+)@([\w\.-]+)')
+    if p.match(mail):
+        return True
+    return False
+
 #@validate_captcha
 def send (request):
     if request.POST:
@@ -48,6 +54,9 @@ def send (request):
         user_email = feedback_data['user_email']
         message_title = feedback_data['message_title']
         message_text = feedback_data['message_text']
+
+        if not user_name or not regexMail(user_email) or not message_title or not message_text:
+            return HttpResponse(1)
 
         """sending emails"""
         static_mail_files_path = "/Feedback/templates/Feedback/mail/"
