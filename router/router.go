@@ -18,6 +18,7 @@ func New() *gin.Engine {
 	router.Use(sessions.Sessions("mysession", store))
 
 	router.GET("/", indexHandler)
+	router.GET("/test", testHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")
@@ -28,7 +29,7 @@ func New() *gin.Engine {
 
 func chk(obj interface{}, err error) interface{} {
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("panic in handlers: " + err.Error())
 		panic(err.Error())
 	}
 	return obj
@@ -51,6 +52,7 @@ func writePongoTemplate(filepath string, pc pongo2.Context, c *gin.Context) []by
 
 func rec(c *gin.Context) {
 	if err := recover(); err != nil {
+		log.Fatal(err)
 		c.JSON(
 			http.StatusOK,
 			gin.H{
