@@ -19,8 +19,8 @@ func chk(obj interface{}, err error) interface{} {
 	return obj
 }
 
-func getQuery(db *sql.DB, sql string) interface{} {
-	return chk(db.Query(sql))
+func getQuery(db *sql.DB, sqlReq string) *sql.Rows {
+	return chk(db.Query(sqlReq)).(*sql.Rows)
 }
 
 func prepare(db *sql.DB, sqlReq string) *sql.Stmt {

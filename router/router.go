@@ -1,6 +1,7 @@
 package router
 
 import (
+	"CypherDesk-main/db"
 	"log"
 	"net/http"
 
@@ -18,6 +19,8 @@ func New() *gin.Engine {
 	router.Use(sessions.Sessions("mysession", store))
 
 	router.GET("/", indexHandler)
+	router.POST("/authorize", authorizeHandler)
+	router.GET("/account", accountHandler)
 	router.GET("/test", testHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
@@ -61,4 +64,19 @@ func rec(c *gin.Context) {
 			},
 		)
 	}
+}
+
+func getID(c *gin.Context) (bool, int) {
+	session := sessions.Default(c)
+	id := session.Get("id")
+	if id == nil || id == 0 {
+		return false, 0
+	}
+	return true, id.(int)
+}
+
+func setID(c *gin.Context, user *db.User) {
+	session := sessions.Default(c)
+	session.Set("id", user.ID)
+	session.Save()
 }

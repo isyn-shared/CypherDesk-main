@@ -2,7 +2,7 @@ package db
 
 // User - struct describing the registered user
 type User struct {
-	Id         int    `json: "id"`
+	ID         int    `json: "id"`
 	Login      string `json: "login"`
 	Pass       string `json: "pass"`
 	Mail       string `json: "mail"`
@@ -16,22 +16,58 @@ type User struct {
 }
 
 type userNullFields struct {
-	mail       *NullString
-	name       *NullString
-	surname    *NullString
-	partonymic *NullString
-	recourse   *NullString
-	status     *NullString
+	Mail       interface{}
+	Name       interface{}
+	Surname    interface{}
+	Partonymic interface{}
+	Recourse   interface{}
+	Status     interface{}
 }
 
 // BasicUser returns user obj containing system information
 func BasicUser(mail, role, status string, department int) *User {
-	return &User{
+	user := &User{
 		Mail:       mail,
 		Role:       role,
 		Status:     status,
 		Department: department,
 	}
+	return user
+}
+
+// WriteIn fills empty fields fo user obj
+func (u *User) WriteIn(name, surname, partonymic, recourse, login, password string) {
+	u.Name, u.Surname, u.Partonymic = name, surname, partonymic
+	u.Recourse = recourse
+	u.Login, u.Pass = login, password
+}
+
+// UpdateUser fills empty fields of user entry in DB
+func (m *MysqlUser) UpdateUser(user *User) int64 {
+	db := m.connect()
+	defer db.Close()
+	stmt := prepare(db, "UPDATE users SET name=? surname=? partonymic=? recourse=? login=? password=? WHERE id = ?")
+	defer stmt.Close()
+	res := exec(stmt, []interface{}{user.Name, user.Surname, user.Partonymic, user.Partonymic,
+		user.Recourse, user.Login, user.Pass, user.ID})
+	aff := affect(res)
+	return aff
+}
+
+// Exist method checks if user exist
+func (u *User) Exist() bool {
+	if u.ID == 0 {
+		return false
+	}
+	return true
+}
+
+// Filled method returns true if all user fields are filled
+func (u *User) Filled() bool {
+	if u.Name == "" || u.Mail == "" {
+		return false
+	}
+	return true
 }
 
 // GetUser return user obj using diff keys (id, login, mail)
@@ -43,36 +79,42 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	defer stmt.Close()
 
 	user := new(User)
-	nf := new(userNullFields)
-	err := stmt.QueryRow(key).Scan(&user.Id, &user.Login, &user.Pass, &nf.mail, &nf.name,
-		&nf.surname, &nf.partonymic, &nf.recourse, &user.Role, &user.Department, &nf.status)
-	if err != nil {
+	ns := new(userNullFields)
+	err := stmt.QueryRow(key).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name,
+		&ns.Surname, &ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		return user
+	} else if err != nil {
 		panic("db error: " + err.Error())
 	}
-
-	user.chkUserNullFields(nf)
-
+	user.chkNullFields(ns)
 	return user
 }
 
 // TODO: think about refactoring
-func (u *User) chkUserNullFields(nf *userNullFields) {
-	if nf.mail != nil {
-		u.Mail = nf.mail.String
+func (u *User) chkNullFields(ns *userNullFields) {
+	if ns.Mail != nil {
+		u.Mail = string(ns.Mail.([]byte))
 	}
-	if nf.name != nil {
-		u.Name = nf.name.String
+	if ns.Name != nil {
+		u.Name = string(ns.Name.([]byte))
 	}
-	if nf.partonymic != nil {
-		u.Partonymic = nf.partonymic.String
+	if ns.Surname != nil {
+		u.Surname = string(ns.Surname.([]byte))
 	}
-	if nf.recourse != nil {
-		u.Recourse = nf.recourse.String
+	if ns.Partonymic != nil {
+		u.Partonymic = string(ns.Partonymic.([]byte))
 	}
-	if nf.status != nil {
-		u.Status = nf.status.String
+	if ns.Recourse != nil {
+		u.Recourse = string(ns.Recourse.([]byte))
 	}
-	if nf.surname != nil {
-		u.Surname = nf.surname.String
+	if ns.Status != nil {
+		u.Status = string(ns.Status.([]byte))
 	}
+}
+
+// GetDepartment method returns the department obj of user
+func (u *User) GetDepartment() *Department {
+	mysql := CreateMysqlUser()
+	return mysql.GetDepartment(u.Department)
 }
