@@ -1,5 +1,7 @@
 package db
 
+import "CypherDesk-main/alias"
+
 // User - struct describing the registered user
 type User struct {
 	ID         int    `json: "id"`
@@ -21,7 +23,6 @@ type userNullFields struct {
 	Surname    interface{}
 	Partonymic interface{}
 	Recourse   interface{}
-	Status     interface{}
 }
 
 // BasicUser returns user obj containing system information
@@ -39,16 +40,16 @@ func BasicUser(mail, role, status string, department int) *User {
 func (u *User) WriteIn(name, surname, partonymic, recourse, login, password string) {
 	u.Name, u.Surname, u.Partonymic = name, surname, partonymic
 	u.Recourse = recourse
-	u.Login, u.Pass = login, password
+	u.Login, u.Pass = login, alias.HashPass(password)
 }
 
 // UpdateUser fills empty fields of user entry in DB
 func (m *MysqlUser) UpdateUser(user *User) int64 {
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "UPDATE users SET name=? surname=? partonymic=? recourse=? login=? password=? WHERE id = ?")
+	stmt := prepare(db, "UPDATE users SET mail=? name=? surname=? partonymic=? recourse=? login=? password=? WHERE id = ?")
 	defer stmt.Close()
-	res := exec(stmt, []interface{}{user.Name, user.Surname, user.Partonymic, user.Partonymic,
+	res := exec(stmt, []interface{}{user.Mail, user.Name, user.Surname, user.Partonymic,
 		user.Recourse, user.Login, user.Pass, user.ID})
 	aff := affect(res)
 	return aff
@@ -81,7 +82,7 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	user := new(User)
 	ns := new(userNullFields)
 	err := stmt.QueryRow(key).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name,
-		&ns.Surname, &ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
+		&ns.Surname, &ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &user.Status)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user
 	} else if err != nil {
@@ -107,9 +108,6 @@ func (u *User) chkNullFields(ns *userNullFields) {
 	}
 	if ns.Recourse != nil {
 		u.Recourse = string(ns.Recourse.([]byte))
-	}
-	if ns.Status != nil {
-		u.Status = string(ns.Status.([]byte))
 	}
 }
 

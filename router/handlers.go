@@ -3,7 +3,7 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"fmt"
+	"CypherDesk-main/feedback"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -40,10 +40,9 @@ func authorizeHandler(c *gin.Context) {
 }
 
 func testHandler(c *gin.Context) {
-	defer rec(c)
-	mysql := db.CreateMysqlUser()
-	departments := mysql.GetDepartments()
-	for k, val := range departments {
-		fmt.Println(k, val)
-	}
+	msg := new(feedback.MailMessage)
+	msg.Recipients = []string{"nikita.surnachev03@gmail.com"}
+	msg.Subject = "KekLOLOLOLOL"
+	msg.Body = "Heeeey maaaaan"
+	feedback.SendMail(msg)
 }

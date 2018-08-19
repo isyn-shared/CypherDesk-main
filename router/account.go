@@ -18,7 +18,11 @@ func accountHandler(c *gin.Context) {
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", id)
 	if !user.Filled() {
-		writePongoTemplate("templates/fillAccount/index.html", pongo2.Context{}, c)
+		if user.Role == "admin" {
+			writePongoTemplate("templates/fillAccount/admin.html", pongo2.Context{}, c)
+		} else {
+			writePongoTemplate("templates/fillAccount/user.html", pongo2.Context{}, c)
+		}
 	} else {
 		if user.Role == "admin" {
 			departments := mysql.GetDepartments()
@@ -44,4 +48,12 @@ func accountHandler(c *gin.Context) {
 			}, c)
 		}
 	}
+}
+
+func fillAdminAccountHandler(c *gin.Context) {
+
+}
+
+func fillUserAccountHandler(c *gin.Context) {
+
 }

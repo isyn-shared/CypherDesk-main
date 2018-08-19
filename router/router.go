@@ -20,8 +20,10 @@ func New() *gin.Engine {
 
 	router.GET("/", indexHandler)
 	router.POST("/authorize", authorizeHandler)
-	router.GET("/account", accountHandler)
 	router.GET("/test", testHandler)
+	router.GET("/account", accountHandler)
+	router.POST("/fillUserAccount", fillUserAccountHandler)
+	router.POST("/fillAdminAccount", fillAdminAccountHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")
