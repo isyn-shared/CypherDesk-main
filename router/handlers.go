@@ -18,7 +18,7 @@ func indexHandler(c *gin.Context) {
 func authorizeHandler(c *gin.Context) {
 	defer rec(c)
 	if isAuthorized, _ := getID(c); isAuthorized {
-		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы уже авторизованы!"})
+		c.Redirect(http.StatusSeeOther, "/account")
 		return
 	}
 	login, pass := c.PostForm("login"), c.PostForm("pass")
