@@ -8,9 +8,8 @@ function fillAccountAdmin() {
         pass = $('#passwordInput').val(),
         repass = $('#repasswordInput').val();
 
-
     if (!pass || !repass || pass != repass) 
-        createAlert('alert-danger', 'Ошибка!', 'Пароли не совпадают!');
+        return createAlert('alert-danger', 'Ошибка!', 'Пароли не совпадают!');
 
     sendPOST('/fillAdminAccount', {name, surname, partonymic, recourse, mail, login, pass}, true)
         .then(resp => {

@@ -3,7 +3,7 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"CypherDesk-main/feedback"
+	"fmt"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -12,6 +12,10 @@ import (
 
 func indexHandler(c *gin.Context) {
 	defer rec(c)
+	if isAuthorized, _ := getID(c); isAuthorized {
+		c.Redirect(http.StatusSeeOther, "/account")
+		return
+	}
 	writePongoTemplate("templates/frontPage/index.html", pongo2.Context{}, c)
 }
 
@@ -36,14 +40,17 @@ func authorizeHandler(c *gin.Context) {
 			return
 		}
 	}
-	setID(c, user)
-	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+
+	pass = alias.HashPass(pass)
+	if pass == user.Pass {
+		setID(c, user)
+		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный пароль!"})
+	}
 }
 
 func testHandler(c *gin.Context) {
-	msg := new(feedback.MailMessage)
-	msg.Recipients = []string{"nikita.surnachev03@gmail.com"}
-	msg.Subject = "KekLOLOLOLOL"
-	msg.Body = "Heeeey maaaaan"
-	feedback.SendMail(msg)
+	str := "admin"
+	fmt.Println(alias.HashPass(str))
 }

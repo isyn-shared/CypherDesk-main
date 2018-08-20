@@ -34,3 +34,12 @@ func EmptyStr(s string) bool {
 	}
 	return false
 }
+
+func EmptyStrArr(arr []string) bool {
+	for _, str := range arr {
+		if EmptyStr(str) {
+			return true
+		}
+	}
+	return false
+}

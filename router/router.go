@@ -11,6 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	Protocol = "http"
+	Host     = "127.0.0.1"
+	Port     = "3000"
+)
+
 // New returns pointer on gin.Engine obj with settings
 func New() *gin.Engine {
 	router := gin.Default()
@@ -25,6 +31,7 @@ func New() *gin.Engine {
 	router.POST("/fillUserAccount", fillUserAccountHandler)
 	router.POST("/fillAdminAccount", fillAdminAccountHandler)
 	router.GET("/out", logOutHandler)
+	router.GET("/activate/:key", activateAccountHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")

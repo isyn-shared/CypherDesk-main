@@ -22,7 +22,7 @@ type MailMessage struct {
 }
 
 // GetString returns byte array with recipients, subj, body
-func (mm *MailMessage) GetString() []byte {
+func (mm *MailMessage) getString() []byte {
 	res := "To: "
 	for _, rec := range mm.Recipients {
 		res += rec + "\r\n"
@@ -60,7 +60,7 @@ func SendMail(mm *MailMessage) error {
 		mc.pass,
 		mc.host,
 	)
-	err := smtp.SendMail(mc.host+":"+mc.port, auth, mc.mail, mm.Recipients, mm.GetString())
+	err := smtp.SendMail(mc.host+":"+mc.port, auth, mc.mail, mm.Recipients, mm.getString())
 	if err != nil {
 		panic(err.Error())
 	}

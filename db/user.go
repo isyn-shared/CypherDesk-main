@@ -7,25 +7,28 @@ import (
 
 // User - struct describing the registered user
 type User struct {
-	ID         int    `json: "id"`
-	Login      string `json: "login"`
-	Pass       string `json: "pass"`
-	Mail       string `json: "mail"`
-	Name       string `json: "name"`
-	Surname    string `json: "surname"`
-	Partonymic string `json: "partonymic"`
-	Recourse   string `json: "recourse"`
-	Role       string `json: "role"`
-	Department int    `json: "department"`
-	Status     string `json: "status"`
+	ID            int    `json: "id"`
+	Login         string `json: "login"`
+	Pass          string `json: "pass"`
+	Mail          string `json: "mail"`
+	Name          string `json: "name"`
+	Surname       string `json: "surname"`
+	Partonymic    string `json: "partonymic"`
+	Recourse      string `json: "recourse"`
+	Role          string `json: "role"`
+	Department    int    `json: "department"`
+	Status        string `json: "status"`
+	ActivationKey string `json: "activationKey"`
 }
 
 type userNullFields struct {
-	Mail       interface{}
-	Name       interface{}
-	Surname    interface{}
-	Partonymic interface{}
-	Recourse   interface{}
+	Mail          interface{}
+	Name          interface{}
+	Surname       interface{}
+	Partonymic    interface{}
+	Recourse      interface{}
+	ActivationKey interface{}
+	Status        interface{}
 }
 
 // BasicUser returns user obj containing system information
@@ -39,11 +42,23 @@ func BasicUser(mail, role, status string, department int) *User {
 	return user
 }
 
+// SetActivationKey
+func (u *User) SetActivationKey(key string) {
+	u.ActivationKey = alias.MD5(key)
+}
+
 // WriteIn fills empty fields fo user obj
-func (u *User) WriteIn(name, surname, partonymic, recourse, login, password string) {
-	u.Name, u.Surname, u.Partonymic = name, surname, partonymic
-	u.Recourse = recourse
-	u.Login, u.Pass = login, alias.HashPass(password)
+func (u *User) WriteIn(user *User) {
+	u.Name, u.Surname, u.Partonymic = user.Name, user.Surname, user.Partonymic
+	u.Recourse = user.Recourse
+	u.Login, u.Pass = user.Login, user.Pass
+
+	if !alias.EmptyStr(user.ActivationKey) {
+		u.ActivationKey = user.ActivationKey
+	}
+	if !alias.EmptyStr(user.Mail) {
+		u.Mail = user.Mail
+	}
 }
 
 // HashPass method encrypt password of user
@@ -55,10 +70,10 @@ func (u *User) HashPass() {
 func (m *MysqlUser) UpdateUser(user *User) int64 {
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "UPDATE users SET mail=? name=? surname=? partonymic=? recourse=? login=? password=? WHERE id = ?")
+	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=? WHERE id = ?")
 	defer stmt.Close()
 	res := exec(stmt, []interface{}{user.Mail, user.Name, user.Surname, user.Partonymic,
-		user.Recourse, user.Login, user.Pass, user.ID})
+		user.Recourse, user.Login, user.Pass, user.ActivationKey, user.ID})
 	aff := affect(res)
 	return aff
 }
@@ -87,10 +102,9 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	stmt := prepare(db, "SELECT * FROM users WHERE "+sqlParam+" = ? LIMIT 1")
 	defer stmt.Close()
 
-	user := new(User)
-	ns := new(userNullFields)
-	err := stmt.QueryRow(key).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name,
-		&ns.Surname, &ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &user.Status)
+	user, ns := new(User), new(userNullFields)
+	err := stmt.QueryRow(key).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user
 	} else if err != nil {
@@ -117,6 +131,12 @@ func (u *User) chkNullFields(ns *userNullFields) {
 	if ns.Recourse != nil {
 		u.Recourse = string(ns.Recourse.([]byte))
 	}
+	if ns.ActivationKey != nil {
+		u.ActivationKey = string(ns.ActivationKey.([]byte))
+	}
+	if ns.Status != nil {
+		u.Status = string(ns.Status.([]byte))
+	}
 }
 
 // GetDepartment method returns the department obj of user
@@ -127,7 +147,7 @@ func (u *User) GetDepartment() *Department {
 
 // ChkPass returns true if regexp match the password
 func (u *User) ChkPass() bool {
-	if alias.StrLen(u.Pass) > 5 || alias.StrLen(u.Pass) < 16 {
+	if alias.StrLen(u.Pass) > 5 && alias.StrLen(u.Pass) < 16 {
 		match, _ := regexp.MatchString("^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+[a-zA-Z0-9]{1}$", u.Pass)
 		return match
 	}
@@ -136,7 +156,7 @@ func (u *User) ChkPass() bool {
 
 // ChkLogin returns true if regexp match the login
 func (u *User) ChkLogin() bool {
-	if alias.StrLen(u.Login) > 3 || alias.StrLen(u.Login) < 11 {
+	if alias.StrLen(u.Login) > 3 && alias.StrLen(u.Login) < 11 {
 		match, _ := regexp.MatchString("^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+[a-zA-Z0-9]{1}$", u.Login)
 		return match
 	}
