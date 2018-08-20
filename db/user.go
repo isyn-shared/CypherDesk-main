@@ -1,6 +1,9 @@
 package db
 
-import "CypherDesk-main/alias"
+import (
+	"CypherDesk-main/alias"
+	"regexp"
+)
 
 // User - struct describing the registered user
 type User struct {
@@ -41,6 +44,11 @@ func (u *User) WriteIn(name, surname, partonymic, recourse, login, password stri
 	u.Name, u.Surname, u.Partonymic = name, surname, partonymic
 	u.Recourse = recourse
 	u.Login, u.Pass = login, alias.HashPass(password)
+}
+
+// HashPass method encrypt password of user
+func (u *User) HashPass() {
+	u.Pass = alias.HashPass(u.Pass)
 }
 
 // UpdateUser fills empty fields of user entry in DB
@@ -115,4 +123,22 @@ func (u *User) chkNullFields(ns *userNullFields) {
 func (u *User) GetDepartment() *Department {
 	mysql := CreateMysqlUser()
 	return mysql.GetDepartment(u.Department)
+}
+
+// ChkPass returns true if regexp match the password
+func (u *User) ChkPass() bool {
+	if alias.StrLen(u.Pass) > 5 || alias.StrLen(u.Pass) < 16 {
+		match, _ := regexp.MatchString("^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+[a-zA-Z0-9]{1}$", u.Pass)
+		return match
+	}
+	return false
+}
+
+// ChkLogin returns true if regexp match the login
+func (u *User) ChkLogin() bool {
+	if alias.StrLen(u.Login) > 3 || alias.StrLen(u.Login) < 11 {
+		match, _ := regexp.MatchString("^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+[a-zA-Z0-9]{1}$", u.Login)
+		return match
+	}
+	return false
 }
