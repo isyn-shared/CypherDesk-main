@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/flosch/pongo2"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -48,6 +49,13 @@ func accountHandler(c *gin.Context) {
 			}, c)
 		}
 	}
+}
+
+func logOutHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Delete("id")
+	session.Save()
+	c.Redirect(http.StatusSeeOther, "/")
 }
 
 func fillAdminAccountHandler(c *gin.Context) {

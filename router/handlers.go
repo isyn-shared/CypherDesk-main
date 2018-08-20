@@ -28,6 +28,7 @@ func authorizeHandler(c *gin.Context) {
 	}
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("login", login)
+
 	if !user.Exist() {
 		user = mysql.GetUser("mail", login)
 		if !user.Exist() {

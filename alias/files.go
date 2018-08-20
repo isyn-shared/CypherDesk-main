@@ -23,12 +23,13 @@ func isWindows() bool {
 }
 
 func windowsify(path string) string {
+	// -1 means that we need to replace all entries
 	return "\\" + strings.Replace(path, "/", "\\", -1)
 }
 
 // ReadFile returns text from file
 func ReadFile(path string) (string, error) {
-	bs, err := ioutil.ReadFile(AnalyzePath(build.Default.GOPATH + "src/CypherDesk-main/" + path))
+	bs, err := ioutil.ReadFile(build.Default.GOPATH + AnalyzePath("src/CypherDesk-main/"+path))
 	if err != nil {
 		return "", err
 	}

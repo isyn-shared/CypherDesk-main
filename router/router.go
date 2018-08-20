@@ -24,6 +24,7 @@ func New() *gin.Engine {
 	router.GET("/account", accountHandler)
 	router.POST("/fillUserAccount", fillUserAccountHandler)
 	router.POST("/fillAdminAccount", fillAdminAccountHandler)
+	router.GET("/out", logOutHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")
