@@ -3,7 +3,6 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"fmt"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -49,8 +48,6 @@ func authorizeHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный пароль!"})
 	}
 }
-
 func testHandler(c *gin.Context) {
-	str := "admin"
-	fmt.Println(alias.HashPass(str))
+	c.String(http.StatusOK, "test")
 }

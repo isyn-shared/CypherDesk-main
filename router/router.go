@@ -30,6 +30,7 @@ func New() *gin.Engine {
 	router.GET("/account", accountHandler)
 	router.POST("/fillUserAccount", fillUserAccountHandler)
 	router.POST("/fillAdminAccount", fillAdminAccountHandler)
+	router.POST("/createUser", createUserHandler)
 	router.GET("/out", logOutHandler)
 	router.GET("/activate/:key", activateAccountHandler)
 

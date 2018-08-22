@@ -2,6 +2,7 @@ package db
 
 import (
 	"CypherDesk-main/alias"
+	"database/sql"
 	"regexp"
 )
 
@@ -78,12 +79,42 @@ func (m *MysqlUser) UpdateUser(user *User) int64 {
 	return aff
 }
 
+func (m *MysqlUser) InsertUser(user *User) sql.Result {
+	db := m.connect()
+	defer db.Close()
+	stmt := prepare(db, "INSERT INTO users (login, pass, mail, name, surname, partonymic, recourse, role, department, status, activationKey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	defer stmt.Close()
+	res := exec(stmt, []interface{}{user.Login, user.Pass, user.Mail, user.Name, user.Surname, user.Partonymic, user.Recourse,
+		user.Recourse, user.Department, user.Status, user.ActivationKey})
+	return res
+}
+
 // Exist method checks if user exist
 func (u *User) Exist() bool {
 	if u.ID == 0 {
 		return false
 	}
 	return true
+}
+
+const loginCharset = "abcdefghijklmnopqrstuvwxyz" +
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+// GenerateLogin generates login for user and check if user with this login exist`s
+func (u *User) GenerateLogin(len int) {
+	mysql := CreateMysqlUser()
+	for {
+		login := alias.StringWithCharset(len, loginCharset)
+		if !mysql.GetUser("login", login).Exist() {
+			u.Login = login
+			return
+		}
+	}
+}
+
+// GeneratePass generates pass for user
+func (u *User) GeneratePass(len int) {
+	u.Pass = alias.StringWithCharset(len, loginCharset)
 }
 
 // Filled method returns true if all user fields are filled
