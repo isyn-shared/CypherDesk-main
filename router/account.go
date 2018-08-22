@@ -28,28 +28,32 @@ func accountHandler(c *gin.Context) {
 			writePongoTemplate("templates/fillAccount/user.html", pongo2.Context{}, c)
 		}
 	} else {
-		if user.Role == "admin" {
-			departments := mysql.GetDepartments()
-			writePongoTemplate("templates/adminPanel/index.html", pongo2.Context{
-				"name":        user.Name,
-				"surname":     user.Surname,
-				"partonymic":  user.Partonymic,
-				"recourse":    user.Recourse,
-				"mail":        user.Mail,
-				"login":       user.Login,
-				"departments": departments,
-			}, c)
+		if user.ActivationKey != "" {
+			writePongoTemplate("templates/fillAccount/activationMessage.html", pongo2.Context{}, c)
 		} else {
-			department := user.GetDepartment()
-			writePongoTemplate("templates/homePage/index.html", pongo2.Context{
-				"name":       user.Name,
-				"surname":    user.Surname,
-				"partonymic": user.Partonymic,
-				"recourse":   user.Recourse,
-				"mail":       user.Mail,
-				"login":      user.Login,
-				"department": department.Name,
-			}, c)
+			if user.Role == "admin" {
+				departments := mysql.GetDepartments()
+				writePongoTemplate("templates/adminPanel/index.html", pongo2.Context{
+					"name":        user.Name,
+					"surname":     user.Surname,
+					"partonymic":  user.Partonymic,
+					"recourse":    user.Recourse,
+					"mail":        user.Mail,
+					"login":       user.Login,
+					"departments": departments,
+				}, c)
+			} else {
+				department := user.GetDepartment()
+				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
+					"name":       user.Name,
+					"surname":    user.Surname,
+					"partonymic": user.Partonymic,
+					"recourse":   user.Recourse,
+					"mail":       user.Mail,
+					"login":      user.Login,
+					"department": department.Name,
+				}, c)
+			}
 		}
 	}
 }
@@ -114,13 +118,20 @@ func activateAccountHandler(c *gin.Context) {
 	key := c.Param("key")
 	isAuthorized, id := getID(c)
 	if !isAuthorized {
-		c.String(http.StatusOK, "Вы не авторизованы!")
+		writePongoTemplate("templates/fillAccount/failActivation.html", pongo2.Context{
+			"err": "Вы не авторизованы!",
+		}, c)
+		return
 	}
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", id)
 	if user.ActivationKey == key {
-		c.String(http.StatusOK, "Yeeeaaaahhh!!!")
+		user.ActivationKey = ""
+		mysql.UpdateUser(user)
+		c.Redirect(http.StatusSeeOther, "/account")
 	} else {
-		c.String(http.StatusOK, "Ohh, nooo!!!")
+		writePongoTemplate("templates/fillAccount/failActivation.html", pongo2.Context{
+			"err": "Активационный ключ не действителен!",
+		}, c)
 	}
 }

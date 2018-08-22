@@ -8,6 +8,7 @@ import (
 
 // HashPass returns encrypted user pass
 func HashPass(password string) string {
+	// admin pass: 4BDF095E5605643D3D70725376A626E3BD2349B89CA78531DBF65E3FF78C3E82
 	md5Str := MD5(password)
 	return SHA256(md5Str)
 }
