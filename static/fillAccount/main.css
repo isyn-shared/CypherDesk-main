@@ -5,7 +5,7 @@ body {
 
 body {
     display: flex;
-    align-items: center;
+    align-items: right;
 
     background-image: url("/static/fillAccount/background.jpg")
 }
@@ -20,6 +20,7 @@ body {
     background-color: #e3e3e3;
 }
 
+/* Desktop */
 @media (min-width: 770px) {
     #authCard {
         width: 450px
@@ -29,6 +30,7 @@ body {
     }
 }
 
+/* Mobile */
 @media (max-width: 769px) {
     #authCard {
         padding: 0!important;
