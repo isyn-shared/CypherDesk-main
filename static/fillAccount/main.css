@@ -7,7 +7,8 @@ body {
     display: flex;
     align-items: right;
 
-    background-image: url("/static/fillAccount/background.jpg")
+    background-image: url("/static/fillAccount/background.jpg");
+    background-size: cover; 
 }
 
 .display-5 {
