@@ -27,4 +27,11 @@ function createAlert(type, title, text = "") {
             <strong>${title}</strong> ${text}
         </div>
     `);
+
+    const offset = $('#alertWrapper').offset();
+
+    $('html, body').animate({
+        scrollTop: offset.top,
+        scrollLeft: offset.left
+    });
 }
