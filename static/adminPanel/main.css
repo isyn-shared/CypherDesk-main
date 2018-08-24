@@ -1,0 +1,101 @@
+html,
+body {
+    overflow-x: hidden;
+}
+
+.display-5 {
+    font-size: 3rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.window {
+    width: 100%;
+    height: calc(100% - 80px);
+    position: absolute;
+}
+
+.out {
+    /* left: 100%; */
+    display: none;
+}
+
+@keyframes slideIn {
+    from {
+        left: 100%;
+    }
+
+    to {
+        left: 0%
+    }
+}
+
+
+@keyframes slideAway {
+    from {
+        left: 0%;
+    }
+
+    to {
+        left: -100%;
+    }
+}
+
+#status {
+    background-color: rgba(202, 223, 248, 0.377);
+}
+
+#users {
+    background-color: rgba(197, 255, 197, 0.212);
+}
+
+#departments {
+    background-color: rgba(255, 255, 202, 0.205);
+}
+
+.controlBlock {
+    height: 50%;
+    padding-top: 50%;
+}
+
+/* Mobile */
+@media (max-width: 769px) {
+    .display-3 {
+        font-size: 2rem;
+    }
+
+    .paddingDesktop {
+        padding: auto;
+    }
+
+    .slideIn {
+        animation-duration: 0.3s;
+        animation-name: slideIn;
+    }
+
+    .slideAway {
+        animation-duration: 0.3s;
+        animation-name: slideAway;
+    }
+}
+
+/* Desktop */
+@media (min-width: 770px) { 
+    .paddingDesktop {
+        padding: 3rem!important;
+    }
+
+    .slideIn {
+        animation-duration: 0.5s;
+        animation-name: slideIn;
+    }
+
+    .slideAway {
+        animation-duration: 0.5s;
+        animation-name: slideAway;
+    }
+}
+
+.bg-none {
+    background-color: transparent;
+}
