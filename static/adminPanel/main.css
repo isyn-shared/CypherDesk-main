@@ -64,7 +64,7 @@ body {
         font-size: 2rem;
     }
 
-    .paddingDesktop {
+    .p-5-desktop {
         padding: auto;
     }
 
@@ -77,11 +77,16 @@ body {
         animation-duration: 0.3s;
         animation-name: slideAway;
     }
+
+    .mobilePadding {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
 }
 
 /* Desktop */
 @media (min-width: 770px) { 
-    .paddingDesktop {
+    .p-5-desktop {
         padding: 3rem!important;
     }
 
@@ -93,6 +98,14 @@ body {
     .slideAway {
         animation-duration: 0.5s;
         animation-name: slideAway;
+    }
+
+    .w-50-desktop {
+        width: 50%!important;
+    }
+
+    .mobilePadding {
+        padding: auto;
     }
 }
 
