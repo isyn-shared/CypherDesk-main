@@ -140,9 +140,9 @@
         <div class="d-flex justify-content-center mt-5" style="font-size: 2.5rem">
             <div class="input-group mb-3 w-50-desktop mobilePadding">
                 <input type="text" class="form-control" placeholder="ФИО / Почта / Никнейм / Обращение" aria-label="Recipient's username"
-                    aria-describedby="basic-addon2">
+                    aria-describedby="basic-addon2" id="searchInput"> 
                 <div class="input-group-append">
-                    <button class="btn btn-primary" type="button">Поиск</button>
+                    <button id="searchButton" class="btn btn-primary" type="button" onclick="search()">Поиск</button>
                 </div>
             </div>
         </div> 
@@ -215,8 +215,8 @@
 
     <!-- My JS -->
     <script src="/static/publicVars.js"></script>
-    <script src="/static/adminPanel/main.js"></script>
     <script src="/static/sendPOST.js"></script>
+    <script src="/static/adminPanel/main.js"></script>
 
     <!-- ISYN Software 2018 -->
 </body>

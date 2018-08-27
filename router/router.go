@@ -36,7 +36,7 @@ func New() *gin.Engine {
 	router.POST("/createUser", createUserHandler)
 	router.GET("/out", logOutHandler)
 	router.GET("/activate/:key", activateAccountHandler)
-	router.GET("/findUser", findUserHandler)
+	router.POST("/findUser", findUserHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")

@@ -23,3 +23,32 @@ function showWindow(windowID) {
         $(selectedWindow).removeClass('out').addClass('slideIn');
     }
 }
+
+$(document).ready(() => {
+    $('#searchInput').keyup(event => {
+        if (event.key)
+            search(false);
+    });
+});
+
+let timer = null;
+function search(bypass = true) {
+    console.log(bypass);
+    const key = $('#searchInput').val() || "*";
+
+    if (!bypass) {
+
+        if (timer) clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            action();
+        }, 200);
+    } else 
+        action();
+
+    function action() {
+        sendPOST('/findUser', {key})
+            .then(console.log)
+            .catch(console.error);
+    }
+}

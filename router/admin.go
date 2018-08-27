@@ -4,6 +4,7 @@ import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -64,17 +65,18 @@ func findUserHandler(c *gin.Context) {
 		return
 	}
 
-	keyPhrases := strings.Split(c.Query("key"), "~")
+	keyPhrases := strings.Split(c.PostForm("key"), " ")
 	if len(keyPhrases) == 0 || len(keyPhrases) > 5 {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильные POST данные"})
 		return
 	}
 
-	var res string
 	users := mysql.FindUser(keyPhrases)
+
 	for _, u := range users {
-		res += u.String() + "\n\n"
+		u.HidePrivateInfo()
 	}
 
-	c.String(http.StatusOK, res)
+	strRes := string(chk(json.Marshal(users)).([]byte))
+	c.String(http.StatusOK, strRes)
 }

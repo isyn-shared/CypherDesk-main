@@ -169,7 +169,6 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 		}
 	}
 
-	fmt.Println(sqlReq)
 	users := make([]*User, 0)
 
 	db := m.connect()

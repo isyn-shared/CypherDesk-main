@@ -1,1 +1,1 @@
-const DEBUG = true;
+let DEBUG = true;
