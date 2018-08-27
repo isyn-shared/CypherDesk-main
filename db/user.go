@@ -3,7 +3,12 @@ package db
 import (
 	"CypherDesk-main/alias"
 	"database/sql"
+	"fmt"
 	"regexp"
+)
+
+var (
+	findUserFields = []string{"Login", "Mail", "Name", "Surname", "Partonymic", "Recourse"}
 )
 
 // User - struct describing the registered user
@@ -145,6 +150,55 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	return user
 }
 
+// FindUser returns finded user-obj arr using key
+func (m *MysqlUser) FindUser(keys []string) []*User {
+	var argsLen = 6
+	sqlReq := "SELECT * FROM users WHERE (name = ? OR surname = ? OR partonymic = ? OR login = ? OR mail = ? OR recourse = ?)"
+	addSQLReq := " AND (name = ? OR surname = ? OR partonymic = ? OR login = ? OR mail = ? OR recourse = ?)"
+	keysLen := len(keys)
+	sqlKeys := make([]string, 0)
+
+	for i := 0; i < argsLen; i++ {
+		sqlKeys = append(sqlKeys, keys[0])
+	}
+
+	for i := 1; i < keysLen; i++ {
+		sqlReq += addSQLReq
+		for j := 0; j < argsLen; j++ {
+			sqlKeys = append(sqlKeys, keys[i])
+		}
+	}
+
+	fmt.Println(sqlReq)
+	users := make([]*User, 0)
+
+	db := m.connect()
+	defer db.Close()
+
+	stmt := prepare(db, sqlReq)
+	defer stmt.Close()
+
+	InterfaceArgs := make([]interface{}, len(sqlKeys))
+	for i, a := range sqlKeys {
+		InterfaceArgs[i] = a
+	}
+
+	rows := chk(stmt.Query(InterfaceArgs...)).(*sql.Rows)
+
+	for rows.Next() {
+		user, ns := new(User), new(userNullFields)
+		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		user.chkNullFields(ns)
+		users = append(users, user)
+	}
+
+	return users
+}
+
 // TODO: think about refactoring
 func (u *User) chkNullFields(ns *userNullFields) {
 	if ns.Mail != nil {
@@ -174,6 +228,18 @@ func (u *User) chkNullFields(ns *userNullFields) {
 func (u *User) GetDepartment() *Department {
 	mysql := CreateMysqlUser()
 	return mysql.GetDepartment(u.Department)
+}
+
+// HidePrivateInfo clears all private info from user obj
+func (u *User) HidePrivateInfo() {
+	u.Pass = ""
+	u.ID = 0
+}
+
+// String returns user object description
+func (u *User) String() string {
+	return "Name: " + u.Name + "\nSurname: " + u.Surname + "\nPartonymic: " + u.Partonymic +
+		"\nLogin: " + u.Login + "\nMail: " + u.Mail + "\nRecourse: " + u.Recourse
 }
 
 // ChkPass returns true if regexp match the password

@@ -12,9 +12,12 @@ import (
 )
 
 var (
+	// Protocol which used to access to the server
 	Protocol = "http"
-	Host     = "127.0.0.1"
-	Port     = "3000"
+	// Host of the server
+	Host = "127.0.0.1"
+	// Port which used to access to the server
+	Port = "3000"
 )
 
 // New returns pointer on gin.Engine obj with settings
@@ -33,6 +36,7 @@ func New() *gin.Engine {
 	router.POST("/createUser", createUserHandler)
 	router.GET("/out", logOutHandler)
 	router.GET("/activate/:key", activateAccountHandler)
+	router.GET("/findUser", findUserHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")

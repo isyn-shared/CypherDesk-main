@@ -5,6 +5,7 @@ import (
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,8 +22,13 @@ func createUserHandler(c *gin.Context) {
 		return
 	}
 	mysql := db.CreateMysqlUser()
-	user := mysql.GetUser("id", id)
-	if user.Role != "admin" {
+	user := mysql.GetUser("mail", userMail)
+	if user.Exist() {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пользователь с такой почтой уже существует!"})
+		return
+	}
+	user = mysql.GetUser("id", id)
+	if user.Role != "admin" || !user.Filled() {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие"})
 		return
 	}
@@ -43,4 +49,32 @@ func createUserHandler(c *gin.Context) {
 	}
 
 	feedback.SendMail(mailMsg)
+}
+
+func findUserHandler(c *gin.Context) {
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	userAdmin := mysql.GetUser("id", id)
+	if userAdmin.Role != "admin" || !userAdmin.Filled() {
+		c.JSON(http.StatusOK, "У Вас нет прав на это действие")
+		return
+	}
+
+	keyPhrases := strings.Split(c.Query("key"), "~")
+	if len(keyPhrases) == 0 || len(keyPhrases) > 5 {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильные POST данные"})
+		return
+	}
+
+	var res string
+	users := mysql.FindUser(keyPhrases)
+	for _, u := range users {
+		res += u.String() + "\n\n"
+	}
+
+	c.String(http.StatusOK, res)
 }

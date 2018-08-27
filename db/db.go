@@ -34,3 +34,7 @@ func exec(stmt *sql.Stmt, args []interface{}) sql.Result {
 func affect(res sql.Result) int64 {
 	return chk(res.RowsAffected()).(int64)
 }
+
+func colums(db *sql.DB, rows *sql.Rows) []string {
+	return chk(rows.Columns()).([]string)
+}
