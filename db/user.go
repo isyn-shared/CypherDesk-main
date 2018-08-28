@@ -226,7 +226,7 @@ func (u *User) chkNullFields(ns *userNullFields) {
 // GetDepartment method returns the department obj of user
 func (u *User) GetDepartment() *Department {
 	mysql := CreateMysqlUser()
-	return mysql.GetDepartment(u.Department)
+	return mysql.GetDepartment("id", u.Department)
 }
 
 // HidePrivateInfo clears all private info from user obj
