@@ -3,7 +3,7 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -50,10 +50,8 @@ func authorizeHandler(c *gin.Context) {
 	}
 }
 func testHandler(c *gin.Context) {
-	_, id := getID(c)
+	//	_, id := getID(c)
 	mysql := db.CreateMysqlUser()
-	user := mysql.GetUser("id", id)
-	dep := user.GetDepartment()
-	fmt.Println(dep.ID, dep.Name)
-	c.String(http.StatusOK, "test")
+	users := mysql.FindUser([]string{})
+	c.String(http.StatusOK, string(chk(json.Marshal(users)).([]byte)))
 }

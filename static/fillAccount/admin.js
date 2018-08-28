@@ -40,3 +40,11 @@ function createAlert(type, title, text = "") {
         scrollLeft: offset.left
     });
 }
+
+$(document).ready(() => {
+    $('#setDataForm').submit(e => {
+        e.preventDefault();
+
+        fillAccountAdmin();
+    })
+});

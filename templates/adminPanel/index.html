@@ -28,6 +28,12 @@
                 </a>
                 <a class="nav-item nav-link" id="usersA" onclick="showWindow('#users')" href="#">Пользователи</a>
                 <a class="nav-item nav-link" id="departmentsA" onclick="showWindow('#departments')" href="#">Отделы</a>
+                
+                <!-- This will hide on mobile -->
+                <a class="nav-item nav-link text-danger d-none d-sm-block" style="position: absolute; right: 10px"
+                    onclick="location = '/out'" href="#">Выход</a>
+                <!-- This will appear on mobile -->
+                <a class="nav-item nav-link text-danger d-block d-sm-none" onclick="location = '/out'" href="#">Выход</a>
             </div>
         </div>
     </nav>
@@ -150,22 +156,33 @@
             <button class="btn btn-primary mt-0" data-toggle="modal" data-target="#addUserModal">Добавить пользователя</button>
         </div>
 
+
+        <!-- Creating this script to store some values from server on client side -->
+        <script>
+            let departments = {
+                {% for dep in departments %}
+                    {{dep.ID}}: "{{dep.Name}}",
+                {% endfor %}
+            }            
+        </script>
+
+
         <div class="container-fluid p-5-desktop">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <div class="row" id="renderedUsers">
+                <div v-for="user in users" class="col-lg-3 col-md-6 col-12 mb-3">
 
                     <div class="card text-center" style="height: 30rem">
                         <div class="card-header bg-primary">
-                            <span class="lead text-white">Сеньор</span>
+                            <span class="lead text-white">{{ '{{user.Recourse}}' }}</span>
                         </div>
                         <div class="card-body d-flex flex-wrap align-content-center justify-content-center">
                             <img src="/static/adminPanel/default_profile.jpg" width="150px" height="150px" alt="Thumbnail image">
                             <div>
-                                <h4 class="card-title">Ватсон Джон Иванов</h4>
+                                <h4 class="card-title">{{ '{{user.Surname}} {{user.Name}} {{user.Partonymic}}' }}</h4>
                                 <p class="card-text">
-                                    <b>Почта:</b> mail@mail.mail<br>
-                                    <b>Никнейм:</b> sherlok2<br>
-                                    <b>Отдел:</b> 2 (расследования)
+                                    <b>Почта:</b> {{ '{{user.Mail}}' }}<br>
+                                    <b>Логин:</b> {{ '{{user.Login}}' }}<br>
+                                    <b>Отдел:</b> {{ '{{user.DepartmentName}}' }}
                                 </p>
                                 <a href="#!" class="btn btn-primary">Редактировать</a>
                             </div>
@@ -175,8 +192,8 @@
                         </div>
                     </div>
 
-                    
                 </div>
+
             </div>
             <!-- /.row -->
         </div>
@@ -212,9 +229,9 @@
                                 <label for="departmentSelect" class="blockquote mt-3 mb-1">Отдел</label>                                
                                 <select class="custom-select" name="departmentSelect" id="departmentSelect">
                                     <option value="0" selected="">Выберите отдел</option>
-                                    <option value="1">Ну</option>
-                                    <option value="2">У меня</option>
-                                    <option value="3">Рендера пока нет</option>
+                                    {% for dep in departments %}
+                                        <option value="{{dep.ID}}">{{dep.Name}}</option>
+                                    {% endfor %}
                                 </select>
 
                                 <!-- This will be filled using JS -->
@@ -243,21 +260,25 @@
 
         <div class="container-fluid p-5-desktop">
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-12 mb-3">
-                    <div class="card text-center" style="height: 22rem">
-                        <div class="card-header bg-primary">
-                            <span class="lead text-white">Отдел №2</span>
-                        </div>
-                        <div class="card-body d-flex flex-wrap align-content-center justify-content-center">
-                            <h4 class="card-title">Расследования</h4>
-                            <p class="card-text">На данный момент в системе есть <b>18</b> пользователей, из которых <b>12</b> рядовых пользователей и <b>6</b> с повышенными правами.</p>
-                            <a href="#!" class="btn btn-primary">Редактировать отдел</a>
-                        </div>
-                        <div class="card-footer text-muted">
-                            Отдел
+
+                {% for dep in departments %}
+                    <div class="col-lg-3 col-md-6 col-12 mb-3">
+                        <div class="card text-center" style="height: 22rem">
+                            <div class="card-header bg-primary">
+                                <span class="lead text-white">Отдел №{{dep.ID}}</span>
+                            </div>
+                            <div class="card-body d-flex flex-wrap align-content-center justify-content-center">
+                                <h4 class="card-title">Название: {{dep.Name}}</h4>
+                                <p class="card-text">Вы можете отредактировать этот отдел (Никита, а го статистику потом сюда?)</p>
+                                <a href="#!" class="btn btn-primary">Редактировать отдел</a>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Отдел
+                            </div>
                         </div>
                     </div>
-                </div>
+                {% endfor %} 
+
             </div>
             <!-- ./row -->
         </div>
@@ -307,6 +328,9 @@
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Vue.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
     <!-- My JS -->
     <script src="/static/publicVars.js"></script>

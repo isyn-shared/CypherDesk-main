@@ -13,28 +13,30 @@ var (
 
 // User - struct describing the registered user
 type User struct {
-	ID            int    `json: "id"`
-	Login         string `json: "login"`
-	Pass          string `json: "pass"`
-	Mail          string `json: "mail"`
-	Name          string `json: "name"`
-	Surname       string `json: "surname"`
-	Partonymic    string `json: "partonymic"`
-	Recourse      string `json: "recourse"`
-	Role          string `json: "role"`
-	Department    int    `json: "department"`
-	Status        string `json: "status"`
-	ActivationKey string `json: "activationKey"`
+	ID             int    `json: "id"`
+	Login          string `json: "login"`
+	Pass           string `json: "pass"`
+	Mail           string `json: "mail"`
+	Name           string `json: "name"`
+	Surname        string `json: "surname"`
+	Partonymic     string `json: "partonymic"`
+	Recourse       string `json: "recourse"`
+	Role           string `json: "role"`
+	Department     int    `json: "department"`
+	Status         string `json: "status"`
+	ActivationKey  string `json: "activationKey"`
+	ActivationType int    `json: "activationType"`
 }
 
 type userNullFields struct {
-	Mail          interface{}
-	Name          interface{}
-	Surname       interface{}
-	Partonymic    interface{}
-	Recourse      interface{}
-	ActivationKey interface{}
-	Status        interface{}
+	Mail           interface{}
+	Name           interface{}
+	Surname        interface{}
+	Partonymic     interface{}
+	Recourse       interface{}
+	ActivationKey  interface{}
+	Status         interface{}
+	ActivationType interface{}
 }
 
 // BasicUser returns user obj containing system information
@@ -84,6 +86,7 @@ func (m *MysqlUser) UpdateUser(user *User) int64 {
 	return aff
 }
 
+// InsertUser inserts user obj in db
 func (m *MysqlUser) InsertUser(user *User) sql.Result {
 	db := m.connect()
 	defer db.Close()
@@ -140,7 +143,7 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 
 	user, ns := new(User), new(userNullFields)
 	err := stmt.QueryRow(key).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey)
+		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user
 	} else if err != nil {
@@ -150,25 +153,95 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	return user
 }
 
+// GetUsers returns all users from db
+func (m *MysqlUser) GetUsers(sqlKey string, keyVal interface{}) []*User {
+	db := m.connect()
+	defer db.Close()
+
+	var rows *sql.Rows
+	if sqlKey == "*" {
+		rows = getQuery(db, "SELECT * FROM users")
+	} else {
+		stmt := prepare(db, "SELECT * FROM users WHERE "+sqlKey+" = ?")
+		defer stmt.Close()
+		rows = chk(stmt.Query(keyVal)).(*sql.Rows)
+	}
+
+	users := make([]*User, 0)
+	for rows.Next() {
+		user, ns := new(User), new(userNullFields)
+		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		user.chkNullFields(ns)
+		users = append(users, user)
+	}
+	return users
+}
+
 // FindUser returns finded user-obj arr using key
 func (m *MysqlUser) FindUser(keys []string) []*User {
+	modified := false
+	sqlReq := "SELECT * FROM users WHERE "
+
+	checkModified := func() {
+		if modified {
+			sqlReq += "AND "
+		}
+		modified = true
+	}
+
+	delReservKey := func(i *int) {
+		fmt.Println("DELETE: " + keys[*i])
+		if *i+1 >= len(keys) {
+			keys = keys[:*i]
+		} else {
+			keys = append(keys[:*i], keys[*i+1:]...)
+		}
+		*i--
+	}
+
+	for i := 0; i < len(keys); i++ {
+		switch keys[i] {
+		case "@admin":
+			checkModified()
+			delReservKey(&i)
+			sqlReq += "role = \"admin\" "
+		case "@user":
+			checkModified()
+			delReservKey(&i)
+			sqlReq += "role = \"user\" "
+		case "@activated":
+			checkModified()
+			delReservKey(&i)
+			sqlReq += "activationKey = \"\" "
+		case "@inactive":
+			checkModified()
+			delReservKey(&i)
+			sqlReq += "activationKey != \"\" "
+		}
+	}
+
+	fmt.Println(keys)
+
 	var argsLen = 6
-	sqlReq := "SELECT * FROM users WHERE (name = ? OR surname = ? OR partonymic = ? OR login = ? OR mail = ? OR recourse = ?)"
-	addSQLReq := " AND (name = ? OR surname = ? OR partonymic = ? OR login = ? OR mail = ? OR recourse = ?)"
+	addSQLReq := "(name = ? OR surname = ? OR partonymic = ? OR login = ? OR mail = ? OR recourse = ?)"
 	keysLen := len(keys)
 	sqlKeys := make([]string, 0)
 
-	for i := 0; i < argsLen; i++ {
-		sqlKeys = append(sqlKeys, keys[0])
-	}
+	fmt.Println(modified)
 
-	for i := 1; i < keysLen; i++ {
+	for i := 0; i < keysLen; i++ {
+		checkModified()
 		sqlReq += addSQLReq
 		for j := 0; j < argsLen; j++ {
 			sqlKeys = append(sqlKeys, keys[i])
 		}
 	}
 
+	fmt.Println(sqlReq)
 	users := make([]*User, 0)
 
 	db := m.connect()
@@ -187,7 +260,7 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 	for rows.Next() {
 		user, ns := new(User), new(userNullFields)
 		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey)
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -220,6 +293,9 @@ func (u *User) chkNullFields(ns *userNullFields) {
 	}
 	if ns.Status != nil {
 		u.Status = string(ns.Status.([]byte))
+	}
+	if ns.ActivationType != nil {
+		u.ActivationType = ns.ActivationType.(int)
 	}
 }
 

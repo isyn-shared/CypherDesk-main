@@ -78,7 +78,7 @@ function search(bypass = true) {
 
         timer = setTimeout(() => {
             action();
-        }, 200);
+        }, 1000);
     } else 
         action();
 
@@ -98,11 +98,24 @@ function createAlert(type, title, text = "") {
             <strong>${title}</strong> ${text}
         </div>
     `);
-
-    const offset = $('#alertWrapper').offset();
-
-    $('html, body').animate({
-        scrollTop: offset.top,
-        scrollLeft: offset.left
-    });
 }
+
+
+/* Vue.JS */
+
+sendPOST('/findUser', {key: "*"})
+    .then(str => {
+
+        let users = JSON.parse(str);
+        console.log(users);
+
+        for (user of users) {
+            user.DepartmentName = departments[user.Department];
+        }
+
+        var app = new Vue({
+            el: '#renderedUsers',
+            data: {users}
+        });
+    })
+    .catch(console.error);

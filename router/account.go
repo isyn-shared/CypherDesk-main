@@ -111,7 +111,37 @@ func fillAdminAccountHandler(c *gin.Context) {
 }
 
 func fillUserAccountHandler(c *gin.Context) {
+	defer rec(c)
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	updUser := new(db.User)
+	updUser.Name, updUser.Surname, updUser.Partonymic = c.PostForm("name"), c.PostForm("surname"), c.PostForm("partonymic")
+	updUser.Recourse = c.PostForm("recourse")
+	updUser.Login, updUser.Pass = c.PostForm("login"), c.PostForm("pass")
+	if alias.EmptyStrArr([]string{updUser.Name, updUser.Surname, updUser.Partonymic, updUser.Recourse,
+		updUser.Login, updUser.Pass}) {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Заполните все поля!"})
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", id)
+	prevLogin := user.Login
+	user.WriteIn(updUser)
 
+	if !user.ChkLogin() {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Логин не подходит по регулярке"})
+	} else if !user.ChkPass() {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пароль не подходит по регулярке"})
+	} else if user.Login != prevLogin && mysql.GetUser("login", updUser.Login).Exist() {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Такой логин уже существует!"})
+	} else {
+		user.HashPass()
+		mysql.UpdateUser(user)
+		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+	}
 }
 
 func activateAccountHandler(c *gin.Context) {
@@ -134,4 +164,37 @@ func activateAccountHandler(c *gin.Context) {
 			"err": "Активационный ключ не действителен!",
 		}, c)
 	}
+}
+
+func remindPassHandler(c *gin.Context) {
+	defer rec(c)
+	isAuthorized, _ := getID(c)
+	if isAuthorized {
+		c.Redirect(http.StatusSeeOther, "/account")
+		return
+	}
+
+	credentials := c.PostForm("credentials")
+	if alias.EmptyStr(credentials) {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный запрос"})
+		return
+	}
+
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("login", credentials)
+	if !user.Exist() {
+		user = mysql.GetUser("mail", credentials)
+		if !user.Exist() {
+			c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Такого пользователя не существует!"})
+			return
+		}
+	}
+
+	mailMsg := &feedback.MailMessage{
+		Subject:    "Восстановление пароля CypherDesk",
+		Body:       "КЕК",
+		Recipients: []string{user.Mail},
+	}
+
+	feedback.SendMail(mailMsg)
 }

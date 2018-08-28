@@ -12,6 +12,7 @@ import (
 )
 
 func createUserHandler(c *gin.Context) {
+	defer rec(c)
 	isAuthorized, id := getID(c)
 	if !isAuthorized {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы не авторизованы"})
@@ -41,18 +42,23 @@ func createUserHandler(c *gin.Context) {
 	}
 	NewUser.GenerateLogin(12)
 	NewUser.GeneratePass(15)
+	privPass := NewUser.Pass
+	NewUser.HashPass()
+	NewUser.Role = "user"
 	mysql.InsertUser(NewUser)
 
 	mailMsg := &feedback.MailMessage{
 		Subject:    "Регистрация CypherDesk",
-		Body:       "Здравствуйте. Для авторизации используйте логин: " + NewUser.Login + " и пароль: " + NewUser.Pass + ". Приятного пользования!",
-		Recipients: []string{user.Mail},
+		Body:       "Здравствуйте. Для авторизации используйте логин: " + NewUser.Login + " и пароль: " + privPass + ". Приятного пользования!",
+		Recipients: []string{NewUser.Mail},
 	}
 
 	feedback.SendMail(mailMsg)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
 
 func findUserHandler(c *gin.Context) {
+	defer rec(c)
 	isAuthorized, id := getID(c)
 	if !isAuthorized {
 		c.Redirect(http.StatusSeeOther, "/")
@@ -71,12 +77,36 @@ func findUserHandler(c *gin.Context) {
 		return
 	}
 
-	users := mysql.FindUser(keyPhrases)
+	users := make([]*db.User, 0)
+	defer func() {
+		for _, u := range users {
+			u.HidePrivateInfo()
+		}
+		strRes := string(chk(json.Marshal(users)).([]byte))
+		c.String(http.StatusOK, strRes)
+	}()
 
-	for _, u := range users {
-		u.HidePrivateInfo()
+	if len(keyPhrases) == 1 {
+		switch keyPhrases[0] {
+		case "*":
+			users = mysql.GetUsers("*", "")
+			return
+		case "@admin":
+			users = mysql.GetUsers("role", "admin")
+			return
+		case "@user":
+			users = mysql.GetUsers("role", "user")
+			return
+		}
 	}
 
-	strRes := string(chk(json.Marshal(users)).([]byte))
-	c.String(http.StatusOK, strRes)
+	users = mysql.FindUser(keyPhrases)
+}
+
+func createDepartmentHandler(c *gin.Context) {
+	defer rec(c)
+	depName := c.PostForm("name")
+	mysql := db.CreateMysqlUser()
+	mysql.InsertDepartment(depName)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }

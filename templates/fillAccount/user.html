@@ -32,7 +32,7 @@
 
             <div class="card text-center shadow p-3 mb-5 bg-light rounded" id="authCard">
                 <div class="card-body">
-                    <form id="setDataForm" method="GET" action="#">
+                    <form id="setDataForm">
                         <div class="form-group">
                             <label for="loginInput" class="display-5 mb-3">Ваши данные:</label>
                             <input type="text" class="form-control mb-1" id="nameInput" placeholder="Имя" required>
@@ -47,7 +47,7 @@
                             <input type="password" class="form-control" id="repasswordInput" placeholder="Повторите пароль" required>
 
                         </div>
-                        <button class="btn btn-primary" onclick="fillAccountUser()">Вход</button>
+                        <button type="submit" class="btn btn-primary">Вход</button>
                     </form>
                 </div>
                 <!-- /.card-body -->     
