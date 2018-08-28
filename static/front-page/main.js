@@ -35,3 +35,11 @@ function createAlert(type, title, text = "") {
         scrollLeft: offset.left
     });
 }
+$(document).ready(() => {
+    $('#loginForm').submit(e => {
+        e.preventDefault();
+
+        login();
+    })
+
+});
