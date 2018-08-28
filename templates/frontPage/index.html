@@ -31,14 +31,14 @@
 
             <div class="card text-center shadow p-3 mb-5 bg-light rounded" id="authCard">
                 <div class="card-body">
-                    <form id="loginForm" method="GET" action="#">
+                    <form id="loginForm">
                         <div class="form-group">
                             <label for="loginInput" class="display-5 mb-3">Авторизация:</label>
                             <input type="text" class="form-control mb-2" id="loginInput" placeholder="Введите почту или логин" required>
                             <input type="password" class="form-control" id="passwordInput" placeholder="Введите пароль" aria-describedby="passwordHelp" required>
                             <small id="passwordHelp" class="form-text text-muted">Пароль вам должен выдать администратор</small>
                         </div>
-                        <button class="btn btn-primary" onclick="login()">Вход</button>
+                        <button type="submit" class="btn btn-primary">Вход</button>
                     </form>
                 </div>
                 <!-- /.card-body -->     
