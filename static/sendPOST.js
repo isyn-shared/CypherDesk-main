@@ -1,6 +1,6 @@
 const xhr = new XMLHttpRequest();
 
-function sendPOST(url, body = {}, convertToJSON = false) {
+function sendPOST(url, body = {}, convertToJSON = true) {
     return new Promise((resolve, reject) => {
         let formData = new FormData();
         for (let name in body)

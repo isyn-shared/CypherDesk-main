@@ -4,6 +4,7 @@ import (
 	"CypherDesk-main/alias"
 	"database/sql"
 	"fmt"
+	"reflect"
 	"regexp"
 )
 
@@ -53,6 +54,12 @@ func BasicUser(mail, role, status string, department int) *User {
 // SetActivationKey
 func (u *User) SetActivationKey(key string) {
 	u.ActivationKey = alias.MD5(key)
+	u.ActivationType = 1
+}
+
+func (u *User) SetRemindKey(key string) {
+	u.ActivationKey = alias.MD5(key)
+	u.ActivationType = 2
 }
 
 // WriteIn fills empty fields fo user obj
@@ -63,6 +70,9 @@ func (u *User) WriteIn(user *User) {
 
 	if !alias.EmptyStr(user.ActivationKey) {
 		u.ActivationKey = user.ActivationKey
+	}
+	if user.ActivationType == 0 {
+		u.ActivationType = user.ActivationType
 	}
 	if !alias.EmptyStr(user.Mail) {
 		u.Mail = user.Mail
@@ -78,10 +88,10 @@ func (u *User) HashPass() {
 func (m *MysqlUser) UpdateUser(user *User) int64 {
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=? WHERE id = ?")
+	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=?, activationType = ? WHERE id = ?")
 	defer stmt.Close()
 	res := exec(stmt, []interface{}{user.Mail, user.Name, user.Surname, user.Partonymic,
-		user.Recourse, user.Login, user.Pass, user.ActivationKey, user.ID})
+		user.Recourse, user.Login, user.Pass, user.ActivationKey, user.ActivationType, user.ID})
 	aff := affect(res)
 	return aff
 }
@@ -90,10 +100,10 @@ func (m *MysqlUser) UpdateUser(user *User) int64 {
 func (m *MysqlUser) InsertUser(user *User) sql.Result {
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "INSERT INTO users (login, pass, mail, name, surname, partonymic, recourse, role, department, status, activationKey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt := prepare(db, "INSERT INTO users (login, pass, mail, name, surname, partonymic, recourse, role, department, status, activationKey, activationType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	defer stmt.Close()
 	res := exec(stmt, []interface{}{user.Login, user.Pass, user.Mail, user.Name, user.Surname, user.Partonymic, user.Recourse,
-		user.Recourse, user.Department, user.Status, user.ActivationKey})
+		user.Role, user.Department, user.Status, user.ActivationKey, user.ActivationType})
 	return res
 }
 
@@ -216,22 +226,18 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 		case "@activated":
 			checkModified()
 			delReservKey(&i)
-			sqlReq += "activationKey = \"\" "
+			sqlReq += "name != \"\" "
 		case "@inactive":
 			checkModified()
 			delReservKey(&i)
-			sqlReq += "activationKey != \"\" "
+			sqlReq += "name = \"\" "
 		}
 	}
-
-	fmt.Println(keys)
 
 	var argsLen = 6
 	addSQLReq := "(name = ? OR surname = ? OR partonymic = ? OR login = ? OR mail = ? OR recourse = ?)"
 	keysLen := len(keys)
 	sqlKeys := make([]string, 0)
-
-	fmt.Println(modified)
 
 	for i := 0; i < keysLen; i++ {
 		checkModified()
@@ -241,7 +247,6 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 		}
 	}
 
-	fmt.Println(sqlReq)
 	users := make([]*User, 0)
 
 	db := m.connect()
@@ -295,7 +300,11 @@ func (u *User) chkNullFields(ns *userNullFields) {
 		u.Status = string(ns.Status.([]byte))
 	}
 	if ns.ActivationType != nil {
-		u.ActivationType = ns.ActivationType.(int)
+		if reflect.TypeOf(ns.ActivationType).String() == "[]uint8" {
+			u.ActivationType = chk(alias.STI(string(ns.ActivationType.([]byte)))).(int)
+		} else {
+			u.ActivationType = int(ns.ActivationType.(int64))
+		}
 	}
 }
 

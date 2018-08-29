@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 // Department obj
@@ -40,7 +41,8 @@ func (m *MysqlUser) InsertDepartment(name string) sql.Result {
 	return res
 }
 
-func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) {
+// GetDepartmentUsers returns all users which con
+func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) []*User {
 	db := m.connect()
 	defer db.Close()
 
@@ -58,9 +60,19 @@ func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) {
 
 	rows := chk(stmt.Query(depID)).(*sql.Rows)
 
+	users := make([]*User, 0)
 	for rows.Next() {
-		//TODO: Дописать!!!!!!!!!!!
+		user, ns := new(User), new(userNullFields)
+		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		user.chkNullFields(ns)
+		users = append(users, user)
 	}
+
+	return users
 }
 
 // GetDepartments return all departmens objects from DB

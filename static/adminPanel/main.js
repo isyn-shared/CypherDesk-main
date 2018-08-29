@@ -36,8 +36,11 @@ $(document).ready(() => {
         const name = $('#depNameInput').val();
 
         sendPOST('/createDepartment', {name})
-            .then(e => {
-                createAlert('alert-success', "Отлично!", "Сервер успешно получил данные, хз если все окей")
+            .then(resp => {
+                if (!resp.ok) 
+                    return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
+
+                createAlert('alert-success', "Отлично!", "Отдел создан!");
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -54,11 +57,17 @@ $(document).ready(() => {
 
         if (DEBUG) console.log(mail, role, department);
         if (role == "0" || department == "0")
-            return createAlert('alert-danger', 'Упс!', 'Убедитесь, что выбрали все!')
+            return createAlert('alert-danger', 'Упс!', 'Убедитесь, что выбрали все!');
+
+        createAlert('alert-info', "Загрузка...", "Пожалуйста подождите");
     
         sendPOST('/createUser', {mail, role, department})
-            .then(e => {
-                createAlert('alert-success', "Отлично!", "Сервер успешно получил данные, хз если все окей")
+            .then(resp => {
+                console.log(resp, typeof resp);
+                if (!resp.ok) 
+                    return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
+
+                createAlert('alert-success', "Отлично!", "Пользователь создан!");
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -77,16 +86,10 @@ function search(bypass = true) {
         if (timer) clearTimeout(timer);
 
         timer = setTimeout(() => {
-            action();
+            findUsers(key);
         }, 1000);
     } else 
-        action();
-
-    function action() {
-        sendPOST('/findUser', {key})
-            .then(console.log)
-            .catch(console.error);
-    }
+        findUsers(key);
 }
 
 function createAlert(type, title, text = "") {
@@ -102,20 +105,33 @@ function createAlert(type, title, text = "") {
 
 
 /* Vue.JS */
+// Render all users by making one call ourselves
+findUsers("*");
 
-sendPOST('/findUser', {key: "*"})
-    .then(str => {
+const app = new Vue({
+    el: '#renderedUsers',
+    data: {users: []}
+});
+function findUsers(key) {
+    sendPOST('/findUser', {key})
+        .then(users => {
 
-        let users = JSON.parse(str);
-        console.log(users);
+            console.log(users);
 
-        for (user of users) {
-            user.DepartmentName = departments[user.Department];
-        }
+            for (user of users) {
+                // Departments were defined inside html page
+                user.DepartmentName = departments[user.Department];
+                user.Tag = "bg-primary";
 
-        var app = new Vue({
-            el: '#renderedUsers',
-            data: {users}
-        });
-    })
-    .catch(console.error);
+                if (!user.Name) {
+                    user.Name = "Пользователь не активирован";
+                    user.Recourse = "Неопределено";
+                    user.Tag = "bg-secondary";
+                }
+
+            }
+
+            app.users = users;
+        })
+        .catch(console.error);
+}

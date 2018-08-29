@@ -11,6 +11,8 @@ function fillAccountAdmin() {
     if (!pass || !repass || pass != repass) 
         return createAlert('alert-danger', 'Ошибка!', 'Пароли не совпадают!');
 
+    createAlert('alert-info', 'Загрузка...', 'Пожалуйста подождите');    
+
     sendPOST('/fillAdminAccount', {name, surname, partonymic, recourse, mail, login, pass}, true)
         .then(resp => {
             if (!resp.ok)
@@ -18,7 +20,7 @@ function fillAccountAdmin() {
 
             createAlert('alert-success', "Успех!", "Все прошло успешно");
 
-            // TODO: Redirect
+            location = "/account";
         })
         .catch(console.error);
 }

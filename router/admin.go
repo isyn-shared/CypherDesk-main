@@ -24,14 +24,14 @@ func createUserHandler(c *gin.Context) {
 		return
 	}
 	mysql := db.CreateMysqlUser()
-	user := mysql.GetUser("mail", userMail)
-	if user.Exist() {
-		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пользователь с такой почтой уже существует!"})
-		return
-	}
-	user = mysql.GetUser("id", id)
+	user := mysql.GetUser("id", id)
 	if user.Role != "admin" || !user.Filled() {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие"})
+		return
+	}
+	user = mysql.GetUser("mail", userMail)
+	if user.Exist() {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пользователь с такой почтой уже существует!"})
 		return
 	}
 	uDid, _ := alias.STI(userDepartment)
@@ -44,7 +44,6 @@ func createUserHandler(c *gin.Context) {
 	NewUser.GeneratePass(15)
 	privPass := NewUser.Pass
 	NewUser.HashPass()
-	NewUser.Role = "user"
 	mysql.InsertUser(NewUser)
 
 	mailMsg := &feedback.MailMessage{
@@ -89,13 +88,7 @@ func findUserHandler(c *gin.Context) {
 	if len(keyPhrases) == 1 {
 		switch keyPhrases[0] {
 		case "*":
-			users = mysql.GetUsers("*", "")
-			return
-		case "@admin":
-			users = mysql.GetUsers("role", "admin")
-			return
-		case "@user":
-			users = mysql.GetUsers("role", "user")
+			users = mysql.GetUsers("*", "*")
 			return
 		}
 	}
@@ -105,8 +98,20 @@ func findUserHandler(c *gin.Context) {
 
 func createDepartmentHandler(c *gin.Context) {
 	defer rec(c)
-	depName := c.PostForm("name")
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы не авторизованы!"})
+		return
+	}
 	mysql := db.CreateMysqlUser()
+
+	user := mysql.GetUser("id", id)
+	if !user.Exist() || user.Role != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие!!"})
+		return
+	}
+
+	depName := c.PostForm("name")
 	mysql.InsertDepartment(depName)
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }

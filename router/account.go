@@ -28,7 +28,7 @@ func accountHandler(c *gin.Context) {
 			writePongoTemplate("templates/fillAccount/user.html", pongo2.Context{}, c)
 		}
 	} else {
-		if user.ActivationKey != "" {
+		if user.ActivationKey != "" && user.ActivationType == 1 {
 			writePongoTemplate("templates/fillAccount/activationMessage.html", pongo2.Context{}, c)
 		} else {
 			if user.Role == "admin" {
@@ -69,7 +69,13 @@ func fillAdminAccountHandler(c *gin.Context) {
 	defer rec(c)
 	isAuthorized, id := getID(c)
 	if !isAuthorized {
-		c.Redirect(http.StatusSeeOther, "/")
+		c.JSON(http.StatusSeeOther, gin.H{"ok": false, "err": "Вы не авторизованы", "redirect": "/"})
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", id)
+	if user.Filled() {
+		c.JSON(http.StatusSeeOther, gin.H{"ok": false, "err": "Вы уже заполнили аккаунт!", "redirect": "/account"})
 		return
 	}
 
@@ -82,8 +88,6 @@ func fillAdminAccountHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Заполните все поля!"})
 		return
 	}
-	mysql := db.CreateMysqlUser()
-	user := mysql.GetUser("id", id)
 	user.WriteIn(updUser)
 
 	if !user.ChkLogin() {
@@ -94,7 +98,7 @@ func fillAdminAccountHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Такой логин уже существует!"})
 	} else {
 		user.HashPass()
-		activationKey := user.Mail + time.Now().String()
+		activationKey := alias.StringWithCharset(20, loginCharset) + user.Mail + time.Now().String()
 		user.SetActivationKey(activationKey)
 		mysql.UpdateUser(user)
 
@@ -106,7 +110,7 @@ func fillAdminAccountHandler(c *gin.Context) {
 
 		feedback.SendMail(mailMsg)
 
-		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil, "redirect": "/account"})
 	}
 }
 
@@ -155,8 +159,9 @@ func activateAccountHandler(c *gin.Context) {
 	}
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", id)
-	if user.ActivationKey == key {
+	if user.ActivationKey == key && user.ActivationType == 1 {
 		user.ActivationKey = ""
+		user.ActivationType = 0
 		mysql.UpdateUser(user)
 		c.Redirect(http.StatusSeeOther, "/account")
 	} else {
@@ -190,6 +195,8 @@ func remindPassHandler(c *gin.Context) {
 		}
 	}
 
+	user.SetRemindKey(alias.StringWithCharset(20, loginCharset) + time.Now().String())
+
 	mailMsg := &feedback.MailMessage{
 		Subject:    "Восстановление пароля CypherDesk",
 		Body:       "КЕК",
@@ -197,4 +204,21 @@ func remindPassHandler(c *gin.Context) {
 	}
 
 	feedback.SendMail(mailMsg)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+}
+
+func changeCredentialsHandler(c *gin.Context) {
+	defer rec(c)
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы не авторизованы", "redirect": "/"})
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", id)
+	if user.ActivationType != 2 || user.ActivationKey != c.Param("key") {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный активационный ключ!", "redirect": "/"})
+		return
+	}
+
 }

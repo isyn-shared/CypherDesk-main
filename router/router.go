@@ -18,6 +18,9 @@ var (
 	Host = "127.0.0.1"
 	// Port which used to access to the server
 	Port = "3000"
+
+	loginCharset = "abcdefghijklmnopqrstuvwxyz" +
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 // New returns pointer on gin.Engine obj with settings
