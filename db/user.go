@@ -343,3 +343,16 @@ func (u *User) ChkLogin() bool {
 	}
 	return false
 }
+
+// DeleteUser delete`s user from db
+func (m *MysqlUser) DeleteUser(sqlKey string, keyVal interface{}) int64 {
+	db := m.connect()
+	defer db.Close()
+
+	stmt := prepare(db, "DELETE FROM users WHERE "+sqlKey+" = ?")
+	defer stmt.Close()
+	res := exec(stmt, []interface{}{keyVal})
+	aff := affect(res)
+
+	return aff
+}

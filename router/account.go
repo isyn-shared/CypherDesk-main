@@ -207,18 +207,69 @@ func remindPassHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
 
-func changeCredentialsHandler(c *gin.Context) {
+func checkChangeCredentialsKeyHandler(c *gin.Context) {
 	defer rec(c)
-	isAuthorized, id := getID(c)
-	if !isAuthorized {
-		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы не авторизованы", "redirect": "/"})
+	isAuthorized, _ := getID(c)
+	if isAuthorized {
+		c.Redirect(http.StatusSeeOther, "/account")
 		return
 	}
 	mysql := db.CreateMysqlUser()
-	user := mysql.GetUser("id", id)
+	user := mysql.GetUser("login", c.Param("login"))
 	if user.ActivationType != 2 || user.ActivationKey != c.Param("key") {
-		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный активационный ключ!", "redirect": "/"})
+		writePongoTemplate("templates/fillAccount/failActivation.html", pongo2.Context{}, c)
+		return
+	}
+	session := sessions.Default(c)
+	session.Set("updatePass", user.ActivationKey)
+	session.Save()
+	writePongoTemplate("templates/fillAccount/changePass.html", pongo2.Context{
+		"login":      user.Login,
+		"mail":       user.Mail,
+		"name":       user.Name,
+		"surname":    user.Surname,
+		"partonymic": user.Partonymic,
+	}, c)
+}
+
+func changeCredentialsHandler(c *gin.Context) {
+	defer rec(c)
+	isAuthorized, _ := getID(c)
+	if isAuthorized {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы уже авторизованы!", "redirect": "/account"})
 		return
 	}
 
+	userLogin, userNewPass := c.PostForm("login"), c.PostForm("pass")
+	if alias.EmptyStr(userLogin) || alias.EmptyStr(userNewPass) {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Некорректный запрос!"})
+		return
+	}
+
+	session := sessions.Default(c)
+	updatePassKey := session.Get("updatePass")
+
+	if alias.EmptyStr(updatePassKey.(string)) {
+		writePongoTemplate("templates/fillAccount/failAccount.html", pongo2.Context{}, c)
+		return
+	}
+
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("login", userLogin)
+
+	if user.ActivationKey != updatePassKey {
+		writePongoTemplate("templates/fillAccount/failAccount.html", pongo2.Context{}, c)
+		return
+	}
+
+	user.Pass = userNewPass
+	user.ActivationKey = ""
+	user.ActivationType = 0
+	user.HashPass()
+	mysql.UpdateUser(user)
+
+	session.Delete("id")
+	session.Save()
+
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil, "redirect": "/"})
 }

@@ -31,17 +31,25 @@ func New() *gin.Engine {
 	router.Use(sessions.Sessions("mysession", store))
 
 	router.GET("/", indexHandler)
-	router.POST("/authorize", authorizeHandler)
-	router.GET("/test", testHandler)
+
+	//Account
 	router.GET("/account", accountHandler)
+	router.POST("/authorize", authorizeHandler)
 	router.POST("/fillAdminAccount", fillAdminAccountHandler)
-	router.POST("/createUser", createUserHandler)
 	router.GET("/out", logOutHandler)
 	router.GET("/activate/:key", activateAccountHandler)
-	router.POST("/findUser", findUserHandler)
-	router.POST("/createDepartment", createDepartmentHandler)
 	router.POST("/fillUserAccount", fillUserAccountHandler)
 	router.POST("/remindPass", remindPassHandler)
+	router.GET("/remindPass/chk/:login/:key", checkChangeCredentialsKeyHandler)
+	router.POST("/remindPass/change", changeCredentialsHandler)
+
+	// AdminPanel
+	router.POST("/createDepartment", createDepartmentHandler)
+	router.POST("/createUser", createUserHandler)
+	router.POST("/findUser", findUserHandler)
+	router.GET("/deleteUser", deleteUserHandler)
+
+	router.GET("/test", testHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")
 	router.Static("/static", "./static")

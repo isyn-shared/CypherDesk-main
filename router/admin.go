@@ -115,3 +115,47 @@ func createDepartmentHandler(c *gin.Context) {
 	mysql.InsertDepartment(depName)
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
+
+func deleteUserHandler(c *gin.Context) {
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы не авторизованы", "redirect": "/"})
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", id)
+	if !user.Exist() || user.Role != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие!!"})
+		return
+	}
+	login := c.Query("login")
+	if alias.EmptyStr(login) {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный запрос"})
+		return
+	}
+	mysql.DeleteUser("login", login)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+}
+
+func changeUserHandler(c *gin.Context) {
+	defer rec(c)
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Вы не авторизованы", "redirect": "/"})
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", id)
+	if !user.Exist() || user.Role != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие!!"})
+		return
+	}
+	login, newLogin, newName, newSurname, newPartonymic, newRecourse, newDepartment := c.PostForm("login"),
+		c.PostForm("newLogin"), c.PostForm("newName"), c.PostForm("newSurname"), c.PostForm("newPartyonymic"),
+		c.PostForm("newRecourse"), c.PostForm("newDepartment")
+	user = mysql.GetUser("login", login)
+	user.Login, user.Name, user.Surname, user.Partonymic, user.Recourse, user.Department = newLogin, newName,
+		newSurname, newPartonymic, newRecourse, chk(alias.STI(newDepartment)).(int)
+	mysql.UpdateUser(user)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+}
