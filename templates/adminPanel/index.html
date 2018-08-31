@@ -23,7 +23,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link active" id="statusA" onclick="showWindow('#status')" href="#">Состояние
+                <a class="nav-item nav-link" id="statusA" onclick="showWindow('#status')" href="#">Состояние
                     <span class="sr-only">(current)</span>
                 </a>
                 <a class="nav-item nav-link" id="usersA" onclick="showWindow('#users')" href="#">Пользователи</a>
@@ -39,7 +39,7 @@
     </nav>
 
 
-    <div id="status" class="window">
+    <div id="status" class="window out">
         <p class="text-center display-3">Состояние системы</p>
 
         <!-- This will hide on mobile -->
@@ -160,6 +160,7 @@
         </div>
         <div class="d-flex justify-content-center mt-3 mb-3"> 
             <button class="btn btn-primary mt-0" data-toggle="modal" data-target="#addUserModal">Добавить пользователя</button>
+            <button class="btn btn-success mt-0 ml-2" onclick="search()">Обновить</button>
         </div>
 
 
@@ -169,11 +170,19 @@
                 {% for dep in departments %}
                     {{dep.ID}}: "{{dep.Name}}",
                 {% endfor %}
-            }            
+            }
         </script>
 
 
         <div class="container-fluid p-5-desktop">
+
+            <!-- No users found -->
+
+            <div class="mt-5 text-center d-none" id="usersNotFound">
+                <p class="text-secondary display-4" style="color: #84898d">Пользователи не найдены</p>
+                <p class="text-secondary display-5" style="color: #84898d">Мы старались :(</p>
+            </div>
+
             <div class="row" id="renderedUsers">
                 <div v-for="user in users" class="col-lg-3 col-md-6 col-12 mb-3">
 
@@ -191,7 +200,7 @@
                                     <b>Отдел:</b> {{ '{{user.DepartmentName}}' }}
                                 </p>
                                 <!-- TODO: onclick: "editUser(id)" -->
-                                <a href="#!" class="btn btn-primary" data-toggle="modal" data-target="#editUserMod">Редактировать</a>
+                                <a href="#!" class="btn btn-primary" data-toggle="modal" data-target="#editUserMod" v-on:click="editUser(user)">Редактировать</a>
                             </div>
                         </div>
                         <div class="card-footer text-muted">
@@ -261,28 +270,41 @@
                 <div class="modal-content">
                     <form id="editUserForm">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="modalVerticalLabel3">Добавление пользователя</h5>
+                            <h5 class="modal-title" id="modalVerticalLabel3">Редактирование пользователя</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body pb-0">
                             <div class="form-group">
-                                <label for="userNameInput" class="blockquote mb-1">Имя</label>
-                                <input type="text" class="form-control" id="userNameInput"
+                                <label for="editUserLoginInput" class="blockquote mb-1">Логин</label>
+                                <input type="text" class="form-control" id="editUserLoginInput"
                                 placeholder="Вася" required>
 
-                                <label for="userNameInput" class="blockquote mt-3 mb-1">Фамилия</label>
-                                <input type="text" class="form-control" id="userNameInput"
+                                <label for="editUserNameInput" class="blockquote mt-3 mb-1">Имя</label>
+                                <input type="text" class="form-control" id="editUserNameInput"
+                                placeholder="Вася" required>
+
+                                <label for="editUserSurnameInput" class="blockquote mt-3 mb-1">Фамилия</label>
+                                <input type="text" class="form-control" id="editUserSurnameInput"
                                 placeholder="Печкин" required>
 
-                                <label for="userNameInput" class="blockquote mt-3 mb-1">Отчество</label>
-                                <input type="text" class="form-control" id="userNameInput"
+                                <label for="editUserPartonymicInput" class="blockquote mt-3 mb-1">Отчество</label>
+                                <input type="text" class="form-control" id="editUserPartonymicInput"
                                 placeholder="Петрович" required>
 
-                                <label for="userNameInput" class="blockquote mt-3 mb-1">Обращение</label>
-                                <input type="text" class="form-control" id="userNameInput"
+                                <label for="editUserRecourseInput" class="blockquote mt-3 mb-1">Обращение</label>
+                                <input type="text" class="form-control" id="editUserRecourseInput"
                                 placeholder="Например, Док, Сеньор" required>
+
+                                <label for="editUserDepartmentSelect" name="editUserDepartmentSelect" class="blockquote mt-3 mb-1">Отдел</label>                                
+                                <select class="custom-select" name="departmentSelect" id="editUserDepartmentSelect">
+                                    <option value="0" selected="">Выберите отдел</option>
+                                    {% for dep in departments %}
+                                        <option value="{{dep.ID}}">{{dep.Name}}</option>
+                                    {% endfor %}
+                                </select>
+                                      
 
                                 <!-- This will be filled using JS -->
                                 <div class="mt-3 alertWrapper"></div>
@@ -306,9 +328,18 @@
 
         <div class="d-flex justify-content-center mt-3 mb-3"> 
             <button class="btn btn-primary mt-0" data-toggle="modal" data-target="#addDepModal">Добавить отдел</button>
+            <button class="btn btn-success mt-0 ml-2" onclick="location.reload()">Обновить</button>
         </div>
 
         <div class="container-fluid p-5-desktop">
+
+        {% if departments|length == 0 %}
+            <div class="mt-5 text-center" id="departmentsNotFound">
+                <p class="text-secondary display-4" style="color: #84898d">На данный момент у вас нет отделов</p>
+                <p class="text-secondary display-5" style="color: #84898d">Добавьте их кнопкой выше</p>
+            </div>
+        {% else %}
+
             <div class="row">
 
                 {% for dep in departments %}
@@ -331,6 +362,7 @@
 
             </div>
             <!-- ./row -->
+        {% endif %}
         </div>
         <!-- /.container-fluid -->
 
@@ -385,6 +417,7 @@
     <!-- My JS -->
     <script src="/static/publicVars.js"></script>
     <script src="/static/sendPOST.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="/static/adminPanel/main.js"></script>
 
     <!-- ISYN Software 2018 -->

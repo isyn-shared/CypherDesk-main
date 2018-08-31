@@ -1,9 +1,13 @@
-let selectedWindow = "#status";
+let selectedWindow = Cookies.get('window') || "#status";
+
+$(selectedWindow).removeClass('out');
+$(selectedWindow + "A").addClass('active');
 
 function showWindow(windowID) {
     if (selectedWindow != windowID) {
         if (DEBUG) console.log(windowID);
 
+        Cookies.set('window', windowID);
 
         let prevSelected = selectedWindow;
         selectedWindow = windowID;
@@ -63,11 +67,40 @@ $(document).ready(() => {
     
         sendPOST('/createUser', {mail, role, department})
             .then(resp => {
-                console.log(resp, typeof resp);
+                // if (DEBUG) console.log(resp, typeof resp);
                 if (!resp.ok) 
                     return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
 
                 createAlert('alert-success', "Отлично!", "Пользователь создан!");
+            })
+            .catch(err => {
+                createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
+                console.error(err);
+            });
+    });
+
+    $('#editUserForm').submit(e => {
+        e.preventDefault();
+
+        const newLogin = $('#editUserLoginInput').val(), 
+            newName = $('#editUserNameInput').val(),
+            newSurname = $('#editUserSurnameInput').val(),
+            newPartonymic = $('#editUserPartonymicInput').val(),
+            newRecourse = $('#editUserRecourseInput').val(),
+            newDepartment = $('#editUserDepartmentSelect').val();
+
+        if (DEBUG) 
+            console.log(editingUserLogin, newLogin, newSurname, newPartonymic, newRecourse, newDepartment)
+
+        if (newDepartment == "0")
+            return createAlert('alert-danger', 'Упс!', 'Убедитесь, что выбрали отдел!')
+
+        sendPOST('/changeUser', {login: editingUserLogin, newLogin, newName, newSurname, newPartonymic, newRecourse, newDepartment})
+            .then(resp => {
+                if (!resp.ok) 
+                    return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
+
+                createAlert('alert-success', "Отлично!", "Пользователь изменен!");
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -108,9 +141,26 @@ function createAlert(type, title, text = "") {
 // Render all users by making one call ourselves
 findUsers("*");
 
+let editingUserLogin = "";
+
 const app = new Vue({
     el: '#renderedUsers',
-    data: {users: []}
+    data: {
+        users: [],
+        editUser: function(user) {
+            if (DEBUG) console.log("Editing", user);
+
+            // Save for sending to server in form submit
+            editingUserLogin = user.Login;
+
+            $('#editUserLoginInput').val(user.Login)
+            $('#editUserNameInput').val(user.Name);
+            $('#editUserSurnameInput').val(user.Surname);
+            $('#editUserPartonymicInput').val(user.Partonymic);
+            $('#editUserRecourseInput').val(user.Recourse);
+            $('#editUserDepartmentSelect').val(user.Department);
+        }
+    },
 });
 function findUsers(key) {
     sendPOST('/findUser', {key})
@@ -132,6 +182,11 @@ function findUsers(key) {
             }
 
             app.users = users;
+
+            if (!users.length)
+                $('#usersNotFound').removeClass('d-none');
+            else
+                $('#usersNotFound').addClass('d-none');
         })
         .catch(console.error);
 }
