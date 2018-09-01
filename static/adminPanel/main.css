@@ -20,6 +20,10 @@ body {
     display: none;
 }
 
+.head-link {
+    font-size: 1.2rem;
+}
+
 @keyframes slideIn {
     from {
         left: 100%;

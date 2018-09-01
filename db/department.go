@@ -92,3 +92,26 @@ func (m *MysqlUser) GetDepartments() []*Department {
 	}
 	return res
 }
+
+// UpdateDepartment updates department entry in the db
+func (m *MysqlUser) UpdateDepartment(oldDep *Department, newName string) int64 {
+	db := m.connect()
+	defer db.Close()
+
+	var sqlKey string
+	var keyVal interface{}
+	if oldDep.ID == 0 {
+		sqlKey = "name"
+		keyVal = oldDep.Name
+	} else {
+		sqlKey = "id"
+		keyVal = oldDep.ID
+	}
+
+	stmt := prepare(db, "UPDATE departments SET name=? WHERE "+sqlKey+"=?")
+	defer stmt.Close()
+
+	res := exec(stmt, []interface{}{keyVal})
+	aff := affect(res)
+	return aff
+}
