@@ -198,11 +198,13 @@ func remindPassHandler(c *gin.Context) {
 	user.SetRemindKey(alias.StringWithCharset(20, loginCharset) + time.Now().String())
 
 	mailMsg := &feedback.MailMessage{
-		Subject:    "Восстановление пароля CypherDesk",
-		Body:       "КЕК",
+		Subject: "Восстановление пароля CypherDesk",
+		Body: "Ваш логин: " + user.Login + ". Для восстановления пароля перейдите по ссылке: " + Protocol + "://" + Host + ":" +
+			Port + "/remindPass/chk/" + user.Login + "/" + user.ActivationKey,
 		Recipients: []string{user.Mail},
 	}
 
+	mysql.UpdateUser(user)
 	feedback.SendMail(mailMsg)
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }

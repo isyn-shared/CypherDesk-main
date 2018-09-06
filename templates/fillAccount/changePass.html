@@ -16,12 +16,12 @@
     <!-- Setting margin to auto so on small screens it won't hide -->
     <div class="container text-center shadow-lg desktopPadding rounded" style="margin-top: auto; margin-bottom: auto; background-color: #404549">
         <!-- This will hide on mobile -->
-        <h1 class="display-2 show show1 d-none d-sm-block" style="color: #eeeeee">Сброс пароля</h1>
+        <h1 class="display-3 show show1 d-none d-sm-block" style="color: #eeeeee">Сброс пароля</h1>
         <!-- This will appear on mobile -->
-        <h1 class="display-5 show show1 d-block d-sm-none bold" style="color: #eeeeee">Сброс пароля</h1>
+        <h1 class="display-5 show show1 mt-3 d-block d-sm-none bold" style="color: #eeeeee">Сброс пароля</h1>
 
         <!-- This will hide on mobile -->
-        <h2 class="display-5 show show2 mb-5 d-none d-sm-block" style="color: #a9a9a9">Обновите Ваш пароль и Вы готовы приступить к работе!</h2>
+        <h2 class="display-6 show show2 mb-5 d-none d-sm-block" style="color: #a9a9a9">Обновите Ваш пароль и Вы готовы приступить к работе!</h2>
         <!-- This will appear on mobile -->
         <h2 class="lead show show2 mb-5 d-block d-sm-none" style="color: #a9a9a9">Обновите Ваш пароль и Вы готовы приступить к работе!</h2>
 
@@ -36,12 +36,7 @@
                 <div class="card-body">
                     <form id="updatePasswordForm">
                         <div class="form-group">
-                            <label for="loginInput" class="display-5 mb-3">Ваши данные:</label>
-                            <p class="lead mb-1">Ваше ФИО: <br> {{surname}} {{name}} {{patronymic}}</p>
-                            <p class="lead mb-1">Обращение: {{recourse}}</p>
-                            <p class="lead">Логин: {{login}}</p>
-
-                            <p class="blockquote mt-5 mb-2">Новый пароль:</p>
+                            <label for="loginInput" class="display-5 mb-3">Новый пароль:</label>
                             <input type="password" class="form-control mb-1" id="passwordInput" placeholder="Пароль" required>
                             <input type="password" class="form-control" id="repasswordInput" placeholder="Повторите пароль" required>
 
