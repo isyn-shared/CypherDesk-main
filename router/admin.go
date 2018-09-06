@@ -128,7 +128,7 @@ func deleteUserHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие!!"})
 		return
 	}
-	login := c.Query("login")
+	login := c.PostForm("login")
 	if alias.EmptyStr(login) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный запрос"})
 		return

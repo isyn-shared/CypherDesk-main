@@ -33,6 +33,7 @@ func accountHandler(c *gin.Context) {
 		} else {
 			if user.Role == "admin" {
 				departments := mysql.GetDepartments()
+				department := user.GetDepartment()
 				writePongoTemplate("templates/adminPanel/index.html", pongo2.Context{
 					"name":        user.Name,
 					"surname":     user.Surname,
@@ -40,6 +41,7 @@ func accountHandler(c *gin.Context) {
 					"recourse":    user.Recourse,
 					"mail":        user.Mail,
 					"login":       user.Login,
+					"department":  department.Name,
 					"departments": departments,
 				}, c)
 			} else {

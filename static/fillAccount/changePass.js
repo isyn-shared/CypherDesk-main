@@ -16,6 +16,7 @@ $(document).ready(() => {
                     return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
 
                 createAlert('alert-success', "Отлично!", "Данные изменены!");
+                location = "/";
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);

@@ -1,4 +1,4 @@
-let selectedWindow = Cookies.get('window') || "#status";
+let selectedWindow = Cookies.get('window') || "#profile";
 
 $(selectedWindow).removeClass('out');
 $(selectedWindow + "A").addClass('active');
@@ -107,6 +107,24 @@ $(document).ready(() => {
                 console.error(err);
             });
     });
+
+    $('#editDepForm').submit(e => {
+        e.preventDefault();
+
+        const name = $('#editDepNameInput').val();
+        sendPOST('/changeDepartment', {prevName: editingDepName, name})
+            .then(resp => {
+                // if (DEBUG) console.log(resp, typeof resp);
+                if (!resp.ok) 
+                    return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
+
+                createAlert('alert-success', "Отлично!", "Отредактировано!");
+            })
+            .catch(err => {
+                createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
+                console.error(err);
+            });
+    })
 });
 
 let timer = null;
@@ -143,23 +161,25 @@ findUsers("*");
 
 let editingUserLogin = "";
 
+function editUser(user) {
+    if (DEBUG) console.log("Editing", user);
+
+    // Save for sending to server in form submit
+    editingUserLogin = user.Login;
+
+    $('#editUserLoginInput').val(user.Login)
+    $('#editUserNameInput').val(user.Name);
+    $('#editUserSurnameInput').val(user.Surname);
+    $('#editUserPartonymicInput').val(user.Partonymic);
+    $('#editUserRecourseInput').val(user.Recourse);
+    $('#editUserDepartmentSelect').val(user.Department);
+}
+
 const app = new Vue({
     el: '#renderedUsers',
     data: {
         users: [],
-        editUser: function(user) {
-            if (DEBUG) console.log("Editing", user);
-
-            // Save for sending to server in form submit
-            editingUserLogin = user.Login;
-
-            $('#editUserLoginInput').val(user.Login)
-            $('#editUserNameInput').val(user.Name);
-            $('#editUserSurnameInput').val(user.Surname);
-            $('#editUserPartonymicInput').val(user.Partonymic);
-            $('#editUserRecourseInput').val(user.Recourse);
-            $('#editUserDepartmentSelect').val(user.Department);
-        }
+        editUser
     },
 });
 function findUsers(key) {
@@ -189,4 +209,71 @@ function findUsers(key) {
                 $('#usersNotFound').addClass('d-none');
         })
         .catch(console.error);
+}
+
+function deleteUser() {
+    swal({
+        title: `Удалить ${editingUserLogin}?`,
+        text: "Это действие невозможно отменить!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Да, удалить!',
+        cancelButtonText: 'Отмена',
+        allowOutsideClick: () => !swal.isLoading(),
+        preConfirm: () => {
+            return sendPOST('/deleteUser', {login: editingUserLogin})
+                .then(response => {console.log(response); return response})
+                .catch(error => {
+                    swal.showValidationError(`Запрос провалился: ${error}`);
+                    console.error(error);
+                })
+        }
+    }).then(result => {
+        if (result.value) {
+            swal(
+                'Успех!',
+                'Удалено!',
+                'success'
+            );
+        }
+    }).catch(console.error);
+}
+
+let editingDepName = null;
+function editDep(name) {
+    editingDepName = name;
+
+    $("#editDepNameInput").val(name);
+}
+
+function deleteDep() {
+    swal({
+        title: `Удалить ${editingDepName}?`,
+        text: "Это действие невозможно отменить!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Да, удалить!',
+        cancelButtonText: 'Отмена',
+        allowOutsideClick: () => !swal.isLoading(),
+        preConfirm: () => {
+            return sendPOST('/deleteDepartment', {name: editingDepName})
+                .then(response => {console.log(response); return response})
+                .catch(error => {
+                    swal.showValidationError(`Запрос провалился: ${error}`);
+                    console.error(error);
+                })
+        }
+    }).then(result => {
+        if (result.value) {
+            swal(
+                'Успех!',
+                'Удалено!',
+                'success'
+            );
+        }
+    }).catch(console.error);
 }

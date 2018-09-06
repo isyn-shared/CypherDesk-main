@@ -46,15 +46,15 @@ body {
 }
 
 #profile {
-    background-color: rgba(103, 232, 131, 0.26);
-}
-
-#status {
     background-color: rgba(117, 135, 255, 0.26);
 }
 
-#users {
+#status {
     background-color: rgba(103, 189, 232, 0.26);
+}
+
+#users {
+    background-color: rgba(103, 232, 131, 0.26);
 }
 
 #departments {
@@ -106,6 +106,10 @@ body {
     .slideAway {
         animation-duration: 0.5s;
         animation-name: slideAway;
+    }
+
+    .w-25-desktop {
+        width: 25%!important;
     }
 
     .w-50-desktop {
