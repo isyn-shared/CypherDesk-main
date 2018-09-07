@@ -88,10 +88,10 @@ func (u *User) HashPass() {
 func (m *MysqlUser) UpdateUser(user *User) int64 {
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=?, activationType = ? WHERE id = ?")
+	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=?, activationType = ?, department = ? WHERE id = ?")
 	defer stmt.Close()
 	res := exec(stmt, []interface{}{user.Mail, user.Name, user.Surname, user.Partonymic,
-		user.Recourse, user.Login, user.Pass, user.ActivationKey, user.ActivationType, user.ID})
+		user.Recourse, user.Login, user.Pass, user.ActivationKey, user.ActivationType, user.Department, user.ID})
 	aff := affect(res)
 	return aff
 }
