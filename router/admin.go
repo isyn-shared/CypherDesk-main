@@ -151,11 +151,22 @@ func changeUserHandler(c *gin.Context) {
 		return
 	}
 	login, newLogin, newName, newSurname, newPartonymic, newRecourse, newDepartment := c.PostForm("login"),
-		c.PostForm("newLogin"), c.PostForm("newName"), c.PostForm("newSurname"), c.PostForm("newPartyonymic"),
+		c.PostForm("newLogin"), c.PostForm("newName"), c.PostForm("newSurname"), c.PostForm("newPartonymic"),
 		c.PostForm("newRecourse"), c.PostForm("newDepartment")
 	user = mysql.GetUser("login", login)
 	user.Login, user.Name, user.Surname, user.Partonymic, user.Recourse, user.Department = newLogin, newName,
 		newSurname, newPartonymic, newRecourse, chk(alias.STI(newDepartment)).(int)
 	mysql.UpdateUser(user)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
+}
+
+func changeDepartment(c *gin.Context) {
+	prevName, newName := c.PostForm("prevName"), c.PostForm("name")
+	if alias.EmptyStr(prevName) || alias.EmptyStr(newName) {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный запрос"})
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	mysql.UpdateDepartment(&db.Department{ID: 0, Name: prevName}, newName)
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }

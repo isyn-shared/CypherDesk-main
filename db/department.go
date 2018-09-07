@@ -111,7 +111,7 @@ func (m *MysqlUser) UpdateDepartment(oldDep *Department, newName string) int64 {
 	stmt := prepare(db, "UPDATE departments SET name=? WHERE "+sqlKey+"=?")
 	defer stmt.Close()
 
-	res := exec(stmt, []interface{}{keyVal})
+	res := exec(stmt, []interface{}{newName, keyVal})
 	aff := affect(res)
 	return aff
 }

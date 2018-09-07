@@ -49,6 +49,7 @@ func New() *gin.Engine {
 	router.POST("/findUser", findUserHandler)
 	router.POST("/changeUser", changeUserHandler)
 	router.POST("/deleteUser", deleteUserHandler)
+	router.POST("/changeDepartment", changeDepartment)
 
 	router.GET("/test", testHandler)
 
