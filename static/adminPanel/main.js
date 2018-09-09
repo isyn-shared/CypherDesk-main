@@ -39,12 +39,13 @@ $(document).ready(() => {
 
         const name = $('#depNameInput').val();
 
-        sendPOST('/createDepartment', {name})
+        sendPOST('/admin/createDepartment', {name})
             .then(resp => {
                 if (!resp.ok) 
                     return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
 
                 createAlert('alert-success', "Отлично!", "Отдел создан!");
+                location.reload();
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -65,13 +66,14 @@ $(document).ready(() => {
 
         createAlert('alert-info', "Загрузка...", "Пожалуйста подождите");
     
-        sendPOST('/createUser', {mail, role, department})
+        sendPOST('/admin/createUser', {mail, role, department})
             .then(resp => {
                 // if (DEBUG) console.log(resp, typeof resp);
                 if (!resp.ok) 
                     return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
 
                 createAlert('alert-success', "Отлично!", "Пользователь создан!");
+                $('#refreshUsers').click();
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -95,12 +97,13 @@ $(document).ready(() => {
         if (newDepartment == "0")
             return createAlert('alert-danger', 'Упс!', 'Убедитесь, что выбрали отдел!')
 
-        sendPOST('/changeUser', {login: editingUserLogin, newLogin, newName, newSurname, newPartonymic, newRecourse, newDepartment})
+        sendPOST('/admin/changeUser', {login: editingUserLogin, newLogin, newName, newSurname, newPartonymic, newRecourse, newDepartment})
             .then(resp => {
                 if (!resp.ok) 
                     return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
 
                 createAlert('alert-success', "Отлично!", "Пользователь изменен!");
+                $('#refreshUsers').click();
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -112,13 +115,14 @@ $(document).ready(() => {
         e.preventDefault();
 
         const name = $('#editDepNameInput').val();
-        sendPOST('/changeDepartment', {prevName: editingDepName, name})
+        sendPOST('/admin/changeDepartment', {prevName: editingDepName, name})
             .then(resp => {
                 // if (DEBUG) console.log(resp, typeof resp);
                 if (!resp.ok) 
                     return createAlert('alert-danger', "Упс!", "Произошла ошибка: " + resp.err);
 
                 createAlert('alert-success', "Отлично!", "Отредактировано!");
+                location.reload();
             })
             .catch(err => {
                 createAlert('alert-danger', "Упс!", "Произошла ошибка: " + err);
@@ -143,15 +147,20 @@ function search(bypass = true) {
         findUsers(key);
 }
 
+let autoCloseTimer = null;
 function createAlert(type, title, text = "") {
+    clearTimeout(autoCloseTimer);
     $('.alertWrapper').html(`
         <div class="alert alert-dismissible fade show ${type} mb-0" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Закрыть">
+            <button id="dismissAlert" type="button" class="close" data-dismiss="alert" aria-label="Закрыть">
                 <span aria-hidden="true">×</span>
             </button>
             <strong>${title}</strong> ${text}
         </div>
     `);
+    autoCloseTimer = setTimeout(() => {
+        $(".alert").alert('close');
+    }, 3000);
 }
 
 
@@ -183,7 +192,7 @@ const app = new Vue({
     },
 });
 function findUsers(key) {
-    sendPOST('/findUser', {key})
+    sendPOST('/admin/findUser', {key})
         .then(users => {
 
             console.log(users);
@@ -223,7 +232,7 @@ function deleteUser() {
         cancelButtonText: 'Отмена',
         allowOutsideClick: () => !swal.isLoading(),
         preConfirm: () => {
-            return sendPOST('/deleteUser', {login: editingUserLogin})
+            return sendPOST('/admin/deleteUser', {login: editingUserLogin})
                 .then(response => {console.log(response); return response})
                 .catch(error => {
                     swal.showValidationError(`Запрос провалился: ${error}`);
@@ -237,6 +246,8 @@ function deleteUser() {
                 'Удалено!',
                 'success'
             );
+
+            $('#refreshUsers').click();
         }
     }).catch(console.error);
 }
@@ -260,7 +271,7 @@ function deleteDep() {
         cancelButtonText: 'Отмена',
         allowOutsideClick: () => !swal.isLoading(),
         preConfirm: () => {
-            return sendPOST('/deleteDepartment', {name: editingDepName})
+            return sendPOST('/admin/deleteDepartment', {name: editingDepName})
                 .then(response => {console.log(response); return response})
                 .catch(error => {
                     swal.showValidationError(`Запрос провалился: ${error}`);
@@ -274,6 +285,7 @@ function deleteDep() {
                 'Удалено!',
                 'success'
             );
+            location.reload();
         }
     }).catch(console.error);
 }

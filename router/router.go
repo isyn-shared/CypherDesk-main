@@ -44,12 +44,12 @@ func New() *gin.Engine {
 	router.POST("/remindPass/change", changeCredentialsHandler)
 
 	// AdminPanel
-	router.POST("/createDepartment", createDepartmentHandler)
-	router.POST("/createUser", createUserHandler)
-	router.POST("/findUser", findUserHandler)
-	router.POST("/changeUser", changeUserHandler)
-	router.POST("/deleteUser", deleteUserHandler)
-	router.POST("/changeDepartment", changeDepartment)
+	router.POST("/admin/createDepartment", createDepartmentHandler)
+	router.POST("/admin/createUser", createUserHandler)
+	router.POST("/admin/findUser", findUserHandler)
+	router.POST("/admin/changeUser", changeUserHandler)
+	router.POST("/admin/deleteUser", deleteUserHandler)
+	router.POST("/admin/changeDepartment", changeDepartment)
 
 	router.GET("/test", testHandler)
 

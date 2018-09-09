@@ -23,7 +23,9 @@ func accountHandler(c *gin.Context) {
 	user := mysql.GetUser("id", id)
 	if !user.Filled() {
 		if user.Role == "admin" {
-			writePongoTemplate("templates/fillAccount/admin.html", pongo2.Context{}, c)
+			writePongoTemplate("templates/fillAccount/admin.html", pongo2.Context{
+				"mail": user.Mail,
+			}, c)
 		} else {
 			writePongoTemplate("templates/fillAccount/user.html", pongo2.Context{}, c)
 		}
@@ -85,33 +87,49 @@ func fillAdminAccountHandler(c *gin.Context) {
 	updUser.Name, updUser.Surname, updUser.Partonymic = c.PostForm("name"), c.PostForm("surname"), c.PostForm("partonymic")
 	updUser.Recourse = c.PostForm("recourse")
 	updUser.Mail, updUser.Login, updUser.Pass = c.PostForm("mail"), c.PostForm("login"), c.PostForm("pass")
+
+	var newMail bool
+	if user.Mail != updUser.Mail {
+		newMail = true
+	}
+
 	if alias.EmptyStrArr([]string{updUser.Name, updUser.Surname, updUser.Partonymic, updUser.Recourse,
 		updUser.Mail, updUser.Login, updUser.Pass}) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Заполните все поля!"})
 		return
 	}
+	prevLogin := user.Login
 	user.WriteIn(updUser)
 
 	if !user.ChkLogin() {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Логин не подходит по регулярке"})
 	} else if !user.ChkPass() {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пароль не подходит по регулярке"})
-	} else if user.Login != updUser.Login && mysql.GetUser("login", updUser.Login).Exist() {
+	} else if user.Login != prevLogin && mysql.GetUser("login", updUser.Login).Exist() {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Такой логин уже существует!"})
 	} else {
 		user.HashPass()
-		activationKey := alias.StringWithCharset(20, loginCharset) + user.Mail + time.Now().String()
-		user.SetActivationKey(activationKey)
-		mysql.UpdateUser(user)
 
-		mailMsg := &feedback.MailMessage{
-			Subject:    "Активация аккаунта",
-			Body:       "Здравствуйте! Спасибо за использование системы CypherDesk. Для активации акаунта перейдите по ссылке: " + Protocol + "://" + Host + ":" + Port + "/activate/" + user.ActivationKey,
-			Recipients: []string{user.Mail},
+		mailMsg := &feedback.MailMessage{}
+		if newMail {
+			activationKey := alias.StringWithCharset(20, loginCharset) + user.Mail + time.Now().String()
+			user.SetActivationKey(activationKey)
+
+			mailMsg = &feedback.MailMessage{
+				Subject:    "Активация аккаунта",
+				Body:       "Здравствуйте! Спасибо за использование системы CypherDesk. Для активации акаунта перейдите по ссылке: " + Protocol + "://" + Host + ":" + Port + "/activate/" + user.ActivationKey,
+				Recipients: []string{user.Mail},
+			}
+		} else {
+			mailMsg = &feedback.MailMessage{
+				Subject:    "Активация аккаунта",
+				Body:       "Здравствуйте! Все прошло успешно! Спасибо за использование системы CypherDesk.",
+				Recipients: []string{user.Mail},
+			}
 		}
 
+		mysql.UpdateUser(user)
 		feedback.SendMail(mailMsg)
-
 		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil, "redirect": "/account"})
 	}
 }

@@ -154,6 +154,13 @@ func changeUserHandler(c *gin.Context) {
 		c.PostForm("newLogin"), c.PostForm("newName"), c.PostForm("newSurname"), c.PostForm("newPartonymic"),
 		c.PostForm("newRecourse"), c.PostForm("newDepartment")
 	user = mysql.GetUser("login", login)
+
+	tmpUser := mysql.GetUser("login", newLogin)
+	if tmpUser.Exist() && tmpUser.ID != user.ID {
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пользователь с таким логином уже существует!"})
+		return
+	}
+
 	user.Login, user.Name, user.Surname, user.Partonymic, user.Recourse, user.Department = newLogin, newName,
 		newSurname, newPartonymic, newRecourse, chk(alias.STI(newDepartment)).(int)
 	mysql.UpdateUser(user)

@@ -109,6 +109,7 @@ func (m *MysqlUser) InsertUser(user *User) sql.Result {
 
 // Exist method checks if user exist
 func (u *User) Exist() bool {
+	fmt.Println("UID: ", u.ID)
 	if u.ID == 0 {
 		return false
 	}

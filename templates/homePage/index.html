@@ -1,12 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/static/homePage/main.css">
+    <title>CypherDesk - Домашняя страница</title>
 </head>
+
 <body>
-    Домашняя страница юзера
+
+    <a href="/out" class="text-center btn btn-danger mt-2 mr-2 ml-2 d-block d-sm-none">Выйти из аккаунта</a>
+    <a href="/out" style="position: absolute; right: .1rem; z-index: 100" class="btn btn-danger mt-2 mr-2 d-none d-sm-block">Выйти из аккаунта</a>
+    <div id="profile" class="window">
+            <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Ваш профиль</p>
+    
+            <!-- This will hide on mobile -->
+            <p class="text-center lead d-none d-sm-block">Добро пожаловать, {{name}} {{partonymic}} ({{login}})</p>
+            <!-- This will appear on mobile -->
+            <p class="text-center lead d-block d-sm-none">Добро пожаловать, <br> {{name}} {{partonymic}} ({{login}})</p>
+    
+            <div class="d-flex justify-content-center w-100">
+                <div class="card w-25-desktop mt-5">
+                    <img class="card-img-top" src="/static/adminPanel/default_profile.jpg" alt="Card image cap">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">{{surname}} {{name}} {{partonymic}}</h4>
+                        <p class="card-text mb-1 mt-3"><b>Обращение: </b> {{recourse}}</p>
+                        <p class="card-text mb-1"><b>Почта: </b> {{mail}}</p>
+                        <p class="card-text mb-1"><b>Логин: </b> {{login}}</p>
+                        <p class="card-text mb-1"><b>Отдел: </b> {{department}}</p>
+    
+                        <script>
+                            var myUserData = {
+                                Login: "{{login}}",
+                                Name: "{{name}}",
+                                Surname: "{{surname}}",
+                                Partonymic: "{{partonymic}}",
+                                Recourse: "{{recourse}}",
+                                DepartmentName: "{{department}}"
+                            };
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+            <!-- /.d-flex justify-content-center -->
+            <p class="display-5 text-center mt-2 d-none d-sm-block">↓</p>
+            
+        </div>
+        <!-- /#profile.window -->
+
+        
+
+
+    <!-- JavaScript for Bootstrap -->
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- My JS -->
+    <script src="/static/fillAccount/admin.js"></script>
+    <script src="/static/publicVars.js"></script>
+    <script src="/static/sendPOST.js"></script>
+
+    <!-- ISYN Software 2018 -->
 </body>
+
 </html>
