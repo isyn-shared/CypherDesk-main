@@ -125,3 +125,19 @@ func (m *MysqlUser) GetUserTickets(userID int) []*ExtTicket {
 	}
 	return tickets
 }
+
+func (m *MysqlUser) GetLastLogId() int {
+	db := m.connect()
+	defer db.Close()
+
+	stmt := prepare(db, "SELECT MAX(id) FROM logs")
+	defer stmt.Close()
+
+	var res int
+	err := stmt.QueryRow().Scan(&res)
+
+	if err != nil {
+		panic("db error: " + err.Error())
+	}
+	return res
+}

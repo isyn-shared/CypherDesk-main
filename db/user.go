@@ -329,7 +329,7 @@ func (u *User) String() string {
 
 // ChkPass returns true if regexp match the password
 func (u *User) ChkPass() bool {
-	if alias.StrLen(u.Pass) > 5 && alias.StrLen(u.Pass) < 16 {
+	if alias.StrLen(u.Pass) > 5 && alias.StrLen(u.Pass) < 20 {
 		match, _ := regexp.MatchString("^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+[a-zA-Z0-9]{1}$", u.Pass)
 		return match
 	}
@@ -338,7 +338,7 @@ func (u *User) ChkPass() bool {
 
 // ChkLogin returns true if regexp match the login
 func (u *User) ChkLogin() bool {
-	if alias.StrLen(u.Login) > 3 && alias.StrLen(u.Login) < 11 {
+	if alias.StrLen(u.Login) > 4 && alias.StrLen(u.Login) < 20 {
 		match, _ := regexp.MatchString("^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+[a-zA-Z0-9]{1}$", u.Login)
 		return match
 	}
@@ -356,4 +356,25 @@ func (m *MysqlUser) DeleteUser(sqlKey string, keyVal interface{}) int64 {
 	aff := affect(res)
 
 	return aff
+}
+
+// GetDepartmentTicketAdmin returns user obj - admin in department
+func (m *MysqlUser) GetDepartmentTicketAdmin(depID int) *User {
+	db := m.connect()
+	defer db.Close()
+
+	stmt := prepare(db, "SELECT * FROM users WHERE department = ? AND role = ? LIMIT 1") // TODO: ticket admin
+	defer stmt.Close()
+
+	user, ns := new(User), new(userNullFields)
+	err := stmt.QueryRow(depID).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		return user
+	} else if err != nil {
+		panic("db error: " + err.Error())
+	}
+	user.chkNullFields(ns)
+	return user
+
 }
