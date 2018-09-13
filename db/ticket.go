@@ -14,6 +14,14 @@ type Ticket struct {
 	Status      string `json:"Status"`
 }
 
+type ExtTicket struct {
+	Ticket      *Ticket   `json:"ticket"`
+	ForwardFrom int       `json:"forwardFrom"`
+	ForwardTo   int       `json:"forwardTo"`
+	Action      string    `json:"action"`
+	Time        time.Time `json:"time"`
+}
+
 // TicketLog struct))))
 type TicketLog struct {
 	ID       int       `json: "ID"`
@@ -23,6 +31,13 @@ type TicketLog struct {
 	Action   string    `json: "Action"`
 	Time     time.Time `json: "Time"`
 }
+
+/*
+	About ticketLog Action
+	when user creates ticket, creates ticketLog with action "send".
+	when user forward ticket, creates ticketLog with action "forward".
+	when user fillfield the ticket, creates ticketLog with action "result" and userTo = "Ticket.sender"
+*/
 
 // GetTicket returns ticket obj from db using id
 func (m *MysqlUser) GetTicket(id int) *Ticket {
@@ -53,19 +68,19 @@ func (m *MysqlUser) CreateTicket(ticket *Ticket) sql.Result {
 	return res
 }
 
-// GetTicketLog return array of logs from DB using ticket ID
+// GetTicketLog return array of logs from DB using ticketID
 func (m *MysqlUser) GetTicketLog(ticketID int) []*TicketLog {
 	db := m.connect()
 	defer db.Close()
 
-	stmt := prepare(db, "SELECT * FROM tickets WHERE ticket = ?")
+	stmt := prepare(db, "SELECT * FROM logs WHERE ticket = ?")
 	defer stmt.Close()
 
 	rows := chk(stmt.Query(ticketID)).(*sql.Rows)
 	logs := make([]*TicketLog, 0)
 	for rows.Next() {
 		log := new(TicketLog)
-		err := rows.Scan()
+		err := rows.Scan(&log.ID, &log.Ticket, &log.UserFrom, &log.UserTo, &log.Action, &log.Time)
 		if err != nil {
 			panic("GetTicketLog error: " + err.Error())
 		}
@@ -87,6 +102,26 @@ func (m *MysqlUser) TransferTicket(newLog *TicketLog) sql.Result {
 	return res
 }
 
-// func (m *MysqlUser) GetUserTickets(user *User) []*Users {
+// GetUSerTickets returns array of tickets, which sended to user
+func (m *MysqlUser) GetUserTickets(userID int) []*ExtTicket {
+	db := m.connect()
+	defer db.Close()
 
-// }
+	stmt := prepare(db, "SELECT * FROM logs WHERE userTo = ? OR userFrom = ?")
+	defer stmt.Close()
+
+	rows := chk(stmt.Query([]interface{}{userID, userID}...)).(*sql.Rows)
+	tickets := make([]*ExtTicket, 0)
+	for rows.Next() {
+		log := new(TicketLog)
+		err := rows.Scan(&log.ID, &log.Ticket, &log.UserFrom, &log.UserTo, &log.Action, &log.Time)
+		if err != nil {
+			panic("GetUserTickets error: " + err.Error())
+		}
+		exT := new(ExtTicket)
+		exT.Ticket = m.GetTicket(log.Ticket)
+		exT.Action, exT.ForwardFrom, exT.ForwardTo, exT.Time = log.Action, log.UserFrom, log.UserTo, log.Time
+		tickets = append(tickets, exT)
+	}
+	return tickets
+}
