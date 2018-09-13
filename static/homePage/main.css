@@ -12,7 +12,34 @@ body {
 .window {
     width: 100%;
     height: 100%;
+    /* position: absolute; */
+}
+
+#main {
+    height: 100%;
+    width: 100%;
     position: absolute;
+}
+
+#leftTicket {
+    margin-top: 50px;
+    position: absolute;
+    z-index: 100;
+}
+
+#ticket {
+    margin-top: 50px;
+    position: relative;
+    display: inline;
+    cursor: pointer;
+}
+
+#ticketDesc {
+    width: 100%;
+}
+
+#ticket:hover {
+    bottom: 30px
 }
 
 .out {
