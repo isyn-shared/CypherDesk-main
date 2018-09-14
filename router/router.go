@@ -2,6 +2,7 @@ package router
 
 import (
 	"CypherDesk-main/db"
+	"CypherDesk-main/tickets"
 	"log"
 	"net/http"
 
@@ -50,6 +51,11 @@ func New() *gin.Engine {
 	router.POST("/admin/changeUser", changeUserHandler)
 	router.POST("/admin/deleteUser", deleteUserHandler)
 	router.POST("/admin/changeDepartment", changeDepartment)
+
+	// Tickets
+	router.GET("/tickets/ws", func(c *gin.Context) {
+		tickets.HandleConnections(c)
+	})
 
 	router.GET("/test", testHandler)
 

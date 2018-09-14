@@ -39,6 +39,33 @@ type TicketLog struct {
 	when user fillfield the ticket, creates ticketLog with action "result" and userTo = "Ticket.sender"
 */
 
+func (t *Ticket) Exist() bool {
+	if t.ID == 0 {
+		return false
+	}
+	return true
+}
+
+func (et *ExtTicket) Exist() bool {
+	if et.Ticket.ID == 0 {
+		return false
+	}
+	return true
+}
+
+// UpdateTicketStatus updates status of ticket in db
+func (m *MysqlUser) UpdateTicketStatus(ticketID int, status string) int64 {
+	db := m.connect()
+	defer db.Close()
+
+	stmt := prepare(db, "UPDATE tickets SET status = ? WHERE id = ?")
+	defer stmt.Close()
+
+	res := exec(stmt, []interface{}{status, ticketID})
+	aff := affect(res)
+	return aff
+}
+
 // GetTicket returns ticket obj from db using id
 func (m *MysqlUser) GetTicket(id int) *Ticket {
 	db := m.connect()
@@ -50,6 +77,9 @@ func (m *MysqlUser) GetTicket(id int) *Ticket {
 	ticket := new(Ticket)
 	err := stmt.QueryRow(id).Scan(&ticket.ID, &ticket.Caption, &ticket.Description, &ticket.Sender, &ticket.Status)
 
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		return ticket
+	}
 	if err != nil {
 		panic("db error: " + err.Error())
 	}
@@ -102,7 +132,7 @@ func (m *MysqlUser) TransferTicket(newLog *TicketLog) sql.Result {
 	return res
 }
 
-// GetUSerTickets returns array of tickets, which sended to user
+// GetUserTickets returns array of tickets, which sended to user
 func (m *MysqlUser) GetUserTickets(userID int) []*ExtTicket {
 	db := m.connect()
 	defer db.Close()
@@ -126,15 +156,16 @@ func (m *MysqlUser) GetUserTickets(userID int) []*ExtTicket {
 	return tickets
 }
 
-func (m *MysqlUser) GetLastLogId() int {
+// GetLastLogId - returns last
+func (m *MysqlUser) GetLastTicketBySender(senderID int) int {
 	db := m.connect()
 	defer db.Close()
 
-	stmt := prepare(db, "SELECT MAX(id) FROM logs")
+	stmt := prepare(db, "SELECT MAX(id) FROM tickets WHERE sender = ?")
 	defer stmt.Close()
 
 	var res int
-	err := stmt.QueryRow().Scan(&res)
+	err := stmt.QueryRow(senderID).Scan(&res)
 
 	if err != nil {
 		panic("db error: " + err.Error())

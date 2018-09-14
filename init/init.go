@@ -1,6 +1,7 @@
 package initPkg
 
 import (
+	"CypherDesk-main/tickets"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -14,4 +15,5 @@ func initImg() {
 // Project init makes basic init
 func ProjectInit() {
 	initImg()
+	tickets.Start()
 }
