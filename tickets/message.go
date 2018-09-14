@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Message
 type Message struct {
 	Event          string    `json:"event"`
 	Account        *Account  `json:"account"`

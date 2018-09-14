@@ -59,10 +59,49 @@
 
 
     <div id="main">
-        <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Ваша рабочая станция</p>
+        <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Центр управления тикетами</p>
 
         <img src="/static/ticketImages/ticket2.png" id="leftTicket" alt="">
         <img src="/static/ticketImages/ticket1.png" data-toggle="modal" data-target="#sendTicketModal" id="ticket" alt="">
+        <h5 style="margin-left: 173px;">Новый тикет</h5>
+
+        <div id="box-wrapper">
+            <div id="sentTickets" class="box">
+                <p class="display-6 text-center">Отправленные тикеты</p>
+
+                <ul class="list-group ticket-holder" id="sentTicketsUl">
+                    
+                </ul>
+            </div>
+            <div id="myTickets" class="box">
+                <p class="display-6 text-center">Перенаправленные тикеты</p>
+
+                <ul class="list-group ticket-holder" id="forwardedTicketsUl">
+                    <li class="list-group-item mb-2" style="float: left">
+                        <p class="font-weight-bold">Тема: <span class="font-weight-normal">У меня умир чайник</span></p>
+                        <p class="mb-0">Дратути. Мне очень жаль, но в отделе 69 чайник больше не работает.</p>
+                    </li>
+                    <li class="list-group-item mb-2" style="float: left">
+                        <p class="font-weight-bold">Тема: <span class="font-weight-normal">У меня умир чайник</span></p>
+                        <p class="mb-0">Дратути. Мне очень жаль, но в отделе 69 чайник больше не работает.</p>
+                    </li>
+                    <li class="list-group-item mb-2" style="float: left">
+                        <p class="font-weight-bold">Тема: <span class="font-weight-normal">У меня умир чайник</span></p>
+                        <p class="mb-0">Дратути. Мне очень жаль, но в отделе 69 чайник больше не работает.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="navigation" class="text-center">
+            <p class="display-6">Сервисы</p>
+
+            <ul class="list-group">
+                <li class="list-group-item"><a href="#!">Ваши Документы</a></li>
+                <li class="list-group-item"><a href="#!">Техподдержка</a></li>
+                <li class="list-group-item"><a href="#!">Чат</a></li>
+            </ul>
+        </div>
     </div>
     <!-- /#main.window -->
 
@@ -71,7 +110,7 @@
     <div class="modal fade" id="sendTicketModal" tabindex="-1" role="dialog" aria-labelledby="modalVerticalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form id="addUserForm">
+                <form id="sendTicketForm">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalVerticalLabel">Добавление пользователя</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -95,7 +134,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal">Закрыть</button>
-                        <button type="submit" class="btn btn-success">Сохранить</button>
+                        <button type="submit" class="btn btn-success">Отправить</button>
                     </div>
                 </form>
             </div>
@@ -116,6 +155,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
 
     <!-- My JS -->
+    <script src="/static/homePage/ws.js"></script>
     <script src="/static/homePage/main.js"></script>
     <script src="/static/publicVars.js"></script>
     <script src="/static/sendPOST.js"></script>

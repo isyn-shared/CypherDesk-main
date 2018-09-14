@@ -12,12 +12,12 @@ func getTickets(chnMsg *chanMessage) {
 	id := chnMsg.Message.Account.ID
 	user := mysql.GetUser("id", id)
 	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "У Вас нет прав на это действие!", chnMsg.conn)
+		sendResponse(false, "get", "У Вас нет прав на это действие!", chnMsg.conn)
 		return
 	}
 	tickets := mysql.GetUserTickets(id)
 	byteJsonTickets := chk(json.Marshal(tickets)).([]byte)
-	sendResponse(true, string(byteJsonTickets), chnMsg.conn)
+	sendResponse(true, "get", string(byteJsonTickets), chnMsg.conn)
 }
 
 func sendTicket(chnMsg *chanMessage) {
@@ -25,18 +25,18 @@ func sendTicket(chnMsg *chanMessage) {
 	id := chnMsg.Message.Account.ID
 	user := mysql.GetUser("id", id)
 	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "У Вас нет прав на это действие!", chnMsg.conn)
+		sendResponse(false, "create", "У Вас нет прав на это действие!", chnMsg.conn)
 		return
 	}
 	args := make(map[string]string)
 	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
 	if err != nil {
-		sendResponse(false, "Ошибка на сервере", chnMsg.conn)
+		sendResponse(false, "create", "Ошибка на сервере", chnMsg.conn)
 		return
 	}
 	caption, description := args["caption"], args["description"]
 	if alias.EmptyStr(caption) || alias.EmptyStr("description") { // TODO: chk for nil????
-		sendResponse(false, "Неправильный запрос", chnMsg.conn)
+		sendResponse(false, "create", "Неправильный запрос", chnMsg.conn)
 		return
 	}
 	ticket := &db.Ticket{
@@ -57,11 +57,11 @@ func sendTicket(chnMsg *chanMessage) {
 
 	reciever := mysql.GetUser("id", ticketAdmin.ID)
 	if ClientsByLogin[reciever.Login] != nil {
-		sendResponse(true, string(chk(json.Marshal(ticket)).([]byte)), ClientsByLogin[reciever.Login].Connection)
+		sendResponse(true, "create", string(chk(json.Marshal(ticket)).([]byte)), ClientsByLogin[reciever.Login].Connection)
 	}
 
 	mysql.TransferTicket(log)
-	sendResponse(true, "null", chnMsg.conn)
+	sendResponse(true, "create", "null", chnMsg.conn)
 }
 
 func forwardTicket(chnMsg *chanMessage) {
@@ -69,25 +69,25 @@ func forwardTicket(chnMsg *chanMessage) {
 	id := chnMsg.Message.Account.ID
 	user := mysql.GetUser("id", id)
 	if !user.Exist() || !user.Filled() || user.Role != "ticketModerator" {
-		sendResponse(false, "У Вас нет прав на это действие!", chnMsg.conn)
+		sendResponse(false, "forward", "У Вас нет прав на это действие!", chnMsg.conn)
 		return
 	}
 	args := make(map[string]string)
 	err := json.Unmarshal([]byte(chnMsg.Message.Data), args)
 	if err != nil {
-		sendResponse(false, "Ошибка на сервере", chnMsg.conn)
+		sendResponse(false, "forward", "Ошибка на сервере", chnMsg.conn)
 		return
 	}
 	to, ticketID := args["to"], args["ticketID"]
 	if alias.EmptyStr(to) || alias.EmptyStr(ticketID) {
-		sendResponse(false, "Неправильный запрос!", chnMsg.conn)
+		sendResponse(false, "forward", "Неправильный запрос!", chnMsg.conn)
 		return
 	}
 	tID := chk(alias.STI(ticketID)).(int)
 	ticket := mysql.GetTicket(id)
 
 	if !ticket.Exist() {
-		sendResponse(false, "Неправильный запрос!", chnMsg.conn)
+		sendResponse(false, "forward", "Неправильный запрос!", chnMsg.conn)
 		return
 	}
 
@@ -105,5 +105,5 @@ func forwardTicket(chnMsg *chanMessage) {
 		ClientsByLogin[chnMsg.Message.RecipientLogin].Connection.WriteJSON(StandartResponse{"event": "newTicket", "ok": true, "data": ticketStr})
 	}
 
-	sendResponse(true, "null", chnMsg.conn)
+	sendResponse(true, "forward", "null", chnMsg.conn)
 }

@@ -9,4 +9,11 @@ $(window).on('scroll', () => {
     $("body").css("background-color", `rgb(${242 + scrolledArea * 13}, ${252 + scrolledArea * 3}, ${255 - scrolledArea * 13})`);
 });
 
-$('')
+$('#sendTicketForm').submit(e => {
+    e.preventDefault();
+
+    const caption = $('#ticketCaptionInput').val(),
+        description = $('#ticketDesc').val();
+
+    sendEvent('create', {caption, description});
+});

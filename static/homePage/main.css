@@ -9,6 +9,12 @@ body {
     line-height: 1.2;
 }
 
+.display-6 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
 .window {
     width: 100%;
     height: 100%;
@@ -22,13 +28,15 @@ body {
 }
 
 #leftTicket {
-    margin-top: 50px;
+    margin-top: 200px;
     position: absolute;
     z-index: 100;
+    height: 150px;
 }
 
 #ticket {
-    margin-top: 50px;
+    margin-top: 200px;
+    height: 150px;
     position: relative;
     display: inline;
     cursor: pointer;
@@ -36,6 +44,7 @@ body {
 
 #ticketDesc {
     width: 100%;
+    height: 200px;
 }
 
 #ticket:hover {
@@ -137,4 +146,44 @@ body {
 
 .bg-none {
     background-color: transparent;
+}
+
+#box-wrapper {
+    position: absolute;
+    left: 430px;
+    top: 12%;
+
+    width: calc(100% - 450px);
+    height: calc(100% - 15%);
+}
+
+.box {
+    background-color: rgb(216, 216, 216);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 2rem;
+
+    width: 100%;
+    height: 45%;
+}
+
+#navigation {
+    background-color: rgb(216, 216, 216);
+    position: absolute;
+    border-radius: 10px;
+    padding: 10px;
+    bottom: 45px;
+    left: 10px;
+
+    height: 28.8%;
+    width: 400px;
+}
+
+a {
+    color: black;
+}
+
+.ticket-holder {
+    overflow-y: scroll;
+    height: calc(100% - 70px);
 }

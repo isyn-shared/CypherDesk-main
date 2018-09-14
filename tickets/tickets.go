@@ -42,7 +42,7 @@ func HandleConnections(c *gin.Context) {
 
 	isAuthorized, id := getID(c)
 	if !isAuthorized {
-		sendResponse(false, "Вы не авторизованы!", conn)
+		sendResponse(false, "error", "Вы не авторизованы!", conn)
 		return
 	}
 
@@ -50,7 +50,7 @@ func HandleConnections(c *gin.Context) {
 	user := mysql.GetUser("id", id)
 
 	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "У Вас нет прав на это действие!", conn)
+		sendResponse(false, "error", "У Вас нет прав на это действие!", conn)
 		return
 	}
 
@@ -114,15 +114,15 @@ func handleMessages() {
 		ChanMsg.Message.Account = clientsBySocket[ChanMsg.conn].Account
 
 		if myEvents[ChanMsg.Message.Event] == nil {
-			sendResponse(false, "Обращение к несуществующему event-у", ChanMsg.conn)
+			sendResponse(false, "error", "Обращение к несуществующему event-у", ChanMsg.conn)
 			continue
 		}
 		myEvents[ChanMsg.Message.Event](&ChanMsg)
 	}
 }
 
-func sendResponse(ok bool, message string, conn *websocket.Conn) {
-	err := conn.WriteJSON(StandartResponse{"ok": ok, "res": message})
+func sendResponse(ok bool, event string, message string, conn *websocket.Conn) {
+	err := conn.WriteJSON(StandartResponse{"ok": ok, "data": message, "event": event})
 	if err != nil {
 		fmt.Println("handleMessage error: " + err.Error())
 		deleteClient(clientsBySocket[conn])
