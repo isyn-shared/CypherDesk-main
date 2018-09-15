@@ -9,7 +9,7 @@
 
 <div class="showBase show2">
     <div class="container py-5 whitebox solidbackground mobileCenter" style="margin-top: 20px" class="showBase">
-        <h1>Правила, касающиеся обратной связи</h1>
+        <h3>Правила, касающиеся обратной связи</h3>
         <p class="bigfont">
             Просим Вас убедиться, что Ваш вопрос не находится в списке часто задаваемых вопросов перед тем, как оставлять его через форму
             обратной связи!
@@ -26,7 +26,7 @@
         {% if ready == True %}
         <div class="container">
             <h2>Заполните форму</h2>
-            <h4>Убедитесь, что E-mail введен корректно</h4>
+            <h5>Убедитесь, что E-mail введен корректно</h5>
             <form>
                 {% csrf_token %}
                 <fieldset>
@@ -40,7 +40,7 @@
                         style="width: 70%;">
                 </fieldset>
                 <fieldset class="hint_titles_wrapper hidden">
-                    <h2>Пользователи уже спрашивали: </h2>
+                    <p style = "font-size:150%;"><b>Пользователи уже спрашивали: </b></p>
                     <div class="hint_titles">
 
                     </div>

@@ -17,7 +17,7 @@ $("#message_title").keyup(() => {
             let result = "";
 
             for (let element of data)
-                result += `<h2><a href="./answer/?id=${element.id}">${element.title}</a></h2>`;
+                result += `<h4><a href="./answer/?id=${element.id}">${element.title}</a></h4>`;
 
             $("div.hint_titles").html(result);
 

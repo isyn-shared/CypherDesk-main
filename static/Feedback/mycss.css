@@ -7,7 +7,7 @@ h2 {
 }
 
 p.bigfont {
-    font-size: 30px;
+    font-size: 20px;
 }
 
 label {
@@ -128,5 +128,11 @@ body {
     .mobileQuestionTheme {
         width: 100%!important;
         font-size: 15px!important;
+    }
+}
+
+@media (min-width: 401px) {
+    .desktopPadding {
+        padding: 1.5rem!important;
     }
 }
