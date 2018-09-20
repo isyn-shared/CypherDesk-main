@@ -46,19 +46,19 @@ body {
 }
 
 #profile {
-    background-color: rgba(117, 135, 255, 0.26);
+    background-color: #dbe0ff;
 }
 
 #status {
-    background-color: rgba(103, 189, 232, 0.26);
+    background-color: #d8eef9;
 }
 
 #users {
-    background-color: rgba(103, 232, 131, 0.26);
+    background-color: #d8f9df;
 }
 
 #departments {
-    background-color: rgba(126, 255, 227, 0.26);
+    background-color: #defff8;
 }
 
 .controlBlock {

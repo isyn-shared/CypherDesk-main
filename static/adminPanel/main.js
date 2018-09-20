@@ -3,6 +3,13 @@ let selectedWindow = Cookies.get('window') || "#profile";
 $(selectedWindow).removeClass('out');
 $(selectedWindow + "A").addClass('active');
 
+const windowColors = {
+    "#profile": "#dbe0ff",
+    "#status": "#d8eef9",
+    "#users": "#d8f9df",
+    "#departments": "#defff8"
+};
+
 function showWindow(windowID) {
     if (selectedWindow != windowID) {
         if (DEBUG) console.log(windowID);
@@ -25,6 +32,7 @@ function showWindow(windowID) {
             $(prevSelected).addClass('out').removeClass('slideAway').off('animationend'));
 
         $(selectedWindow).removeClass('out').addClass('slideIn');
+        $('html').css("background-color", windowColors[windowID]);
     }
 }
 
