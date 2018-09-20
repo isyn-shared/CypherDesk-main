@@ -45,6 +45,8 @@ body {
     }
 }
 
+/* Please update colors in adminPanel/main.js if you do it here */
+
 #profile {
     background-color: #dbe0ff;
 }

@@ -27,16 +27,31 @@ body {
     position: absolute;
 }
 
-#leftTicket {
+#leftTicketDesk {
     margin-top: 200px;
     position: absolute;
     z-index: 100;
     height: 150px;
 }
 
-#ticket {
+#ticketDesk {
     margin-top: 200px;
     height: 150px;
+    position: relative;
+    display: inline;
+    cursor: pointer;
+}
+
+#leftTicketMobile {
+    margin-top: 5%;
+    position: absolute;
+    z-index: 100;
+    height: 145px;
+}
+
+#ticketMobile {
+    margin-top: 5%;
+    height: 145px;
     position: relative;
     display: inline;
     cursor: pointer;
@@ -47,7 +62,7 @@ body {
     height: 200px;
 }
 
-#ticket:hover {
+#ticketMobile:hover, #ticketDesk:hover {
     bottom: 30px
 }
 
@@ -167,7 +182,17 @@ body {
     height: 45%;
 }
 
-#navigation {
+.boxMobile {
+    background-color: rgb(216, 216, 216);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 2rem;
+
+    width: 100%;
+    height: 700px;
+}
+
+#navigationDesk {
     background-color: rgb(216, 216, 216);
     position: absolute;
     border-radius: 10px;

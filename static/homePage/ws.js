@@ -59,7 +59,7 @@ const myEvents = {
                 </li>
             `;
         }
-        $('#sentTicketsUl').html(li);
+        $('.sentTicketsUl').html(li);
 
     }
 }

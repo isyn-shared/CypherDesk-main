@@ -59,49 +59,60 @@
 
 
     <div id="main">
-        <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Центр управления тикетами</p>
+        <div class="d-none d-sm-block">
 
-        <img src="/static/ticketImages/ticket2.png" id="leftTicket" alt="">
-        <img src="/static/ticketImages/ticket1.png" data-toggle="modal" data-target="#sendTicketModal" id="ticket" alt="">
-        <h5 style="margin-left: 173px;">Новый тикет</h5>
+            <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Центр управления тикетами</p>
 
-        <div id="box-wrapper">
-            <div id="sentTickets" class="box">
+            <img src="/static/ticketImages/ticket2.png" id="leftTicketDesk" alt="">
+            <img src="/static/ticketImages/ticket1.png" id="ticketDesk" data-toggle="modal" data-target="#sendTicketModal" alt="">
+            <h5 style="margin-left: 173px;">Новый тикет</h5>
+
+            <div id="box-wrapper">
+                <div id="sentTicketsDesk" class="box">
+                    <p class="display-6 text-center">Отправленные тикеты</p>
+
+                    <ul class="list-group ticket-holder sentTicketsUl">
+                        
+                    </ul>
+                </div>
+                <div id="myTicketsDesk" class="box">
+                    <p class="display-6 text-center">Перенаправленные тикеты</p>
+
+                    <ul class="list-group ticket-holder forwardedTicketsUl">
+                        
+                    </ul>
+                </div>
+            </div>
+
+            <div id="navigationDesk" class="text-center">
+                <p class="display-6">Сервисы</p>
+
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="#!">Ваши Документы</a></li>
+                    <li class="list-group-item"><a href="#!">Техподдержка</a></li>
+                    <li class="list-group-item"><a href="#!">Чат</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- /.d-none d-sm-block -->
+
+        <div class="d-block d-sm-none">
+            <h5 class="text-center mt-2">Центр управления тикетами</h5>
+
+            <img src="/static/ticketImages/ticket2.png" id="leftTicketMobile" alt="">
+            <img src="/static/ticketImages/ticket1.png" id="ticketMobile" data-toggle="modal" data-target="#sendTicketModal" alt="">
+            <p class="lead" style="margin-left: 173px;">Новый тикет</p>
+
+            <div id="sentTicketsMobile" class="boxMobile">
                 <p class="display-6 text-center">Отправленные тикеты</p>
 
-                <ul class="list-group ticket-holder" id="sentTicketsUl">
-                    
+                <ul class="list-group ticket-holder sentTicketsUl">
+
                 </ul>
             </div>
-            <div id="myTickets" class="box">
-                <p class="display-6 text-center">Перенаправленные тикеты</p>
 
-                <ul class="list-group ticket-holder" id="forwardedTicketsUl">
-                    <li class="list-group-item mb-2" style="float: left">
-                        <p class="font-weight-bold">Тема: <span class="font-weight-normal">У меня умир чайник</span></p>
-                        <p class="mb-0">Дратути. Мне очень жаль, но в отделе 69 чайник больше не работает.</p>
-                    </li>
-                    <li class="list-group-item mb-2" style="float: left">
-                        <p class="font-weight-bold">Тема: <span class="font-weight-normal">У меня умир чайник</span></p>
-                        <p class="mb-0">Дратути. Мне очень жаль, но в отделе 69 чайник больше не работает.</p>
-                    </li>
-                    <li class="list-group-item mb-2" style="float: left">
-                        <p class="font-weight-bold">Тема: <span class="font-weight-normal">У меня умир чайник</span></p>
-                        <p class="mb-0">Дратути. Мне очень жаль, но в отделе 69 чайник больше не работает.</p>
-                    </li>
-                </ul>
-            </div>
         </div>
-
-        <div id="navigation" class="text-center">
-            <p class="display-6">Сервисы</p>
-
-            <ul class="list-group">
-                <li class="list-group-item"><a href="#!">Ваши Документы</a></li>
-                <li class="list-group-item"><a href="#!">Техподдержка</a></li>
-                <li class="list-group-item"><a href="#!">Чат</a></li>
-            </ul>
-        </div>
+        <!-- /.d-block d-sm-none -->
     </div>
     <!-- /#main.window -->
 
