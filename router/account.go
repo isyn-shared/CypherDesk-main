@@ -46,6 +46,26 @@ func accountHandler(c *gin.Context) {
 					"department":  department.Name,
 					"departments": departments,
 				}, c)
+			} else if user.Role == "ticket" { // TODO:  е Модератор тикетов
+				department := user.GetDepartment()
+				usersInDep := mysql.GetUsers("department", department.ID)
+				admins := mysql.GetUsers("role", "admin")
+				usersToTransfer := append(usersInDep, admins...) // TODO: юзеры со всех департаментов?
+
+				for _, u := range usersToTransfer {
+					u.HidePrivateInfo()
+				}
+
+				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
+					"name":            user.Name,
+					"surname":         user.Surname,
+					"partonymic":      user.Partonymic,
+					"recourse":        user.Recourse,
+					"mail":            user.Mail,
+					"login":           user.Login,
+					"department":      department.Name,
+					"usersToTransfer": usersToTransfer,
+				}, c)
 			} else {
 				department := user.GetDepartment()
 				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
