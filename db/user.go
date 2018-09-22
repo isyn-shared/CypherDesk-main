@@ -367,7 +367,7 @@ func (m *MysqlUser) GetDepartmentTicketAdmin(depID int) *User {
 	defer stmt.Close()
 
 	user, ns := new(User), new(userNullFields)
-	err := stmt.QueryRow(depID).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+	err := stmt.QueryRow(depID, "ticketModerator").Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
 		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user
