@@ -19,6 +19,21 @@
     <a href="/out" class="text-center btn btn-danger mt-2 mr-2 ml-2 d-block d-sm-none">Выйти из аккаунта</a>
     <a href="/out" style="position: absolute; right: .1rem; z-index: 100" class="btn btn-danger mt-2 mr-2 d-none d-sm-block">Выйти
         из аккаунта</a>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light d-flex d-sm-none lead">
+        <h5 class="navbar-brand" href="#">Сервисы</h5>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="#">Ваши Документы</a>
+                <a class="nav-item nav-link" href="#">Техподдержка</a>
+                <a class="nav-item nav-link" href="#">Чат</a>
+            </div>
+        </div>
+    </nav>    
+    
     <div id="profile" class="window">
         <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Ваш профиль</p>
 
@@ -59,6 +74,7 @@
 
 
     <div id="main">
+        <!-- This will be visible on desktop -->
         <div class="d-none d-sm-block">
 
             <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Центр управления тикетами</p>
@@ -96,6 +112,7 @@
         </div>
         <!-- /.d-none d-sm-block -->
 
+        <!-- This will be visible on mobile -->
         <div class="d-block d-sm-none">
             <h5 class="text-center mt-2">Центр управления тикетами</h5>
 
@@ -106,7 +123,7 @@
             <div id="sentTicketsMobile" class="boxMobile">
                 <p class="display-6 text-center">Отправленные тикеты</p>
 
-                <ul class="list-group ticket-holder sentTicketsUl">
+                <ul class="list-group ticket-holder sentTicketsUl" style="height: 315px;">
 
                 </ul>
             </div>

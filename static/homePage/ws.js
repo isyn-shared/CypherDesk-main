@@ -6,7 +6,7 @@ function send(data) {
     ws.send(data)
 }
 
-let tickets = [{
+/* let tickets = [{
 	ticket: {
 		ID: 1,
 		Caption: "Hello",
@@ -31,7 +31,7 @@ let tickets = [{
 	forwardTo: 2,
     Action: "create",
 	Time: "Когда-то"
-}]
+}] */
 
 const myEvents = {
     // Special multi-purpose event 
@@ -59,11 +59,14 @@ const myEvents = {
                 </li>
             `;
         }
+        if (tickets.length == 0)
+            li = `<h2 class="text-center">У вас нет тикетов!</h2>`
+
         $('.sentTicketsUl').html(li);
 
     }
 }
-myEvents['get'](tickets);
+// myEvents['get'](tickets);
 
 ws.onmessage = (event) => {
     console.log(event);
@@ -79,13 +82,14 @@ ws.onmessage = (event) => {
     if (!myEvents[msg.event])
         return console.log("No event " + msg.event);
 
-    myEvents[msg.event](msg.data);
+    myEvents[msg.event](JSON.parse(msg.data));
 }
 
 ws.onopen = () => {
     console.log("Connected successfully!");
 
     /* Send initial events here */
+    sendEvent('get', {});
 }
 
 ws.onclose = () => {
