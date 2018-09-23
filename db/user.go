@@ -109,7 +109,6 @@ func (m *MysqlUser) InsertUser(user *User) sql.Result {
 
 // Exist method checks if user exist
 func (u *User) Exist() bool {
-	fmt.Println("UID: ", u.ID)
 	if u.ID == 0 {
 		return false
 	}
@@ -224,6 +223,10 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 			checkModified()
 			delReservKey(&i)
 			sqlReq += "role = \"user\" "
+		case "@ticketModerator":
+			checkModified()
+			delReservKey(&i)
+			sqlReq += "role = \"ticketModerator\" "
 		case "@activated":
 			checkModified()
 			delReservKey(&i)
@@ -318,7 +321,7 @@ func (u *User) GetDepartment() *Department {
 // HidePrivateInfo clears all private info from user obj
 func (u *User) HidePrivateInfo() {
 	u.Pass = ""
-	u.ID = 0
+	//u.ID = 0
 }
 
 // String returns user object description

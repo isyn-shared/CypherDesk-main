@@ -55,7 +55,7 @@ func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) []*Use
 		depID = keyVal.(int)
 	}
 
-	stmt := prepare(db, "SELECT * FROM users WHERE department = ?")
+	stmt := prepare(db, "SELECT * FROM users WHERE department = ? AND role = 'user'")
 	defer stmt.Close()
 
 	rows := chk(stmt.Query(depID)).(*sql.Rows)

@@ -46,13 +46,11 @@ func createUserHandler(c *gin.Context) {
 	NewUser.HashPass()
 	mysql.InsertUser(NewUser)
 
-	mailMsg := &feedback.MailMessage{
-		Subject:    "Регистрация CypherDesk",
-		Body:       "Здравствуйте. Для авторизации используйте логин: " + NewUser.Login + " и пароль: " + privPass + ". Приятного пользования!",
-		Recipients: []string{NewUser.Mail},
-	}
+	mailText := "Для авторизации используйте логин: " + NewUser.Login + " и пароль: " + privPass + ". Приятного пользования!"
 
-	feedback.SendMail(mailMsg)
+	r := feedback.NewMailRequest([]string{NewUser.Mail}, "Восстановление пароля CypherDesk")
+	r.Send("templates/mail/body.html", map[string]string{"text": mailText})
+
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
 

@@ -133,11 +133,11 @@ func (m *MysqlUser) TransferTicket(newLog *TicketLog) sql.Result {
 }
 
 // GetUserTickets returns array of tickets, which sended to user
-func (m *MysqlUser) GetUserTickets(userID int) []*ExtTicket {
+func (m *MysqlUser) GetUserTickets(userID int, filter bool) []*ExtTicket {
 	db := m.connect()
 	defer db.Close()
 
-	stmt := prepare(db, "SELECT * FROM logs WHERE userTo = ? OR userFrom = ?")
+	stmt := prepare(db, "SELECT * FROM logs WHERE (userTo = ? OR userFrom = ?)")
 	defer stmt.Close()
 
 	rows := chk(stmt.Query([]interface{}{userID, userID}...)).(*sql.Rows)
@@ -151,7 +151,10 @@ func (m *MysqlUser) GetUserTickets(userID int) []*ExtTicket {
 		exT := new(ExtTicket)
 		exT.Ticket = m.GetTicket(log.Ticket)
 		exT.Action, exT.ForwardFrom, exT.ForwardTo, exT.Time = log.Action, log.UserFrom, log.UserTo, log.Time
-		tickets = append(tickets, exT)
+
+		if (filter && exT.Ticket.Status == "deleted") || !filter {
+			tickets = append(tickets, exT)
+		}
 	}
 	return tickets
 }

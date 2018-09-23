@@ -15,9 +15,9 @@ func getTickets(chnMsg *chanMessage) {
 		sendResponse(false, "get", "У Вас нет прав на это действие!", chnMsg.conn)
 		return
 	}
-	tickets := mysql.GetUserTickets(id)
-	byteJsonTickets := chk(json.Marshal(tickets)).([]byte)
-	sendResponse(true, "get", string(byteJsonTickets), chnMsg.conn)
+	tickets := mysql.GetUserTickets(id, true)
+	byteJSONTickets := chk(json.Marshal(tickets)).([]byte)
+	sendResponse(true, "get", string(byteJSONTickets), chnMsg.conn)
 }
 
 func sendTicket(chnMsg *chanMessage) {
@@ -35,7 +35,7 @@ func sendTicket(chnMsg *chanMessage) {
 		return
 	}
 	caption, description := args["caption"], args["description"]
-	if alias.EmptyStr(caption) || alias.EmptyStr("description") { // TODO: chk for nil????
+	if alias.EmptyStr(caption) || alias.EmptyStr("description") {
 		sendResponse(false, "create", "Неправильный запрос", chnMsg.conn)
 		return
 	}
@@ -55,13 +55,19 @@ func sendTicket(chnMsg *chanMessage) {
 		Time:     time.Now(),
 	}
 
-	reciever := mysql.GetUser("id", ticketAdmin.ID)
-	if ClientsByLogin[reciever.Login] != nil {
-		sendResponse(true, "create", string(chk(json.Marshal(ticket)).([]byte)), ClientsByLogin[reciever.Login].Connection)
+	extTicket := db.ExtTicket{
+		Ticket:      ticket,
+		ForwardFrom: id,
+		ForwardTo:   ticketAdmin.ID,
+		Time:        time.Now(),
 	}
 
 	mysql.TransferTicket(log)
-	sendResponse(true, "create", "null", chnMsg.conn)
+
+	if ClientsByLogin[ticketAdmin.Login] != nil {
+		sendResponse(true, "incoming", string(chk(json.Marshal(extTicket)).([]byte)), ClientsByLogin[ticketAdmin.Login].Connection)
+	}
+	sendResponse(true, "create", string(chk(json.Marshal(extTicket)).([]byte)), chnMsg.conn)
 }
 
 func forwardTicket(chnMsg *chanMessage) {
@@ -78,6 +84,8 @@ func forwardTicket(chnMsg *chanMessage) {
 		sendResponse(false, "forward", "Ошибка на сервере", chnMsg.conn)
 		return
 	}
+	// TODO: rights to send ticket to this user
+
 	to, ticketID := args["to"], args["ticketID"]
 	if alias.EmptyStr(to) || alias.EmptyStr(ticketID) {
 		sendResponse(false, "forward", "Неправильный запрос!", chnMsg.conn)
@@ -106,4 +114,28 @@ func forwardTicket(chnMsg *chanMessage) {
 	}
 
 	sendResponse(true, "forward", "null", chnMsg.conn)
+}
+
+func deleteTicket(chnMsg *chanMessage) {
+	mysql := db.CreateMysqlUser()
+	id := chnMsg.Message.Account.ID
+	user := mysql.GetUser("id", id)
+	if !user.Exist() || !user.Filled() {
+		sendResponse(false, "delete", "У Вас нет прав на это действие!", chnMsg.conn)
+		return
+	}
+	args := make(map[string]string)
+	err := json.Unmarshal([]byte(chnMsg.Message.Data), args)
+	if err != nil {
+		sendResponse(false, "delete", "Ошибка на сервере", chnMsg.conn)
+		return
+	}
+
+	ticketID := args["id"]
+	if alias.EmptyStr(ticketID) {
+		sendResponse(false, "delete", "Неправильный запрос", chnMsg.conn)
+	}
+
+	mysql.UpdateTicketStatus(chk(alias.STI(ticketID)).(int), "deleted")
+	sendResponse(true, "delete", "null", chnMsg.conn)
 }

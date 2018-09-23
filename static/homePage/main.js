@@ -15,5 +15,20 @@ $('#sendTicketForm').submit(e => {
     const caption = $('#ticketCaptionInput').val(),
         description = $('#ticketDesc').val();
 
-    sendEvent('create', {caption, description});
+    // TODO: Сообщение, куда, что и зачем
+    swal({
+        title: 'Отправить тикет?',
+        text: "Это действие нельзя будет отменить",
+        type: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Да, отправить',
+        cancelButtonText: 'Отмена'
+    }).then(obj => {
+        if (obj.value) {
+            sendEvent('create', {caption, description});
+            $('#sendTicketModal').modal('hide');
+        }
+    });
 });

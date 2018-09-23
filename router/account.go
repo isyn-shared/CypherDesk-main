@@ -46,17 +46,21 @@ func accountHandler(c *gin.Context) {
 					"department":  department.Name,
 					"departments": departments,
 				}, c)
-			} else if user.Role == "ticket" { // TODO:  е Модератор тикетов
+			} else if user.Role == "ticketModerator" {
 				department := user.GetDepartment()
-				usersInDep := mysql.GetUsers("department", department.ID)
+				departments := mysql.GetDepartments()
+				usersInDep := mysql.GetDepartmentUsers("id", department.ID)
 				admins := mysql.GetUsers("role", "admin")
-				usersToTransfer := append(usersInDep, admins...) // TODO: юзеры со всех департаментов?
+				moderators := mysql.GetUsers("role", "ticketModerator")
+				usersToTransfer := append(usersInDep, admins...)
+				usersToTransfer = append(usersToTransfer, moderators...)
 
 				for _, u := range usersToTransfer {
 					u.HidePrivateInfo()
 				}
-
 				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
+					"isModerator":     true,
+					"id":              user.ID,
 					"name":            user.Name,
 					"surname":         user.Surname,
 					"partonymic":      user.Partonymic,
@@ -64,18 +68,21 @@ func accountHandler(c *gin.Context) {
 					"mail":            user.Mail,
 					"login":           user.Login,
 					"department":      department.Name,
+					"departments":     departments,
 					"usersToTransfer": usersToTransfer,
 				}, c)
 			} else {
 				department := user.GetDepartment()
 				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
-					"name":       user.Name,
-					"surname":    user.Surname,
-					"partonymic": user.Partonymic,
-					"recourse":   user.Recourse,
-					"mail":       user.Mail,
-					"login":      user.Login,
-					"department": department.Name,
+					"isModerator": false,
+					"id":          user.ID,
+					"name":        user.Name,
+					"surname":     user.Surname,
+					"partonymic":  user.Partonymic,
+					"recourse":    user.Recourse,
+					"mail":        user.Mail,
+					"login":       user.Login,
+					"department":  department.Name,
 				}, c)
 			}
 		}
@@ -130,26 +137,19 @@ func fillAdminAccountHandler(c *gin.Context) {
 	} else {
 		user.HashPass()
 
-		mailMsg := &feedback.MailMessage{}
+		var mailMsg string
 		if newMail {
 			activationKey := alias.StringWithCharset(20, loginCharset) + user.Mail + time.Now().String()
 			user.SetActivationKey(activationKey)
 
-			mailMsg = &feedback.MailMessage{
-				Subject:    "Активация аккаунта",
-				Body:       "Здравствуйте! Спасибо за использование системы CypherDesk. Для активации акаунта перейдите по ссылке: " + Protocol + "://" + Host + ":" + Port + "/activate/" + user.ActivationKey,
-				Recipients: []string{user.Mail},
-			}
+			mailMsg = "Здравствуйте! Спасибо за использование системы CypherDesk. Для активации акаунта перейдите по ссылке: " + Protocol + "://" + Host + ":" + Port + "/activate/" + user.ActivationKey
 		} else {
-			mailMsg = &feedback.MailMessage{
-				Subject:    "Активация аккаунта",
-				Body:       "Здравствуйте! Все прошло успешно! Спасибо за использование системы CypherDesk.",
-				Recipients: []string{user.Mail},
-			}
+			mailMsg = "Здравствуйте! Все прошло успешно! Спасибо за использование системы CypherDesk."
 		}
 
 		mysql.UpdateUser(user)
-		feedback.SendMail(mailMsg)
+		r := feedback.NewMailRequest([]string{user.Mail}, "Восстановление пароля CypherDesk")
+		r.Send("templates/mail/body.html", map[string]string{"text": mailMsg})
 		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil, "redirect": "/account"})
 	}
 }
@@ -236,16 +236,14 @@ func remindPassHandler(c *gin.Context) {
 	}
 
 	user.SetRemindKey(alias.StringWithCharset(20, loginCharset) + time.Now().String())
-
-	mailMsg := &feedback.MailMessage{
-		Subject: "Восстановление пароля CypherDesk",
-		Body: "Ваш логин: " + user.Login + ". Для восстановления пароля перейдите по ссылке: " + Protocol + "://" + Host + ":" +
-			Port + "/remindPass/chk/" + user.Login + "/" + user.ActivationKey,
-		Recipients: []string{user.Mail},
-	}
-
 	mysql.UpdateUser(user)
-	feedback.SendMail(mailMsg)
+
+	mailMsg := "Ваш логин: " + user.Login + ". Для восстановления пароля перейдите по ссылке: " + Protocol + "://" + Host + ":" +
+		Port + "/remindPass/chk/" + user.Login + "/" + user.ActivationKey
+
+	r := feedback.NewMailRequest([]string{user.Mail}, "Восстановление пароля CypherDesk")
+	r.Send("templates/mail/body.html", map[string]string{"text": mailMsg})
+
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
 
