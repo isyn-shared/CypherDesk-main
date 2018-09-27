@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-HOSTNAME = 'http://127.0.0.1:8000/'
-SERVER_IP = '127.0.0.1' 
+HOSTNAME = 'http://cypherdesk.tk:8000/'
+SERVER_IP = '195.123.213.226' 
 
 #isyn.tk ip -> 195.123.225.209
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

@@ -32,7 +32,7 @@ def regexMail(mail):
         return True
     return False
 
-@validate_captcha
+#@validate_captcha
 def send (request):
     if request.POST:
         ADD_IP_F = False
@@ -77,7 +77,7 @@ def send (request):
         telegram_message = "User name: " + user_name + "\nUser email: " + user_email + "\nTitle: " + message_title + "\nMessage: " + message_text
         url = settings.HOSTNAME + 'telegram/send/'
         data = {'chat_name': 'feedback', 'token_name': 'feedback', 'text': telegram_message}
-        #result_telegram = requests.post(url, data=data).text
+        result_telegram = requests.post(url, data=data).text
 
         """post request on MailAgent app"""
         url = settings.HOSTNAME + 'mail/send/'
