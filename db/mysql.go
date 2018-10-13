@@ -37,7 +37,7 @@ func CreateMysqlUser() *MysqlUser {
 }
 
 func getMysqlKey() (string, string, string) {
-	bs := chk(alias.ReadFile("mysql.key"))
+	bs := chk(alias.ReadFile("keys/mysql.key"))
 
 	str := bs.(string)
 	lp := strings.Split(str, ";")

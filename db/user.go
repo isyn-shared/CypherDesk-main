@@ -12,6 +12,11 @@ var (
 	findUserFields = []string{"Login", "Mail", "Name", "Surname", "Partonymic", "Recourse"}
 )
 
+const (
+	stInfoKey = "keys/userdatakey.toml"
+	passKey   = "keys/passkey.toml"
+)
+
 // User - struct describing the registered user
 type User struct {
 	ID             int    `json: "id"`
@@ -79,9 +84,52 @@ func (u *User) WriteIn(user *User) {
 	}
 }
 
+// RefactStandartInfo encrypts/decrypts all string-fields of user
+func (u *User) RefactStandartInfo(dec bool) {
+	ak := new(alias.AesKey)
+	ak.Read(stInfoKey)
+
+	aesEnc := func(input []byte) []byte {
+		enc := make([]byte, len(input))
+
+		if dec {
+			enc = alias.DecryptAES(input, ak)
+		} else {
+			enc = alias.EncryptAES(input, ak)
+		}
+		return enc
+	}
+
+	fields := reflect.TypeOf(*u)
+	values := reflect.ValueOf(*u)
+
+	num := values.NumField()
+
+	for i := 0; i < num; i++ {
+		var input string
+		value := values.Field(i)
+		field := fields.Field(i)
+
+		switch value.Kind() {
+		case reflect.String:
+			input = value.String()
+			enc := string(aesEnc([]byte(input)))
+			reflect.ValueOf(u).Elem().FieldByName(field.Name).SetString(enc)
+		case reflect.Int:
+			continue
+		}
+	}
+}
+
 // HashPass method encrypt password of user
 func (u *User) HashPass() {
-	u.Pass = alias.HashPass(u.Pass)
+	ak := new(alias.AesKey)
+	ak.Read(passKey)
+
+	input := []byte(u.Pass)
+	encrypted := alias.EncryptAES(input, ak)
+
+	u.Pass = alias.HashPass(string(encrypted))
 }
 
 // UpdateUser fills empty fields of user entry in DB

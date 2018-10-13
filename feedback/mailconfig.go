@@ -14,7 +14,7 @@ type config struct {
 }
 
 func (c *config) Read() {
-	if _, err := toml.DecodeFile("feedback/mailconfig.toml", &c); err != nil {
+	if _, err := toml.DecodeFile("keys/mailconfig.toml", &c); err != nil {
 		log.Fatal(err)
 	}
 }
