@@ -27,6 +27,7 @@
                 <a class="nav-item nav-link head-link" id="statusA" onclick="showWindow('#status')" href="#">Состояние</a>
                 <a class="nav-item nav-link head-link" id="usersA" onclick="showWindow('#users')" href="#">Пользователи</a>
                 <a class="nav-item nav-link head-link" id="departmentsA" onclick="showWindow('#departments')" href="#">Отделы</a>
+                <a class="nav-item nav-link head-link" id="ticketsA" onclick="showWindow('#tickets')" href="#">Тикеты</a>
                 
                 <!-- This will hide on mobile -->
                 <a class="nav-item nav-link text-danger d-none d-sm-block head-link" style="position: absolute; right: 10px"
@@ -471,6 +472,161 @@
 
     </div>
     <!-- /#departments -->
+
+    <div id="tickets" class="window out">
+        <!-- This will be visible on desktop -->
+        <div class="d-none d-sm-block">
+
+            <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Центр управления тикетами</p>
+
+            <img src="/static/ticketImages/ticket2.png" id="leftTicketDesk" alt="">
+            <img src="/static/ticketImages/ticket1.png" id="ticketDesk" data-toggle="modal" data-target="#sendTicketModal" alt="">
+            <h5 style="margin-left: 173px;">Новый тикет</h5>
+
+            <div id="box-wrapper">
+                <div id="sentTicketsDesk" class="box">
+                    <p class="display-6 text-center">Отправленные тикеты</p>
+
+                    <ul class="list-group ticket-holder sentTicketsUl">
+                        <h2 class="text-center">Загрузка...</h2>
+                    </ul>
+                </div>
+                <div id="myTicketsDesk" class="box">
+                    <p class="display-6 text-center">Входящие тикеты</p>
+
+                    <ul class="list-group ticket-holder incomingTicketsUl">
+                        <h2 class="text-center">Загрузка...</h2>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /.d-none d-sm-block -->
+
+        <!-- This will be visible on mobile -->
+        <div class="d-block d-sm-none">
+            <h5 class="text-center mt-2">Центр управления тикетами</h5>
+
+            <img src="/static/ticketImages/ticket2.png" id="leftTicketMobile" alt="">
+            <img src="/static/ticketImages/ticket1.png" id="ticketMobile" data-toggle="modal" data-target="#sendTicketModal" alt="">
+            <p class="lead" style="margin-left: 173px;">Новый тикет</p>
+
+            <div id="sentTicketsMobile" class="boxMobile">
+                <p class="display-6 text-center">Отправленные тикеты</p>
+
+                <ul class="list-group ticket-holder sentTicketsUl" style="height: 315px;">
+                    <h2 class="text-center">Загрузка...</h2>
+                </ul>
+            </div>
+
+            <div id="sentTicketsMobile" class="boxMobile">
+                <p class="display-6 text-center">Входящие тикеты</p>
+
+                <ul class="list-group ticket-holder incomingTicketsUl" style="height: 315px;">
+                    <h2 class="text-center">Загрузка...</h2>
+                </ul>
+            </div>
+
+        </div>
+        <!-- /.d-block d-sm-none -->
+
+        <div class="modal fade" id="sendTicketModal" tabindex="-1" role="dialog" aria-labelledby="modalVerticalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form id="sendTicketForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalVerticalLabel">Отправка тикета (модератор)</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body pb-0">
+                            <div class="form-group">
+                                <label for="ticketCaptionInput" class="blockquote">Заголовок</label>
+                                <input type="text" class="form-control" id="ticketCaptionInput" aria-describedby="emailHelp"
+                                placeholder="Краткое описание проблемы" required>
+                                <small id="emailHelp" class="form-text text-muted text-center">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время </small>
+                                
+                                <label for="userToTransfer" class="blockquote mt-2 mb-1">Кому</label>                                
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle w-100"
+                                            type="button" id="dropdownMenu1" data-toggle="collapse" data-target="#findUserCollapse" aria-controls="findUserCollapse">
+                                        Выбрать пользователя
+                                    </button>
+                                    <div class="collapse mt-2" id="findUserCollapse">
+                                        <small id="emailHelp" class="form-text text-muted text-center">Если пользователь является модератором, то справа от его имени будет его отдел</small>
+                                        <div class="card card-body">
+                                            <div v-for="user in users" class="userDiv w-100" v-bind:id=" 'user' + user.ID " v-on:click="selectSendUser(user.ID)">
+                                                <span><span class="font-weight-bold">{{ '{{user.Recourse}}' }}</span> {{ '{{user.Name}}' }} {{ '{{user.Surname}}' }} ({{ '{{user.Login}}' }})</span>
+                                                <span v-if="user.Role === 'ticketModerator'" style="float: right" class="depSpan">{{ '{{user.DepartmentName}}' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- <script>
+                                        let spans = Array.prototype.slice.call( document.getElementsByClassName('depSpan') );
+                                        spans.forEach(span => {
+                                            span.innerText = departments[span.innerText];
+                                        });
+                                    </script> -->
+                                    <!-- <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                        {% for user in usersToTransfer %}
+                                            <a class="dropdown-item" href="#!">{{user}}</a>
+                                        {% endfor %}
+                                    </div> -->
+                                </div>
+
+                                <label for="ticketDesc" class="blockquote mt-2 mb-1">Описание</label><br>                           
+                                <textarea name="ticketDesc" id="ticketDesc"></textarea>
+
+                                <!-- This will be filled using JS -->
+                                <div class="mt-3 alertWrapper"></div>
+                            </div>
+                                    
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Закрыть</button>
+                            <button type="submit" class="btn btn-success">Отправить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="forwardTicketModal" tabindex="-1" role="dialog" aria-labelledby="modalVerticalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form id="forwardTicketForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalVerticalLabel">Перенаправление тикета (модератор)</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body pb-0">
+                            <div class="form-group">
+                                <label for="ticketCaptionInput" class="blockquote">Заголовок</label>
+                                <input type="text" class="form-control" id="ticketCaptionInput" aria-describedby="emailHelp"
+                                placeholder="Краткое описание проблемы" required>
+                                <small id="emailHelp" class="form-text text-muted text-center">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время </small>
+                                
+                                <label for="ticketDesc" class="blockquote mt-2 mb-1">Описание</label><br>                           
+                                <textarea name="ticketDesc" id="ticketDesc"></textarea>
+
+                                <!-- This will be filled using JS -->
+                                <div class="mt-3 alertWrapper"></div>
+                            </div>
+                                    
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Закрыть</button>
+                            <button type="submit" class="btn btn-success">Отправить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#tickets.window out -->
 
     <!-- JavaScript for Bootstrap -->
     <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="

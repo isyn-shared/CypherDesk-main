@@ -215,7 +215,7 @@
                                         <small id="emailHelp" class="form-text text-muted text-center">Если пользователь является модератором, то справа от его имени будет его отдел</small>
                                         <div class="card card-body">
                                             {% for user in usersToTransfer %}
-                                                <div class="userDiv w-100" onclick="selectSendUser({{user.id}})">
+                                                <div class="userDiv w-100" onclick="selectSendUser({{user.ID}}, this)">
                                                     <span><span class="font-weight-bold">{{user.Recourse}}</span> {{user.Name}} {{user.Surname}} ({{user.Login}})</span>
                                                     {% if user.Role == "ticketModerator" %} <span style="float: right" class="depSpan">{{user.Department}}</span> {% endif %}
                                                 </div>
@@ -303,7 +303,11 @@
 
     <!-- My JS -->
     <script src="/static/homePage/ws.js"></script>
-    <script src="/static/homePage/main.js"></script>
+    {% if isModerator %}
+        <script src="/static/homePage/mainM.js"></script>
+    {% else %}
+        <script src="/static/homePage/mainU.js"></script>
+    {% endif %}
     <script src="/static/publicVars.js"></script>
     <script src="/static/sendPOST.js"></script>
 
