@@ -1,10 +1,8 @@
 package alias
 
 import (
-	"crypto/cipher"
 	"crypto/md5"
 	"crypto/sha256"
-	"crypto/aes"
 	"fmt"
 )
 
@@ -26,25 +24,3 @@ func SHA256(str string) string {
 	shaByte := sha256.Sum256([]byte(str))
 	return string(fmt.Sprintf("%x", shaByte))
 }
-
-// Зашифровать AES
-func EncryptAES(dst, src, key, iv []byte) error {
-	aesBlockEncryptor, err := aes.NewCipher([]byte(key))
-	if err != nil {
-	  return err
-	}
-	aesEncrypter := cipher.NewCFBEncrypter(aesBlockEncryptor, iv)
-	aesEncrypter.XORKeyStream(dst, src)
-	return nil
-  }
-  
-  // Расшифровать AES
-  func DecryptAES(dst, src, key, iv []byte) error {
-	aesBlockEncryptor, err := aes.NewCipher([]byte(key))
-	if err != nil {
-	  return err
-	}
-	aesEncrypter := cipher.NewCFBEncrypter(aesBlockEncryptor, iv)
-	aesEncrypter.XORKeyStream(dst, src)
-	return nil
-  }

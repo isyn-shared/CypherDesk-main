@@ -194,12 +194,20 @@ function editUser(user) {
     $('#editUserDepartmentSelect').val(user.Department);
 }
 
-const app = new Vue({
+const app1 = new Vue({
     el: '#renderedUsers',
     data: {
         users: [],
         editUser
     },
+});
+
+const app2 = new Vue({
+    el: '#findUserCollapse',
+    data: {
+        users: [],
+        selectSendUser
+    }
 });
 function findUsers(key) {
     sendPOST('/admin/findUser', {key})
@@ -220,7 +228,8 @@ function findUsers(key) {
 
             }
 
-            app.users = users;
+            app1.users = users;
+            app2.users = users;
 
             if (!users.length)
                 $('#usersNotFound').removeClass('d-none');
@@ -298,4 +307,16 @@ function deleteDep() {
             location.reload();
         }
     }).catch(console.error);
+}
+
+let selectedUser = null;
+let lastSelectedHtml = null;
+function selectSendUser(id) {
+    let htmlElement = document.getElementById('user' + id);
+    selectedUser = id;
+
+    if (lastSelectedHtml) lastSelectedHtml.classList.remove('selected');
+
+    htmlElement.classList.add('selected');
+    lastSelectedHtml = htmlElement;
 }
