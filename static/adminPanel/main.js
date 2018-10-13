@@ -10,6 +10,8 @@ const windowColors = {
     "#departments": "#defff8"
 };
 
+$('html').css("background-color", windowColors[selectedWindow]);
+
 function showWindow(windowID) {
     if (selectedWindow != windowID) {
         if (DEBUG) console.log(windowID);
