@@ -27,9 +27,10 @@ func windowsify(path string) string {
 	return "\\" + strings.Replace(path, "/", "\\", -1)
 }
 
+// TODO: Analizepath doesn`t work!!!
 // ReadFile returns text from file
 func ReadFile(path string) (string, error) {
-	bs, err := ioutil.ReadFile(build.Default.GOPATH + AnalyzePath("src/CypherDesk-main/"+path))
+	bs, err := ioutil.ReadFile(build.Default.GOPATH + AnalyzePath("/src/CypherDesk-main/"+path))
 	if err != nil {
 		return "", err
 	}

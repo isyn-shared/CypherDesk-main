@@ -18,7 +18,7 @@ var (
 	// Host of the server
 	Host = "127.0.0.1"
 	// Port which used to access to the server
-	Port = "3000"
+	Port = "8080"
 
 	loginCharset = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

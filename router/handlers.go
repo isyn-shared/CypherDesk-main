@@ -3,7 +3,6 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"encoding/json"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -31,6 +30,9 @@ func authorizeHandler(c *gin.Context) {
 		return
 	}
 	mysql := db.CreateMysqlUser()
+
+	login = alias.StandartRefact(login, false, db.StInfoKey)
+
 	user := mysql.GetUser("login", login)
 
 	if !user.Exist() {
@@ -49,16 +51,14 @@ func authorizeHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный пароль!"})
 	}
 }
+
 func testHandler(c *gin.Context) {
-	mysql := db.CreateMysqlUser()
-	us := mysql.GetUser("login", "suriknik")
-	res1, _ := json.Marshal(us)
+	val := c.Query("v")
+	dec := c.Query("dec")
 
-	us.RefactStandartInfo(false)
-	res2, _ := json.Marshal(us)
-
-	us.RefactStandartInfo(true)
-	res3, _ := json.Marshal(us)
-
-	c.JSON(http.StatusOK, gin.H{"first": string(res1), "second": string(res2), "third": string(res3)})
+	if dec != "yes" {
+		c.String(http.StatusOK, "kekLOLVALIDOL %s", alias.StandartRefact(val, false, db.StInfoKey))
+	} else {
+		c.String(http.StatusOK, "kekLOLVALIDOL %s", alias.StandartRefact(val, true, db.StInfoKey))
+	}
 }

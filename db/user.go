@@ -13,7 +13,7 @@ var (
 )
 
 const (
-	stInfoKey = "keys/userdatakey.toml"
+	StInfoKey = "keys/userdatakey.toml"
 	passKey   = "keys/passkey.toml"
 )
 
@@ -84,21 +84,28 @@ func (u *User) WriteIn(user *User) {
 	}
 }
 
+// RefactField method decrypts or encrypts user object field
+func (u *User) RefactField(fieldName string, dec bool) {
+	ak := new(alias.AesKey)
+	ak.Read(StInfoKey)
+
+	r := reflect.ValueOf(*u)
+	f := reflect.Indirect(r).FieldByName(fieldName)
+
+	var input string
+
+	switch f.Kind() {
+	case reflect.String:
+		input = f.String()
+		enc := alias.StandartRefact(input, dec, StInfoKey)
+		reflect.ValueOf(u).Elem().FieldByName(fieldName).SetString(enc)
+	}
+}
+
 // RefactStandartInfo encrypts/decrypts all string-fields of user
 func (u *User) RefactStandartInfo(dec bool) {
 	ak := new(alias.AesKey)
-	ak.Read(stInfoKey)
-
-	aesEnc := func(input []byte) []byte {
-		enc := make([]byte, len(input))
-
-		if dec {
-			enc = alias.DecryptAES(input, ak)
-		} else {
-			enc = alias.EncryptAES(input, ak)
-		}
-		return enc
-	}
+	ak.Read(StInfoKey)
 
 	fields := reflect.TypeOf(*u)
 	values := reflect.ValueOf(*u)
@@ -113,7 +120,7 @@ func (u *User) RefactStandartInfo(dec bool) {
 		switch value.Kind() {
 		case reflect.String:
 			input = value.String()
-			enc := string(aesEnc([]byte(input)))
+			enc := alias.StandartRefact(input, dec, StInfoKey)
 			reflect.ValueOf(u).Elem().FieldByName(field.Name).SetString(enc)
 		case reflect.Int:
 			continue
@@ -134,6 +141,7 @@ func (u *User) HashPass() {
 
 // UpdateUser fills empty fields of user entry in DB
 func (m *MysqlUser) UpdateUser(user *User) int64 {
+	user.RefactStandartInfo(false)
 	db := m.connect()
 	defer db.Close()
 	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=?, activationType = ?, department = ? WHERE id = ?")
@@ -146,6 +154,7 @@ func (m *MysqlUser) UpdateUser(user *User) int64 {
 
 // InsertUser inserts user obj in db
 func (m *MysqlUser) InsertUser(user *User) sql.Result {
+	user.RefactStandartInfo(false)
 	db := m.connect()
 	defer db.Close()
 	stmt := prepare(db, "INSERT INTO users (login, pass, mail, name, surname, partonymic, recourse, role, department, status, activationKey, activationType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
@@ -208,7 +217,18 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 		panic("db error: " + err.Error())
 	}
 	user.chkNullFields(ns)
+	user.RefactStandartInfo(true)
 	return user
+}
+
+// GetUserByDecField finds user by decrypted val
+
+func (m *MysqlUser) GetUserByDecField(sqlParam string, key interface{}) *User {
+	switch v := key.(type) {
+	case string:
+		key = alias.StandartRefact(v, false, StInfoKey)
+	}
+	return m.GetUser(sqlParam, key)
 }
 
 // GetUsers returns all users from db
@@ -234,6 +254,7 @@ func (m *MysqlUser) GetUsers(sqlKey string, keyVal interface{}) []*User {
 			fmt.Println(err.Error())
 		}
 		user.chkNullFields(ns)
+		user.RefactStandartInfo(true)
 		users = append(users, user)
 	}
 	return users
@@ -322,6 +343,7 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 			fmt.Println(err.Error())
 		}
 		user.chkNullFields(ns)
+		user.RefactStandartInfo(true)
 		users = append(users, user)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -115,8 +116,10 @@ func fillAdminAccountHandler(c *gin.Context) {
 	updUser.Recourse = c.PostForm("recourse")
 	updUser.Mail, updUser.Login, updUser.Pass = c.PostForm("mail"), c.PostForm("login"), c.PostForm("pass")
 
+	copyMail := updUser.Mail
+
 	var newMail bool
-	if user.Mail != updUser.Mail {
+	if alias.StandartRefact(user.Mail, true, db.StInfoKey) != updUser.Mail {
 		newMail = true
 	}
 
@@ -125,6 +128,7 @@ func fillAdminAccountHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Заполните все поля!"})
 		return
 	}
+
 	prevLogin := user.Login
 	user.WriteIn(updUser)
 
@@ -148,7 +152,7 @@ func fillAdminAccountHandler(c *gin.Context) {
 		}
 
 		mysql.UpdateUser(user)
-		r := feedback.NewMailRequest([]string{user.Mail}, "Восстановление пароля CypherDesk")
+		r := feedback.NewMailRequest([]string{copyMail}, "Восстановление пароля CypherDesk")
 		r.Send("templates/mail/body.html", map[string]string{"text": mailMsg})
 		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil, "redirect": "/account"})
 	}
@@ -199,7 +203,8 @@ func activateAccountHandler(c *gin.Context) {
 	}
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", id)
-	if user.ActivationKey == key && user.ActivationType == 1 {
+	fmt.Println(key, alias.StandartRefact(key, false, db.StInfoKey))
+	if user.ActivationKey == alias.StandartRefact(key, false, db.StInfoKey) && user.ActivationType == 1 {
 		user.ActivationKey = ""
 		user.ActivationType = 0
 		mysql.UpdateUser(user)
