@@ -29,7 +29,8 @@ func createUserHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "У Вас нет прав на это действие"})
 		return
 	}
-	user = mysql.GetUser("mail", userMail)
+	encMail := alias.StandartRefact(userMail, false, db.StInfoKey)
+	user = mysql.GetUser("mail", encMail)
 	if user.Exist() {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пользователь с такой почтой уже существует!"})
 		return
@@ -44,11 +45,12 @@ func createUserHandler(c *gin.Context) {
 	NewUser.GeneratePass(15)
 	privPass := NewUser.Pass
 	NewUser.HashPass()
+	decMail := NewUser.Mail
 	mysql.InsertUser(NewUser)
 
 	mailText := "Для авторизации используйте логин: " + NewUser.Login + " и пароль: " + privPass + ". Приятного пользования!"
 
-	r := feedback.NewMailRequest([]string{NewUser.Mail}, "Восстановление пароля CypherDesk")
+	r := feedback.NewMailRequest([]string{decMail}, "Восстановление пароля CypherDesk")
 	r.Send("templates/mail/body.html", map[string]string{"text": mailText})
 
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})

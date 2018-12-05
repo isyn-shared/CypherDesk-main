@@ -4,7 +4,6 @@ import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -203,8 +202,7 @@ func activateAccountHandler(c *gin.Context) {
 	}
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", id)
-	fmt.Println(key, alias.StandartRefact(key, false, db.StInfoKey))
-	if user.ActivationKey == alias.StandartRefact(key, false, db.StInfoKey) && user.ActivationType == 1 {
+	if user.ActivationKey == key && user.ActivationType == 1 {
 		user.ActivationKey = ""
 		user.ActivationType = 0
 		mysql.UpdateUser(user)

@@ -3,6 +3,7 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
+	"fmt"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -44,6 +45,8 @@ func authorizeHandler(c *gin.Context) {
 	}
 
 	pass = alias.HashPass(pass)
+	fmt.Println(pass, user.Pass)
+
 	if pass == user.Pass {
 		setID(c, user)
 		c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
@@ -53,12 +56,18 @@ func authorizeHandler(c *gin.Context) {
 }
 
 func testHandler(c *gin.Context) {
-	val := c.Query("v")
-	dec := c.Query("dec")
-
-	if dec != "yes" {
-		c.String(http.StatusOK, "kekLOLVALIDOL %s", alias.StandartRefact(val, false, db.StInfoKey))
-	} else {
-		c.String(http.StatusOK, "kekLOLVALIDOL %s", alias.StandartRefact(val, true, db.StInfoKey))
+	m := db.CreateMysqlUser()
+	u := &db.User{
+		Login: "admin",
+		Pass:  "admin",
+		Role:  "admin",
 	}
+	u.HashPass()
+
+	m.InsertUser(u)
+	fmt.Println(u.Pass)
 }
+
+/*
+
+*/

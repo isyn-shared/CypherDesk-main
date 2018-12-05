@@ -13,8 +13,9 @@ var (
 )
 
 const (
-	StInfoKey = "keys/userdatakey.toml"
-	passKey   = "keys/passkey.toml"
+	StInfoKey        = "keys/userdatakey.toml"
+	PassKey          = "keys/passkey.toml"
+	ActivationKeyKey = "keys/activationKey.toml"
 )
 
 // User - struct describing the registered user
@@ -120,7 +121,16 @@ func (u *User) RefactStandartInfo(dec bool) {
 		switch value.Kind() {
 		case reflect.String:
 			input = value.String()
-			enc := alias.StandartRefact(input, dec, StInfoKey)
+
+			var enc string
+			if field.Name == "Pass" {
+				enc = alias.StandartRefact(input, dec, PassKey)
+			} else if field.Name == "ActivationKey" {
+				continue
+			} else {
+				enc = alias.StandartRefact(input, dec, StInfoKey)
+			}
+
 			reflect.ValueOf(u).Elem().FieldByName(field.Name).SetString(enc)
 		case reflect.Int:
 			continue
@@ -130,13 +140,7 @@ func (u *User) RefactStandartInfo(dec bool) {
 
 // HashPass method encrypt password of user
 func (u *User) HashPass() {
-	ak := new(alias.AesKey)
-	ak.Read(passKey)
-
-	input := []byte(u.Pass)
-	encrypted := alias.EncryptAES(input, ak)
-
-	u.Pass = alias.HashPass(string(encrypted))
+	u.Pass = alias.HashPass(u.Pass)
 }
 
 // UpdateUser fills empty fields of user entry in DB
@@ -200,7 +204,25 @@ func (u *User) Filled() bool {
 	return true
 }
 
-// GetUser return user obj using diff keys (id, login, mail)
+// GetUserByDecField finds user by decrypted val
+func (m *MysqlUser) GetUserByDecField(sqlParam string, key interface{}) *User {
+	var refactKey string
+	switch v := key.(type) {
+	case string:
+		switch key {
+		case "Pass":
+			v = alias.StandartRefact(v, false, PassKey)
+		case "ActivationKey":
+			v = alias.StandartRefact(v, false, ActivationKeyKey)
+		default:
+			v = alias.StandartRefact(v, false, StInfoKey)
+		}
+		refactKey = v
+	}
+	return m.GetUser(sqlParam, refactKey)
+}
+
+// GetUser returns user obj using diff keys (id, login, mail)
 func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	db := m.connect()
 	defer db.Close()
@@ -219,16 +241,6 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	user.chkNullFields(ns)
 	user.RefactStandartInfo(true)
 	return user
-}
-
-// GetUserByDecField finds user by decrypted val
-
-func (m *MysqlUser) GetUserByDecField(sqlParam string, key interface{}) *User {
-	switch v := key.(type) {
-	case string:
-		key = alias.StandartRefact(v, false, StInfoKey)
-	}
-	return m.GetUser(sqlParam, key)
 }
 
 // GetUsers returns all users from db
@@ -329,8 +341,9 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 	defer stmt.Close()
 
 	InterfaceArgs := make([]interface{}, len(sqlKeys))
+
 	for i, a := range sqlKeys {
-		InterfaceArgs[i] = a
+		InterfaceArgs[i] = alias.StandartRefact(a, false, StInfoKey)
 	}
 
 	rows := chk(stmt.Query(InterfaceArgs...)).(*sql.Rows)
