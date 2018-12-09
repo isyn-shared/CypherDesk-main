@@ -133,6 +133,7 @@ func deleteUserHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Неправильный запрос"})
 		return
 	}
+	login = alias.StandartRefact(login, false, db.StInfoKey)
 	mysql.DeleteUser("login", login)
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
@@ -153,9 +154,12 @@ func changeUserHandler(c *gin.Context) {
 	login, newLogin, newName, newSurname, newPartonymic, newRecourse, newDepartment := c.PostForm("login"),
 		c.PostForm("newLogin"), c.PostForm("newName"), c.PostForm("newSurname"), c.PostForm("newPartonymic"),
 		c.PostForm("newRecourse"), c.PostForm("newDepartment")
-	user = mysql.GetUser("login", login)
 
-	tmpUser := mysql.GetUser("login", newLogin)
+	encLogin := alias.StandartRefact(login, false, db.StInfoKey)
+	user = mysql.GetUser("login", encLogin)
+
+	newEncLogin := alias.StandartRefact(newLogin, false, db.StInfoKey)
+	tmpUser := mysql.GetUser("login", newEncLogin)
 	if tmpUser.Exist() && tmpUser.ID != user.ID {
 		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "Пользователь с таким логином уже существует!"})
 		return
