@@ -152,7 +152,7 @@ func (m *MysqlUser) GetUserTickets(userID int, filter bool) []*ExtTicket {
 		exT.Ticket = m.GetTicket(log.Ticket)
 		exT.Action, exT.ForwardFrom, exT.ForwardTo, exT.Time = log.Action, log.UserFrom, log.UserTo, log.Time
 
-		if (filter && exT.Ticket.Status == "deleted") || !filter {
+		if (filter && exT.Ticket.Status != "deleted") || !filter {
 			tickets = append(tickets, exT)
 		}
 	}
