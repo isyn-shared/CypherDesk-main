@@ -267,6 +267,7 @@ function deleteUser() {
             );
 
             $('#refreshUsers').click();
+            $('#editUserMod').modal('hide');
         }
     }).catch(console.error);
 }
@@ -309,8 +310,8 @@ function deleteDep() {
     }).catch(console.error);
 }
 
-let selectedUser = null;
-let lastSelectedHtml = null;
+var selectedUser = null;
+var lastSelectedHtml = null;
 function selectSendUser(id) {
     let htmlElement = document.getElementById('user' + id);
     selectedUser = id;

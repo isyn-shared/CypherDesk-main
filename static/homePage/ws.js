@@ -159,8 +159,8 @@ ws.onmessage = (event) => {
     console.log(msg);
 
     if (msg.ok === false) {
-        console.warn("Ошибка!", msg.errorMessage);
-        swal('Упс!', `Что-то пошло не так: ${msg.errorMessage}`, 'error');
+        console.warn("Ошибка!", msg.data);
+        swal('Упс!', `Что-то пошло не так: ${msg.data}`, 'error');
         return;
     }
 
