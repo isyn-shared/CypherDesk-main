@@ -44,6 +44,11 @@ const myEvents = {
         let sentLi = '';
         let incomingLi = '';
         for (let extTicket of tickets) {
+            // console.log(usersToTransfer || "usTr: undefined");
+            let ticketSender = !isUser ? usersToTransfer[extTicket.ticket.Sender] : null;
+            let senderHtml = !isUser ?
+                `<p class="font-weight-bold mb-0">Отправитель: <span class="font-weight-normal">${ticketSender}</span></p>`
+                : '';
             let ticket = `
                 <li class="list-group-item mb-2" style="float: left">
                     <h5 class="font-weight-bold">Тема: <span class="font-weight-normal">${extTicket.ticket.Caption}</span></h5>
@@ -56,7 +61,7 @@ const myEvents = {
                         
                         <div class="collapse" id="collapseInfo${extTicket.ticket.ID}">
                             <p class="font-weight-bold mb-0">Время: <span class="font-weight-normal">${getTime( new Date(extTicket.time) )}</span></p>
-                            <p class="font-weight-bold mb-0">Отправитель: <span class="font-weight-normal">${extTicket.ticket.Sender}</span></p>
+                            ${senderHtml}
                             <p class="font-weight-bold mb-0">Статус: <span class="font-weight-normal">${extTicket.ticket.Status}</span></p>
                         </div>
                     </div>
@@ -90,8 +95,7 @@ const myEvents = {
             sentIsEmpty = false;
         }
 
-        let li = $('.sentTicketsUl').html();
-        li += `
+        let li = `
             <li class="list-group-item mb-2" style="float: left">
                 <h5 class="font-weight-bold">Тема: <span class="font-weight-normal">${extTicket.ticket.Caption}</span></h5>
                 <p class="mb-0 lead">${extTicket.ticket.Description}</p>
@@ -109,6 +113,7 @@ const myEvents = {
                 </div>
             </li>
         `;
+        li += $('.sentTicketsUl').html();
 
         $('.sentTicketsUl').html(li);
     },
@@ -120,8 +125,7 @@ const myEvents = {
             incomingIsEmpty = false;
         }
 
-        let li = $('.incomingTicketsUl').html();
-        li += `
+        let li = `
             <li class="list-group-item mb-2" style="float: left">
                 <h5 class="font-weight-bold">Тема: <span class="font-weight-normal">${extTicket.ticket.Caption}</span></h5>
                 <p class="mb-0 lead">${extTicket.ticket.Description}</p>
@@ -139,6 +143,7 @@ const myEvents = {
                 </div>
             </li>
         `;
+        li += $('.incomingTicketsUl').html();
 
         $('.incomingTicketsUl').html(li);
     }

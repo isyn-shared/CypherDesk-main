@@ -1,5 +1,7 @@
+const isUser = true;
+
 $(window).on('scroll', () => {
-    let s = $(window).scrollTop(),
+    let s = $(window).scroliflTop(),
         d = $(document).height(),
         c = $(window).height(),
         w = $(window).width();

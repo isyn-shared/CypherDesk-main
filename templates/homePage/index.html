@@ -182,8 +182,14 @@
         <script>
             let departments = {
                 {% for dep in departments %}
-                    {{dep.ID}}: "{{dep.Name}}",
+                    "{{dep.ID}}": "{{dep.Name}}",
                     "{{dep.Name}}": "{{dep.ID}}",
+                {% endfor %}
+            }
+            let usersToTransfer = {
+                {% for user in usersToTransfer %}
+                    "{{user.ID}}": "{{user.Login}}",
+                    "{{user.Login}}": "{{user.ID}}",
                 {% endfor %}
             }
         </script>

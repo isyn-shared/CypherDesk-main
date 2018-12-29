@@ -55,7 +55,7 @@ func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) []*Use
 		depID = keyVal.(int)
 	}
 
-	stmt := prepare(db, "SELECT * FROM users WHERE department = ? AND role = 'user'")
+	stmt := prepare(db, "SELECT * FROM users WHERE department = ? AND role = 'mlRzUQ=='")
 	defer stmt.Close()
 
 	rows := chk(stmt.Query(depID)).(*sql.Rows)
@@ -69,6 +69,7 @@ func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) []*Use
 			fmt.Println(err.Error())
 		}
 		user.chkNullFields(ns)
+		user.RefactStandartInfo(true)
 		users = append(users, user)
 	}
 

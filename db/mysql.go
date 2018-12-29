@@ -9,6 +9,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var (
+	MysqlPass, MysqlLogin, MysqlDBName string
+)
+
 // MysqlUser - obj that can connect to mysql database and make requests
 type MysqlUser struct {
 	user     string
@@ -31,12 +35,12 @@ func (m MysqlUser) connect() *sql.DB {
 //CreateMysqlUser returns new authorized mysql user
 func CreateMysqlUser() *MysqlUser {
 	mysql := new(MysqlUser)
-	sqlLogin, sqlPass, dbName := getMysqlKey()
-	mysql.create(sqlLogin, sqlPass, dbName)
+	mysql.create(MysqlLogin, MysqlPass, MysqlDBName)
 	return mysql
 }
 
-func getMysqlKey() (string, string, string) {
+//MysqlInit initialize basic mysql vars
+func MysqlInit() {
 	bs := chk(alias.ReadFile("keys/mysql.key"))
 
 	str := bs.(string)
@@ -46,5 +50,5 @@ func getMysqlKey() (string, string, string) {
 		panic("Неправильный формат файла mysql.key!")
 	}
 
-	return lp[0], lp[1], lp[2]
+	MysqlLogin, MysqlPass, MysqlDBName = lp[0], lp[1], lp[2]
 }

@@ -58,6 +58,7 @@ func accountHandler(c *gin.Context) {
 				for _, u := range usersToTransfer {
 					u.HidePrivateInfo()
 				}
+
 				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
 					"isModerator":     true,
 					"id":              user.ID,

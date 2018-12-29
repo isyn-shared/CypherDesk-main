@@ -5,6 +5,7 @@ import (
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -45,6 +46,8 @@ func createUserHandler(c *gin.Context) {
 	NewUser.GeneratePass(15)
 	privPass := NewUser.Pass
 	NewUser.HashPass()
+
+	fmt.Println("NewUSerMail:", NewUser.Mail)
 
 	mailText := "Для авторизации используйте логин: " + NewUser.Login + " и пароль: " + privPass + ". Приятного пользования!"
 	r := feedback.NewMailRequest([]string{NewUser.Mail}, "Восстановление пароля CypherDesk")
