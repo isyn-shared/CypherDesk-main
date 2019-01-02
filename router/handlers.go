@@ -3,8 +3,8 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
@@ -45,7 +45,6 @@ func authorizeHandler(c *gin.Context) {
 	}
 
 	pass = alias.HashPass(pass)
-	fmt.Println(pass, user.Pass)
 
 	if pass == user.Pass {
 		setID(c, user)
@@ -55,19 +54,34 @@ func authorizeHandler(c *gin.Context) {
 	}
 }
 
-func testHandler(c *gin.Context) {
+func createTemporaryHandler(c *gin.Context) {
 	m := db.CreateMysqlUser()
 	u := &db.User{
 		Login: "admin",
 		Pass:  "admin",
 		Role:  "admin",
+		Department: 4,
 	}
 	u.HashPass()
 
 	m.InsertUser(u)
-	fmt.Println(u.Pass)
+
+	u = m.GetUserByDecField("login", "admin")
+
+	eu := &db.ExtendedUser{
+		ID: u.ID,
+		Phone: "+79782568334",
+		Address: "Simferopol",
+		ActivationType: "0",
+		AccountCreationDate: time.Now(),
+		ActivationDate: time.Now(),
+	}
+	m.InsertExtendedUser(eu)
+	c.String(http.StatusOK, "OK")
 }
 
-/*
-
-*/
+func testHandler(c *gin.Context) {
+	nt := time.Now()
+	tt := time.Now().Local().Add(time.Hour * time.Duration(12))
+	c.String(http.StatusOK, nt.String() + " " + tt.String())
+}

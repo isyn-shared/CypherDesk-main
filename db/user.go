@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strconv"
 )
 
 var (
@@ -16,6 +17,7 @@ const (
 	StInfoKey        = "keys/userdatakey.toml"
 	PassKey          = "keys/passkey.toml"
 	ActivationKeyKey = "keys/activationKey.toml"
+	IDKey 			 = "keys/idkey.toml"
 )
 
 // User - struct describing the registered user
@@ -31,8 +33,6 @@ type User struct {
 	Role           string `json: "role"`
 	Department     int    `json: "department"`
 	Status         string `json: "status"`
-	ActivationKey  string `json: "activationKey"`
-	ActivationType int    `json: "activationType"`
 }
 
 type userNullFields struct {
@@ -41,9 +41,20 @@ type userNullFields struct {
 	Surname        interface{}
 	Partonymic     interface{}
 	Recourse       interface{}
-	ActivationKey  interface{}
 	Status         interface{}
-	ActivationType interface{}
+}
+
+func DecID(encID string) int {
+	decID, err := alias.STI(alias.StandartRefact(alias.Base32Decode(encID), true, IDKey))
+	if err != nil {
+		fmt.Println("Error when decrypt uder ID")
+	}
+	return decID
+}
+
+func (u *User) GetEncID() string {
+	strID := strconv.Itoa(u.ID)
+	return alias.Base32Encode(alias.StandartRefact(strID, false, IDKey))
 }
 
 // BasicUser returns user obj containing system information
@@ -57,16 +68,6 @@ func BasicUser(mail, role, status string, department int) *User {
 	return user
 }
 
-// SetActivationKey
-func (u *User) SetActivationKey(key string) {
-	u.ActivationKey = alias.MD5(key)
-	u.ActivationType = 1
-}
-
-func (u *User) SetRemindKey(key string) {
-	u.ActivationKey = alias.MD5(key)
-	u.ActivationType = 2
-}
 
 // WriteIn fills empty fields fo user obj
 func (u *User) WriteIn(user *User) {
@@ -74,12 +75,6 @@ func (u *User) WriteIn(user *User) {
 	u.Recourse = user.Recourse
 	u.Login, u.Pass = user.Login, user.Pass
 
-	if !alias.EmptyStr(user.ActivationKey) {
-		u.ActivationKey = user.ActivationKey
-	}
-	if user.ActivationType == 0 {
-		u.ActivationType = user.ActivationType
-	}
 	if !alias.EmptyStr(user.Mail) {
 		u.Mail = user.Mail
 	}
@@ -105,9 +100,6 @@ func (u *User) RefactField(fieldName string, dec bool) {
 
 // RefactStandartInfo encrypts/decrypts all string-fields of user
 func (u *User) RefactStandartInfo(dec bool) {
-	ak := new(alias.AesKey)
-	ak.Read(StInfoKey)
-
 	fields := reflect.TypeOf(*u)
 	values := reflect.ValueOf(*u)
 
@@ -125,8 +117,6 @@ func (u *User) RefactStandartInfo(dec bool) {
 			var enc string
 			if field.Name == "Pass" {
 				enc = alias.StandartRefact(input, dec, PassKey)
-			} else if field.Name == "ActivationKey" {
-				continue
 			} else {
 				enc = alias.StandartRefact(input, dec, StInfoKey)
 			}
@@ -148,10 +138,10 @@ func (m *MysqlUser) UpdateUser(user *User) int64 {
 	user.RefactStandartInfo(false)
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, activationKey=?, activationType = ?, department = ? WHERE id = ?")
+	stmt := prepare(db, "UPDATE users SET mail=?, name=?, surname=?, partonymic=?, recourse=?, login=?, pass=?, department = ? WHERE id = ?")
 	defer stmt.Close()
 	res := exec(stmt, []interface{}{user.Mail, user.Name, user.Surname, user.Partonymic,
-		user.Recourse, user.Login, user.Pass, user.ActivationKey, user.ActivationType, user.Department, user.ID})
+		user.Recourse, user.Login, user.Pass, user.Department, user.ID})
 	aff := affect(res)
 	return aff
 }
@@ -161,10 +151,10 @@ func (m *MysqlUser) InsertUser(user *User) sql.Result {
 	user.RefactStandartInfo(false)
 	db := m.connect()
 	defer db.Close()
-	stmt := prepare(db, "INSERT INTO users (login, pass, mail, name, surname, partonymic, recourse, role, department, status, activationKey, activationType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt := prepare(db, "INSERT INTO users (login, pass, mail, name, surname, partonymic, recourse, role, department, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	defer stmt.Close()
 	res := exec(stmt, []interface{}{user.Login, user.Pass, user.Mail, user.Name, user.Surname, user.Partonymic, user.Recourse,
-		user.Role, user.Department, user.Status, user.ActivationKey, user.ActivationType})
+		user.Role, user.Department, user.Status})
 	return res
 }
 
@@ -212,8 +202,6 @@ func (m *MysqlUser) GetUserByDecField(sqlParam string, key interface{}) *User {
 		switch key {
 		case "Pass":
 			v = alias.StandartRefact(v, false, PassKey)
-		case "ActivationKey":
-			v = alias.StandartRefact(v, false, ActivationKeyKey)
 		default:
 			v = alias.StandartRefact(v, false, StInfoKey)
 		}
@@ -232,7 +220,7 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 
 	user, ns := new(User), new(userNullFields)
 	err := stmt.QueryRow(key).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user
 	} else if err != nil {
@@ -261,7 +249,7 @@ func (m *MysqlUser) GetUsers(sqlKey string, keyVal interface{}) []*User {
 	for rows.Next() {
 		user, ns := new(User), new(userNullFields)
 		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -351,7 +339,7 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 	for rows.Next() {
 		user, ns := new(User), new(userNullFields)
 		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -380,18 +368,8 @@ func (u *User) chkNullFields(ns *userNullFields) {
 	if ns.Recourse != nil {
 		u.Recourse = string(ns.Recourse.([]byte))
 	}
-	if ns.ActivationKey != nil {
-		u.ActivationKey = string(ns.ActivationKey.([]byte))
-	}
 	if ns.Status != nil {
 		u.Status = string(ns.Status.([]byte))
-	}
-	if ns.ActivationType != nil {
-		if reflect.TypeOf(ns.ActivationType).String() == "[]uint8" {
-			u.ActivationType = chk(alias.STI(string(ns.ActivationType.([]byte)))).(int)
-		} else {
-			u.ActivationType = int(ns.ActivationType.(int64))
-		}
 	}
 }
 
@@ -453,8 +431,8 @@ func (m *MysqlUser) GetDepartmentTicketAdmin(depID int) *User {
 	defer stmt.Close()
 
 	user, ns := new(User), new(userNullFields)
-	err := stmt.QueryRow(depID, "m051SFq+sCAIltun3OPe").Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+	err := stmt.QueryRow(depID, EncryptedTicketModeratorValue).Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
+		&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user
 	} else if err != nil {

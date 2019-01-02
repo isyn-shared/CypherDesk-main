@@ -55,7 +55,7 @@ func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) []*Use
 		depID = keyVal.(int)
 	}
 
-	stmt := prepare(db, "SELECT * FROM users WHERE department = ? AND role = 'mlRzUQ=='")
+	stmt := prepare(db, "SELECT * FROM users WHERE department = ? AND role = '"+EncryptedUserValue+"'")
 	defer stmt.Close()
 
 	rows := chk(stmt.Query(depID)).(*sql.Rows)
@@ -64,7 +64,7 @@ func (m *MysqlUser) GetDepartmentUsers(sqlKey string, keyVal interface{}) []*Use
 	for rows.Next() {
 		user, ns := new(User), new(userNullFields)
 		err := rows.Scan(&user.ID, &user.Login, &user.Pass, &ns.Mail, &ns.Name, &ns.Surname,
-			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status, &ns.ActivationKey, &ns.ActivationType)
+			&ns.Partonymic, &ns.Recourse, &user.Role, &user.Department, &ns.Status)
 		if err != nil {
 			fmt.Println(err.Error())
 		}

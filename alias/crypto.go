@@ -3,6 +3,7 @@ package alias
 import (
 	"crypto/md5"
 	"crypto/sha256"
+	"encoding/base32"
 	b64 "encoding/base64"
 	"fmt"
 )
@@ -55,4 +56,25 @@ func StandartRefact(val string, dec bool, stInfoKey string) string {
 	}
 
 	return enc
+}
+
+//func URLEncode(u string) string {
+//
+//}
+//
+//func URLDecode(u string) string {
+//
+//}
+
+func Base32Encode(data string) string {
+	return base32.StdEncoding.EncodeToString([]byte(data))
+}
+
+func Base32Decode(ds string) string {
+	data, err := base32.StdEncoding.DecodeString(ds)
+	if err != nil {
+		fmt.Println("Base32 decode error:", err)
+		return ""
+	}
+	return string(data)
 }

@@ -38,10 +38,10 @@ func New() *gin.Engine {
 	router.POST("/authorize", authorizeHandler)
 	router.POST("/fillAdminAccount", fillAdminAccountHandler)
 	router.GET("/out", logOutHandler)
-	router.GET("/activate/:key", activateAccountHandler)
+	router.GET("/activate/:id/:key", activateAccountHandler)
 	router.POST("/fillUserAccount", fillUserAccountHandler)
 	router.POST("/remindPass", remindPassHandler)
-	router.GET("/remindPass/chk/:login/:key", checkChangeCredentialsKeyHandler)
+	router.GET("/remindPass/chk/:id/:key", checkChangeCredentialsKeyHandler)
 	router.POST("/remindPass/change", changeCredentialsHandler)
 
 	// AdminPanel
@@ -57,6 +57,7 @@ func New() *gin.Engine {
 		tickets.HandleConnections(c)
 	})
 
+	router.GET("/ctu", createTemporaryHandler)
 	router.GET("/test", testHandler)
 
 	//	router.LoadHTMLGlob("templates/**/template.html")

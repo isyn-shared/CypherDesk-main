@@ -8,6 +8,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+const (
+	EncryptedUserValue = "mlRzUQ=="
+	EncryptedTicketModeratorValue = "m051SFq+sCAIltun3OPe"
+)
+
 // NullString - obj from sql package
 type NullString sql.NullString
 
