@@ -22,7 +22,13 @@ $('#sendTicketForm').submit(e => {
     const caption = $('#ticketCaptionInput').val(),
         description = $('#ticketDesc').val();
 
+    if (!caption) return swal('Упс!', 'Вы не заполнили заголовок тикета!', 'info');
+    // Set length in html
+    if ($('#ticketCaptionInput').attr('data-length') < caption.length) return swal('Упс!', 'Ваш заголовок слишком длинный для отправки!', 'info');
+    
     if (!description) return swal('Упс!', 'Вы не заполнили описание проблемы!', 'info');
+    if ($('#ticketDesc').attr('data-length') < caption.length) return swal('Упс!', 'Ваш заголовок слишком длинный для отправки!', 'info');
+    
     if (!selectedUser) return swal('Упс!', 'Вы не выбрали пользователя, которому отправляется тикет!', 'info');
 
     // TODO: Сообщение, куда, что и зачем
@@ -38,7 +44,10 @@ $('#sendTicketForm').submit(e => {
     }).then(obj => {
         if (obj.value) {
             sendEvent('createM', {caption, description, id: selectedUser});
-            $('#sendTicketModal').modal('hide');
+            
+            // Empty inputs
+            $('#ticketCaptionInput').val('');
+            $('#ticketDesc').val('');
         }
     });
 });

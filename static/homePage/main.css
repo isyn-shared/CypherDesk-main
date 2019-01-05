@@ -1,6 +1,53 @@
 html,
-body {
-    overflow-x: hidden;
+body,
+.block {
+    /* height: 110%; */
+}
+
+.z-top-1 {
+    z-index: 5 !important;
+}
+
+.z-top-2 {
+    z-index: 4 !important;
+}
+
+.z-top-3 {
+    z-index: 3 !important;
+}
+
+.z-top-4 {
+    z-index: 2 !important;
+}
+
+.z-top-5 {
+    z-index: 1 !important;
+}
+
+.z-bottom {
+    z-index: -999 !important;
+}
+
+ul.withLowerButton {
+    /* its children will be flex-items */
+    display: flex;
+    /* move flex-items in column */
+    flex-direction: column;
+}
+
+.transition {
+    transition: all 1s ease-out 0.5s;
+}
+
+/* add maximum available margin-top to last child */
+/* this can be replaced with any selector like nth-child */
+/* and will move flex-items to the bottom if any available vertical space */
+ul.withLowerButton> :last-child {
+    margin-top: auto;
+}
+
+.nav-link {
+    font-size: 20px !important;
 }
 
 .display-5 {
@@ -57,12 +104,13 @@ body {
     cursor: pointer;
 }
 
-#ticketDesc {
+/* #ticketDesc {
     width: 100%;
     height: 200px;
-}
+} */
 
-#ticketMobile:hover, #ticketDesk:hover {
+#ticketMobile:hover,
+#ticketDesk:hover {
     bottom: 30px
 }
 
@@ -104,8 +152,9 @@ body {
 /* Mobile */
 @media (max-width: 769px) {
     .mt-5-mobile {
-        margin-top: 3rem!important;
+        margin-top: 3rem !important;
     }
+
     .display-3 {
         font-size: 2rem;
     }
@@ -133,7 +182,7 @@ body {
 /* No-Laptop */
 @media (min-width: 1500px) {
     .mt-50-desktop {
-        margin-top: calc(50% - 148px); 
+        margin-top: calc(50% - 148px);
     }
 }
 
@@ -141,7 +190,7 @@ body {
 @media (min-width: 770px) {
 
     .p-5-desktop {
-        padding: 3rem!important;
+        padding: 3rem !important;
     }
 
     .slideIn {
@@ -155,11 +204,11 @@ body {
     }
 
     .w-25-desktop {
-        width: 25%!important;
+        width: 25% !important;
     }
 
     .w-50-desktop {
-        width: 50%!important;
+        width: 50% !important;
     }
 
     .mobilePadding {
@@ -232,7 +281,7 @@ a {
     cursor: pointer;
 }
 
-.selected {
-    background-color: #7be57b!important;
-    cursor: default!important;
-}
+/* .selected {
+    background-color: #7be57b !important;
+    cursor: default !important;
+} */
