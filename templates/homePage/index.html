@@ -2,306 +2,265 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>CypherDesk - Домашняя страница</title>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/homePage/materialize/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="/static/homePage/materialize/css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
 
     <link rel="stylesheet" href="/static/homePage/main.css">
-    <title>CypherDesk - Домашняя страница</title>
 </head>
 
-<body style="background-color: #f2fcff;">
-
-    <a href="/out" class="text-center btn btn-danger mt-2 mr-2 ml-2 d-block d-sm-none">Выйти из аккаунта</a>
-    <a href="/out" style="position: absolute; right: .1rem; z-index: 100" class="btn btn-danger mt-2 mr-2 d-none d-sm-block">Выйти
-        из аккаунта</a>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light d-flex d-sm-none lead">
-        <h5 class="navbar-brand" href="#">Сервисы</h5>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" href="#">Ваши Документы</a>
-                <a class="nav-item nav-link" href="#">Техподдержка</a>
-                <a class="nav-item nav-link" href="#">Чат</a>
-            </div>
-        </div>
-    </nav>    
-    
-    <div id="profile" class="window">
-        <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Ваш профиль</p>
-
-        <!-- This will hide on mobile -->
-        <p class="text-center lead d-none d-sm-block">Добро пожаловать, {{name}} {{partonymic}} ({{login}})</p>
-        <!-- This will appear on mobile -->
-        <p class="text-center lead d-block d-sm-none">Добро пожаловать, <br> {{name}} {{partonymic}} ({{login}})</p>
-
-        <div class="d-flex justify-content-center w-100">
-            <div class="card w-25-desktop mt-5">
-                <img class="card-img-top" src="/static/adminPanel/default_profile.jpg" alt="Card image cap">
-                <div class="card-body text-center">
-                    <h4 class="card-title">{{surname}} {{name}} <br> {{partonymic}}</h4>
-                    <p class="card-text mb-1 mt-3"><b>Обращение: </b> {{recourse}}</p>
-                    <p class="card-text mb-1"><b>Почта: </b> {{mail}}</p>
-                    <p class="card-text mb-1"><b>Логин: </b> {{login}}</p>
-                    <p class="card-text mb-1"><b>Отдел: </b> {{department}}</p>
-
-                    <script>
-                        var myUserData = {
-                            Login: "{{login}}",
-                            Name: "{{name}}",
-                            Surname: "{{surname}}",
-                            Partonymic: "{{partonymic}}",
-                            Recourse: "{{recourse}}",
-                            DepartmentName: "{{department}}",
-                            ID: {{id}}
-                        };
-                    </script>
-
-                </div>
-            </div>
-        </div>
-        <!-- /.d-flex justify-content-center -->
-        <p class="display-5 text-center mt-2 d-none d-sm-block">↓</p>
-
+<body>
+    <!-- Desktop -->
+    <div class="fixed-action-btn click-to-toggle direction-top hide-on-small-only" style="bottom: 45px; right: 24px">
+        <a class="btn-floating btn-large red">
+            <i class="large material-icons">menu</i>
+        </a>
+        <ul>
+            <li><a class="btn-floating red tooltipped" data-position="left" data-tooltip="Ваши Документы"><i class="material-icons">folder_open</i></a></li>
+            <li><a class="btn-floating green tooltipped" data-position="left" data-tooltip="Ваши Чаты"><i class="material-icons">chat</i></a></li>
+            <li><a class="btn-floating blue darken-1 tooltipped" data-position="left" data-tooltip="Техническая поддержка"><i class="material-icons">contact_phone</i></a></li>
+        </ul>
     </div>
-    <!-- /#profile.window -->
 
-
-    <div id="main">
-        <!-- This will be visible on desktop -->
-        <div class="d-none d-sm-block">
-
-            <p class="text-center display-5 mt-5-mobile" style="padding-top:0.5rem;">Центр управления тикетами</p>
-
-            <img src="/static/ticketImages/ticket2.png" id="leftTicketDesk" alt="">
-            <img src="/static/ticketImages/ticket1.png" id="ticketDesk" data-toggle="modal" data-target="#sendTicketModal" alt="">
-            <h5 style="margin-left: 173px;">Новый тикет</h5>
-
-            <div id="box-wrapper">
-                <div id="sentTicketsDesk" class="box">
-                    <p class="display-6 text-center">Отправленные тикеты</p>
-
-                    <ul class="list-group ticket-holder sentTicketsUl">
-                        <h2 class="text-center">Загрузка...</h2>
-                    </ul>
-                </div>
-                <div id="myTicketsDesk" class="box">
-                    <p class="display-6 text-center">Входящие тикеты</p>
-
-                    <ul class="list-group ticket-holder incomingTicketsUl">
-                        <h2 class="text-center">Загрузка...</h2>
-                    </ul>
-                </div>
-            </div>
-
-            <div id="navigationDesk" class="text-center">
-                <p class="display-6">Сервисы</p>
-
-                <ul class="list-group mt-50-desktop">
-                    <li class="list-group-item"><a href="#!">Ваши Документы</a></li>
-                    <li class="list-group-item"><a href="#!">Техподдержка</a></li>
-                    <li class="list-group-item"><a href="#!">Чат</a></li>
-                </ul>
-            </div>
-        </div>
-        <!-- /.d-none d-sm-block -->
-
-        <!-- This will be visible on mobile -->
-        <div class="d-block d-sm-none">
-            <h5 class="text-center mt-2">Центр управления тикетами</h5>
-
-            <img src="/static/ticketImages/ticket2.png" id="leftTicketMobile" alt="">
-            <img src="/static/ticketImages/ticket1.png" id="ticketMobile" data-toggle="modal" data-target="#sendTicketModal" alt="">
-            <p class="lead" style="margin-left: 173px;">Новый тикет</p>
-
-            <div id="sentTicketsMobile" class="boxMobile">
-                <p class="display-6 text-center">Отправленные тикеты</p>
-
-                <ul class="list-group ticket-holder sentTicketsUl" style="height: 315px;">
-                    <h2 class="text-center">Загрузка...</h2>
-                </ul>
-            </div>
-
-            <div id="sentTicketsMobile" class="boxMobile">
-                <p class="display-6 text-center">Входящие тикеты</p>
-
-                <ul class="list-group ticket-holder incomingTicketsUl" style="height: 315px;">
-                    <h2 class="text-center">Загрузка...</h2>
-                </ul>
-            </div>
-
-        </div>
-        <!-- /.d-block d-sm-none -->
+    <!-- Mobile -->
+    <div class="fixed-action-btn fixed-action-btn-mobile toolbar direction-top hide-on-med-and-up" style="right: 10px">
+        <a class="btn-floating red">
+            <i class="large material-icons">menu</i>
+        </a>
+        <ul>
+            <li class="waves-effect waves-light"><a href="#!"><i class="material-icons">folder_open</i></a></li>
+            <li class="waves-effect waves-light"><a href="#!"><i class="material-icons">contact_phone</i></a></li>
+            <li class="waves-effect waves-light"><a href="#!"><i class="material-icons">chat</i></a></li>
+            <li class="waves-effect waves-light"><a href="#!" onclick="exitModal();"><i class="material-icons">exit_to_app</i></a></li>
+        </ul>
     </div>
-    <!-- /#main.window -->
 
 
-    <!-- Modal -->
-    {% if not isModerator %}
-        <div class="modal fade" id="sendTicketModal" tabindex="-1" role="dialog" aria-labelledby="modalVerticalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form id="sendTicketForm">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalVerticalLabel">Отправка тикета</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body pb-0">
-                            <div class="form-group">
-                                <label for="ticketCaptionInput" class="blockquote">Заголовок</label>
-                                <input type="text" class="form-control" id="ticketCaptionInput" aria-describedby="emailHelp"
-                                placeholder="Краткое описание проблемы" required>
-                                <small id="emailHelp" class="form-text text-muted text-center">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время </small>
+    <!-- div#intro.block -->
+    <div id="intro" class="block" style="background-color: #faebd74d; padding-bottom: 5rem">
+        <!-- Nav for Desktop -->
+        <nav class="light-blue lighten-1 pushpin-demo-nav z-top-2 hide-on-med-and-down" role="navigation" data-target="intro">
+            <div class="nav-wrapper container">
+                <a id="logo-container" href="http://ссылка-на-наш-домашний.site" class="brand-logo">CypherDesk - Ваш Аккаунт
+            </a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="#!" onclick="exitModal();">Выход из системы</a></li>
+                </ul>
 
-                                <label for="ticketDesc" class="blockquote mt-2 mb-1">Описание</label><br>                           
-                                <textarea name="ticketDesc" id="ticketDesc"></textarea>
+                <!--<ul id="nav-mobile" class="sidenav withLowerButton collection with-header z-top-1">
+                    <li class="collection-header red lighten-1">
+                        <h4>Сервисы</h4>
+                    </li>
+                    <li class="collection-item"><a href="#" class="nav-link">Ваши Документы</a></li>
+                    <li class="collection-item"><a href="#" class="nav-link">Техподдержка</a></li>
+                    <li class="collection-item"><a href="#" class="nav-link">Чат</a></li>
+                    <li><a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light red">Выход
+                            из системы</a></li>
+                </ul>
+                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>-->
+            </div>
+        </nav>
 
-                                <!-- This will be filled using JS -->
-                                <div class="mt-3 alertWrapper"></div>
+        <!-- Nav for Mobile -->
+        <nav class="light-blue lighten-1 hide-on-med-and-up" role="navigation">
+            <div class="nav-wrapper container"><a id="logo-container" href="http://ссылка-на-наш-домашний.site" class="brand-logo">CypherDesk</a></div>
+        </nav>
+
+        <br><br>
+        <div class="section no-pad-bot" id="index-banner">
+            <div class="container">
+                <br><br>
+                <div class="row center">
+                    <div class="col s12 offset-m4 m4">
+                        <div class="card hoverable">
+                            <div class="card-image">
+                                <img src="/static/adminPanel/default_profile.jpg">
+                                <!-- <span class="card-title">{{login}}</span> -->
+                                <a class="btn-floating halfway-fab waves-effect waves-light red tooltipped" id="editBtn"
+                                    data-position="right" data-tooltip="Запрос на редактирование">
+                                    <i class="material-icons">edit</i>
+                                </a>
                             </div>
-                                    
+                            <div class="card-content">
+                                <p style="font-size: 30px">Добро пожаловать!</p>
+                                <p style="font-size: 20px">{{name}} {{partonymic}} ({{login}})</p>
+                                <br>
+                                <p style="font-size: 20px;">Отдел: <b>«{{department}}»</b></p>
+
+                                <script>
+                                    var myUserData = {
+                                        Login: "{{login}}",
+                                        Name: "{{name}}",
+                                        Surname: "{{surname}}",
+                                        Partonymic: "{{partonymic}}",
+                                        Recourse: "{{recourse}}",
+                                        DepartmentName: "{{department}}",
+                                        ID: {{id}}
+                                    };
+                                </script>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Закрыть</button>
-                            <button type="submit" class="btn btn-success">Отправить</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
+
+                <br><br>
+
             </div>
         </div>
-    {% else %}
-        <script>
-            let departments = {
-                {% for dep in departments %}
-                    {{dep.ID}}: "{{dep.Name}}",
-                    "{{dep.Name}}": "{{dep.ID}}",
-                {% endfor %}
-            }
-        </script>
 
-        <div class="modal fade" id="sendTicketModal" tabindex="-1" role="dialog" aria-labelledby="modalVerticalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <form id="sendTicketForm">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalVerticalLabel">Отправка тикета (модератор)</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+
+        <div class="container">
+            <h3 class="header center">Информация об аккаунте</h3>
+            <hr>
+            <div class="section">
+
+                <!--   Icon Section   -->
+                <div class="row">
+                    <div class="col s12 m4">
+                        <div class="icon-block">
+                            <h2 class="center light-blue-text"><i class="material-icons">event_available</i></h2>
+                            <h5 class="center">Ваши тикеты</h5>
+
+                            <p class="center">На данный момент у Вас <b>2</b> незакрытых администрацией тикетов</p>
+                            <p class="center"><a class="waves-effect waves-teal btn-flat">Перейти к тикетам</a></p>
                         </div>
-                        <div class="modal-body pb-0">
-                            <div class="form-group">
-                                <label for="ticketCaptionInput" class="blockquote">Заголовок</label>
-                                <input type="text" class="form-control" id="ticketCaptionInput" aria-describedby="emailHelp"
-                                placeholder="Краткое описание проблемы" required>
-                                <small id="emailHelp" class="form-text text-muted text-center">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время </small>
-                                
-                                <label for="userToTransfer" class="blockquote mt-2 mb-1">Кому</label>                                
-                                <div class="dropdown">
-                                    <button class="btn btn-primary dropdown-toggle w-100"
-                                            type="button" id="dropdownMenu1" data-toggle="collapse" data-target="#findUserCollapse" aria-controls="findUserCollapse">
-                                        Выбрать пользователя
-                                    </button>
-                                    <div class="collapse mt-2" id="findUserCollapse">
-                                        <small id="emailHelp" class="form-text text-muted text-center">Если пользователь является модератором, то справа от его имени будет его отдел</small>
-                                        <div class="card card-body">
+                    </div>
+
+                    <div class="col s12 m4">
+                        <div class="icon-block">
+                            <h2 class="center light-blue-text"><i class="material-icons">people</i></h2>
+                            <h5 class="center">Отдел «{{department}}»</h5>
+
+                            <p class="center">Менеджер тикетов вашего отдела: ИМЯ ФАМИЛИЯ</p>
+                            <p class="center"><a class="waves-effect waves-teal btn-flat">Написать менеджеру</a></p>
+
+                        </div>
+                    </div>
+
+                    <div class="col s12 m4">
+                        <div class="icon-block">
+                            <h2 class="center light-blue-text"><i class="material-icons">chat</i></h2>
+                            <h5 class="center">Чат</h5>
+
+                            <p class="center">Вы имеете <b>8</b> непрочитанных сообщений во всех чатах организации</p>
+                            <p class="center"><a class="waves-effect waves-teal btn-flat">Перейти в чат</a></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <br><br>
+        </div>
+
+    </div>
+    <!-- /div#intro.block -->
+
+    <hr style="opacity: 0.2;">
+    <div id="ticketsBlock" class="block" style="background-color: #ffffff4d; padding-top: 2rem; padding-bottom: 5rem">
+
+        <div class="container">
+            <h3 class="center" style="margin-top: 0">Тикеты</h3>
+            <div class="row center">
+                <div class="row">
+                    <div class="col s12">
+                        <ul class="tabs">
+                        <li class="tab col s4"><a class="active" href="#sendTicket">Написать тикет</a></li>
+                        <li class="tab col s4"><a href="#sentTickets">Отправленные тикеты</a></li>
+                        <li class="tab col s4"><a href="#receivedTickets">Полученные тикеты</a></li>
+                        </ul>
+                    </div>
+                    <div id="sendTicket" class="col s12">
+                        <form id="sendTicketForm">
+                            <ul class="collection">
+                                <div class="input-field col m6 s12" style="margin-top: 2rem">
+                                    <!-- <i class="material-icons prefix">confirmation_number</i> -->
+                                    <!-- Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время -->
+                                    <input id="ticketCaptionInput" type="text" class="validate countable" data-length="30">
+                                    <label for="ticketCaptionInput">Заголовок тикета</label>
+                                    <span class="helper-text left" data-error="Текст слишком длинный" data-success="Текст проходит проверку по длине">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время</span>
+                                </div>
+                                {% if not isModerator %}
+                                    <script>
+                                        let departments = {
+                                            {% for dep in departments %}
+                                                {{dep.ID}}: "{{dep.Name}}",
+                                                "{{dep.Name}}": "{{dep.ID}}",
+                                            {% endfor %}
+                                        }
+                                    </script>
+                                    <br>
+                                    <div class="input-field col m6 s12">
+                                        <select>
+                                            <option value="" disabled selected>Выберите пользователя</option>
                                             {% for user in usersToTransfer %}
-                                                <div class="userDiv w-100" onclick="selectSendUser({{user.ID}}, this)">
+                                                <option value="{{user.ID}}" onclick="/*selectSendUser({{user.ID}}, this)*/">
                                                     <span><span class="font-weight-bold">{{user.Recourse}}</span> {{user.Name}} {{user.Surname}} ({{user.Login}})</span>
                                                     {% if user.Role == "ticketModerator" %} <span style="float: right" class="depSpan">{{user.Department}}</span> {% endif %}
-                                                </div>
+                                                </option>
                                             {% endfor %}
-                                        </div>
+                                        </select>
+                                        <label>Адресат</label>
                                     </div>
+                                {% endif %}
 
-                                    <script>
-                                        let spans = Array.prototype.slice.call( document.getElementsByClassName('depSpan') );
-                                        spans.forEach(span => {
-                                            span.innerText = departments[span.innerText];
-                                        });
-                                    </script>
-                                    <!-- <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                        {% for user in usersToTransfer %}
-                                            <a class="dropdown-item" href="#!">{{user}}</a>
-                                        {% endfor %}
-                                    </div> -->
+                                <div class="input-field col s12">
+                                    <textarea id="ticketDesc" class="materialize-textarea countable validate" data-length="500"></textarea>
+                                    <label for="ticketDesc">Описание проблемы</label>
                                 </div>
+                                <br><br><br><br>
 
-                                <label for="ticketDesc" class="blockquote mt-2 mb-1">Описание</label><br>                           
-                                <textarea name="ticketDesc" id="ticketDesc"></textarea>
+                                <button class="btn waves-effect waves-light" type="submit" name="action" style="margin-bottom: 14px;">Отправить
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </ul>
+                        </form>
+                    </div>
+                    <div id="sentTickets" class="col s12">
+                        <ul class="collection with-header sentTicketsUl collapsible">
+                            <!-- This is filled via JS -->
+                            <li class="collection-header"><h5>Загрузка информации...</h5></li>
+                        </ul>
+                    </div>
 
-                                <!-- This will be filled using JS -->
-                                <div class="mt-3 alertWrapper"></div>
-                            </div>
-                                    
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Закрыть</button>
-                            <button type="submit" class="btn btn-success">Отправить</button>
-                        </div>
-                    </form>
+                    <div id="receivedTickets" class="col s12">
+                        <ul class="collection with-header incomingTicketsUl collapsible">
+                            <!-- This is filled via JS -->
+                            <li class="collection-header"><h5>Загрузка информации...</h5></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="modal fade" id="forwardTicketModal" tabindex="-1" role="dialog" aria-labelledby="modalVerticalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form id="forwardTicketForm">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalVerticalLabel">Перенаправление тикета (модератор)</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body pb-0">
-                            <div class="form-group">
-                                <label for="ticketCaptionInput" class="blockquote">Заголовок</label>
-                                <input type="text" class="form-control" id="ticketCaptionInput" aria-describedby="emailHelp"
-                                placeholder="Краткое описание проблемы" required>
-                                <small id="emailHelp" class="form-text text-muted text-center">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время </small>
-                                
-                                <label for="ticketDesc" class="blockquote mt-2 mb-1">Описание</label><br>                           
-                                <textarea name="ticketDesc" id="ticketDesc"></textarea>
+    </div>
+    <!-- /div#ticketsBlock.block -->
 
-                                <!-- This will be filled using JS -->
-                                <div class="mt-3 alertWrapper"></div>
-                            </div>
-                                    
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Закрыть</button>
-                            <button type="submit" class="btn btn-success">Отправить</button>
-                        </div>
-                    </form>
-                </div>
+    <hr style="opacity: 0.2;">
+    <div id="chatBlock" class="block" style="background-color: #fdf9f3; padding-top: 2rem; padding-bottom: 5rem">
+
+        <div class="container">
+            <h3 class="center" style="margin-top: 0">Ваши чаты</h3>
+            <div class="row center">
+                <h1>Coming soon ;)</h1>
             </div>
         </div>
-    {% endif %}
 
+    </div>
+    <!-- /div#chatBlock.block -->
 
-
-    <!-- JavaScript for Bootstrap -->
-    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-        crossorigin="anonymous"></script>
-
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="/static/homePage/materialize/js/materialize.min.js"></script>
+    <script src="/static/homePage/materialize/js/init.js"></script>
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
 
-    <!-- My JS -->
+    <!-- Our JS -->
     <script src="/static/homePage/ws.js"></script>
     {% if isModerator %}
         <script src="/static/homePage/mainM.js"></script>
@@ -311,7 +270,6 @@
     <script src="/static/publicVars.js"></script>
     <script src="/static/sendPOST.js"></script>
 
-    <!-- ISYN Software 2018 -->
 </body>
 
 </html>
