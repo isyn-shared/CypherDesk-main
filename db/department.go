@@ -1,20 +1,60 @@
 package db
 
 import (
+	"CypherDesk-main/alias"
 	"database/sql"
 	"fmt"
+	"reflect"
 )
 
+
+const (
+	departmentKey = "keys/departmentKey.toml"
+)
 // Department obj
 type Department struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
+func refactDepartmentField(value string, dec bool) string {
+	return alias.StandartRefact(value, dec, departmentKey)
+}
+
+func (dp *Department) refact(dec bool) {
+	fields := reflect.TypeOf(*dp)
+	values := reflect.ValueOf(*dp)
+
+	num := values.NumField()
+
+	for i := 0; i < num; i++ {
+		var input string
+		value := values.Field(i)
+		field := fields.Field(i)
+
+		switch value.Kind() {
+		case reflect.String:
+			input = value.String()
+
+			var enc string
+			enc = refactDepartmentField(input, dec)
+
+			reflect.ValueOf(dp).Elem().FieldByName(field.Name).SetString(enc)
+		case reflect.Int:
+			continue
+		}
+	}
+}
+
 // GetDepartment returns Department obj using id
 func (m *MysqlUser) GetDepartment(sqlKey string, keyVal interface{}) *Department {
 	db := m.connect()
 	defer db.Close()
+
+	switch v := keyVal.(type) {
+	case string:
+		keyVal = refactDepartmentField(v, false)
+	}
 
 	stmt := prepare(db, "SELECT * FROM departments WHERE "+sqlKey+" = ?")
 	defer stmt.Close()
@@ -32,6 +72,8 @@ func (m *MysqlUser) GetDepartment(sqlKey string, keyVal interface{}) *Department
 
 // InsertDepartment inserts
 func (m *MysqlUser) InsertDepartment(name string) sql.Result {
+	name = refactDepartmentField(name, false)
+
 	db := m.connect()
 	defer db.Close()
 
@@ -89,6 +131,7 @@ func (m *MysqlUser) GetDepartments() []*Department {
 		if err != nil {
 			panic("db error: " + err.Error())
 		}
+		dep.refact(true)
 		res = append(res, dep)
 	}
 	return res
@@ -96,6 +139,8 @@ func (m *MysqlUser) GetDepartments() []*Department {
 
 // UpdateDepartment updates department entry in the db
 func (m *MysqlUser) UpdateDepartment(oldDep *Department, newName string) int64 {
+	newName = refactDepartmentField(newName, false)
+
 	db := m.connect()
 	defer db.Close()
 
@@ -103,7 +148,7 @@ func (m *MysqlUser) UpdateDepartment(oldDep *Department, newName string) int64 {
 	var keyVal interface{}
 	if oldDep.ID == 0 {
 		sqlKey = "name"
-		keyVal = oldDep.Name
+		keyVal = refactDepartmentField(oldDep.Name, false)
 	} else {
 		sqlKey = "id"
 		keyVal = oldDep.ID
