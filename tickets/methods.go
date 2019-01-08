@@ -152,7 +152,7 @@ func forwardTicket(chnMsg *chanMessage) {
 		return
 	}
 	tID := chk(alias.STI(ticketID)).(int)
-	ticket := mysql.GetTicket(id)
+	ticket := mysql.GetTicket(tID)
 
 	if !ticket.Exist() {
 		sendResponse(false, "forward", "Неправильный запрос!", chnMsg.conn)
@@ -169,10 +169,10 @@ func forwardTicket(chnMsg *chanMessage) {
 	mysql.TransferTicket(log)
 
 	ticketStr := string(chk(json.Marshal(ticket)).([]byte))
-	if ClientsByLogin[chnMsg.Message.RecipientLogin] != nil {
-		ClientsByLogin[chnMsg.Message.RecipientLogin].Connection.WriteJSON(StandartResponse{"event": "newTicket", "ok": true, "data": ticketStr})
-	}
 
+	if ClientsByLogin[chnMsg.Message.RecipientLogin] != nil {
+		ClientsByLogin[chnMsg.Message.RecipientLogin].Connection.WriteJSON(StandartResponse{"event": "incoming", "ok": true, "data": ticketStr})
+	}
 	sendResponse(true, "forward", "null", chnMsg.conn)
 }
 

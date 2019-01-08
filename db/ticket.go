@@ -1,8 +1,14 @@
 package db
 
 import (
+	"CypherDesk-main/alias"
 	"database/sql"
+	"reflect"
 	"time"
+)
+
+const (
+	ticketKey = "keys/ticketKey.go"
 )
 
 // Ticket structure
@@ -53,8 +59,39 @@ func (et *ExtTicket) Exist() bool {
 	return true
 }
 
+func refactTicketKey(val string, dec bool) string {
+	return alias.StandartRefact(val, dec, ticketKey)
+}
+
+func (t *Ticket) refact(dec bool) {
+	fields := reflect.TypeOf(*t)
+	values := reflect.ValueOf(*t)
+
+	num := values.NumField()
+
+	for i := 0; i < num; i++ {
+		var input string
+		value := values.Field(i)
+		field := fields.Field(i)
+
+		switch value.Kind() {
+		case reflect.String:
+			input = value.String()
+
+			var enc string
+			enc = refactDepartmentField(input, dec)
+
+			reflect.ValueOf(t).Elem().FieldByName(field.Name).SetString(enc)
+		case reflect.Int:
+			continue
+		}
+	}
+}
+
 // UpdateTicketStatus updates status of ticket in db
 func (m *MysqlUser) UpdateTicketStatus(ticketID int, status string) int64 {
+	status = refactTicketKey(status, false)
+
 	db := m.connect()
 	defer db.Close()
 
@@ -83,6 +120,9 @@ func (m *MysqlUser) GetTicket(id int) *Ticket {
 	if err != nil {
 		panic("db error: " + err.Error())
 	}
+
+	ticket.refact(true)
+
 	return ticket
 }
 
