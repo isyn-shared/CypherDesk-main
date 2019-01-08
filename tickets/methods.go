@@ -20,6 +20,66 @@ func getTickets(chnMsg *chanMessage) {
 	sendResponse(true, "get", string(byteJSONTickets), chnMsg.conn)
 }
 
+func sendModeratorTicket(chnMsg *chanMessage) {
+	mysql := db.CreateMysqlUser()
+	id := chnMsg.Message.Account.ID
+	user := mysql.GetUser("id", id)
+	if !user.Exist() || !user.Filled() {
+		sendResponse(false, "createM", "У Вас нет прав на это действие!", chnMsg.conn)
+		return
+	}
+	args := make(map[string]string)
+	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
+	if err != nil {
+		sendResponse(false, "createM", "Ошибка на сервере", chnMsg.conn)
+		return
+	}
+	caption, description, toIdStr := args["caption"], args["description"], args["id"]
+	if alias.EmptyStr(caption) || alias.EmptyStr(description) || alias.EmptyStr(toIdStr) {
+		sendResponse(false, "createM", "Неправильный запрос", chnMsg.conn)
+		return
+	}
+	toId, err := alias.STI(toIdStr)
+	if err != nil {
+		sendResponse(false, "createM", "Невозможное значение ID", chnMsg.conn)
+		return
+	}
+
+	toUser := mysql.GetUser("id", toId)
+	if !user.Exist() {
+		sendResponse(false, "createM", "Такого пользователя не существует", chnMsg.conn)
+	}
+
+	ticket := &db.Ticket{
+		Caption:     caption,
+		Description: description,
+		Sender:      id,
+		Status:      "opened",
+	}
+	mysql.CreateTicket(ticket)
+	log := &db.TicketLog{
+		Ticket:   mysql.GetLastTicketBySender(id),
+		UserFrom: id,
+		UserTo:   toId,
+		Action:   "send",
+		Time:     time.Now(),
+	}
+
+	extTicket := db.ExtTicket{
+		Ticket:      ticket,
+		ForwardFrom: id,
+		ForwardTo:   toId,
+		Time:        time.Now(),
+	}
+
+	mysql.TransferTicket(log)
+
+	if ClientsByLogin[toUser.Login] != nil {
+		sendResponse(true, "incoming", string(chk(json.Marshal(extTicket)).([]byte)), ClientsByLogin[toUser.Login].Connection)
+	}
+	sendResponse(true, "create", string(chk(json.Marshal(extTicket)).([]byte)), chnMsg.conn)
+}
+
 func sendTicket(chnMsg *chanMessage) {
 	mysql := db.CreateMysqlUser()
 	id := chnMsg.Message.Account.ID
@@ -35,7 +95,7 @@ func sendTicket(chnMsg *chanMessage) {
 		return
 	}
 	caption, description := args["caption"], args["description"]
-	if alias.EmptyStr(caption) || alias.EmptyStr("description") {
+	if alias.EmptyStr(caption) || alias.EmptyStr(description) {
 		sendResponse(false, "create", "Неправильный запрос", chnMsg.conn)
 		return
 	}

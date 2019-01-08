@@ -67,6 +67,8 @@ func (m *MysqlUser) GetDepartment(sqlKey string, keyVal interface{}) *Department
 	if err != nil {
 		panic("db error: " + err.Error())
 	}
+
+	d.refact(false)
 	return d
 }
 
