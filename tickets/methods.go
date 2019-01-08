@@ -139,9 +139,9 @@ func forwardTicket(chnMsg *chanMessage) {
 		return
 	}
 	args := make(map[string]string)
-	err := json.Unmarshal([]byte(chnMsg.Message.Data), args)
+	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
 	if err != nil {
-		sendResponse(false, "forward", "Ошибка на сервере", chnMsg.conn)
+		sendResponse(false, "forward", "Ошибка на сервере"+err.Error(), chnMsg.conn)
 		return
 	}
 	// TODO: rights to send ticket to this user

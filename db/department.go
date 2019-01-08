@@ -7,10 +7,10 @@ import (
 	"reflect"
 )
 
-
 const (
 	departmentKey = "keys/departmentKey.toml"
 )
+
 // Department obj
 type Department struct {
 	ID   int    `json:"id"`
@@ -67,8 +67,7 @@ func (m *MysqlUser) GetDepartment(sqlKey string, keyVal interface{}) *Department
 	if err != nil {
 		panic("db error: " + err.Error())
 	}
-
-	d.refact(false)
+	d.refact(true)
 	return d
 }
 

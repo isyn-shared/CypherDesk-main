@@ -1,21 +1,5 @@
 const isUser = true;
 
-$(window).on('scroll', () => {
-    let s = $(window).scroliflTop(),
-        d = $(document).height(),
-        c = $(window).height(),
-        w = $(window).width();
-
-    // If height is greater than width
-    if (c > w) 
-        return $("#main").css("opacity", 1);
-
-    let scrolledArea = (s / (d - c));
-    // console.log(s, d, c, scrolledArea);
-    $("#main").css("opacity", scrolledArea);
-    $("body").css("background-color", `rgb(${242 + scrolledArea * 13}, ${252 + scrolledArea * 3}, ${255 - scrolledArea * 13})`);
-});
-
 $('#sendTicketForm').submit(e => {
     e.preventDefault();
 

@@ -169,8 +169,8 @@
                     <div class="col s12">
                         <ul class="tabs">
                         <li class="tab col s4"><a class="active" href="#sendTicket">Написать тикет</a></li>
-                        <li class="tab col s4"><a href="#sentTickets">Отправленные тикеты</a></li>
-                        <li class="tab col s4"><a href="#receivedTickets">Полученные тикеты</a></li>
+                        <li class="tab col s4"><a href="#sentTickets"><span class="badge" id="sentCounter">0</span>Отправленные тикеты</a></li>
+                        <li class="tab col s4"><a href="#receivedTickets"><span class="badge" id="receivedCounter">0</span>Полученные тикеты</a></li>
                         </ul>
                     </div>
                     <div id="sendTicket" class="col s12">
@@ -183,28 +183,45 @@
                                     <label for="ticketCaptionInput">Заголовок тикета</label>
                                     <span class="helper-text left" data-error="Текст слишком длинный" data-success="Текст проходит проверку по длине">Пожалуйста, делайте хорошие и полезные заголовки, это экономит нам всем время</span>
                                 </div>
-                                {% if not isModerator %}
+                                {% if isModerator %}
                                     <script>
                                         let departments = {
                                             {% for dep in departments %}
                                                 {{dep.ID}}: "{{dep.Name}}",
                                                 "{{dep.Name}}": "{{dep.ID}}",
                                             {% endfor %}
-                                        }
+                                        };
+
+                                        let userNames = {
+                                            {% for user in usersToTransfer %}
+                                                {{user.ID}}: "{{user.Name}} {{user.Surname}}",
+                                            {% endfor %}
+                                            {{id}}: "{{name}} {{surname}}"
+                                        };
+
+                                        let usersWithID = [
+                                            {% for user in usersToTransfer %}
+                                                {{ '{ id: ' }} {{user.ID}}, name: "{{user.Recourse}} {{user.Name}} {{user.Surname}} ({{user.Login}})" {{ '},' }}
+                                            {% endfor %}
+                                        ];
                                     </script>
                                     <br>
-                                    <div class="input-field col m6 s12">
-                                        <select>
+                                    <div class="input-field col m6 s12" id="userSelectField">
+                                        <select id="userSelect">
                                             <option value="" disabled selected>Выберите пользователя</option>
                                             {% for user in usersToTransfer %}
-                                                <option value="{{user.ID}}" onclick="/*selectSendUser({{user.ID}}, this)*/">
-                                                    <span><span class="font-weight-bold">{{user.Recourse}}</span> {{user.Name}} {{user.Surname}} ({{user.Login}})</span>
-                                                    {% if user.Role == "ticketModerator" %} <span style="float: right" class="depSpan">{{user.Department}}</span> {% endif %}
-                                                </option>
+                                                <option value="{{user.ID}}">{{user.Recourse}} {{user.Name}} {{user.Surname}} ({{user.Login}})</option>
                                             {% endfor %}
                                         </select>
                                         <label>Адресат</label>
                                     </div>
+                                {% else %}
+                                    <script>
+                                        let departments = null;
+                                        let userNames = {
+                                            {{id}}: "{{name}} {{surname}}"
+                                        };
+                                    </script>
                                 {% endif %}
 
                                 <div class="input-field col s12">
@@ -260,12 +277,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
 
     <!-- Our JS -->
-    <script src="/static/homePage/ws.js"></script>
     {% if isModerator %}
         <script src="/static/homePage/mainM.js"></script>
     {% else %}
         <script src="/static/homePage/mainU.js"></script>
     {% endif %}
+    <script src="/static/homePage/ws.js"></script>
     <script src="/static/publicVars.js"></script>
     <script src="/static/sendPOST.js"></script>
 

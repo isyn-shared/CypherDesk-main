@@ -43,28 +43,15 @@ const myEvents = {
     "error": (err) => { console.error(err); },
     "get": (tickets) => {
         console.log("Got tickets!", tickets);
-        let sentLi = '<li class="collection-header" id="sentHeader"><h5></h5></li>';
-        let incomingLi = '<li class="collection-header" id="incomingHeader"><h5></h5></li>';
+        let sentLi = '';
+        let incomingLi = '';
         for (let extTicket of tickets) {
-            // let ticket = `
-            //     <li class="list-group-item mb-2" style="float: left">
-            //         <h5 class="font-weight-bold">Тема: <span class="font-weight-normal">${extTicket.ticket.Caption}</span></h5>
-            //         <p class="mb-0 lead">${extTicket.ticket.Description}</p>
-
-            //         <div style="float: right">
-            //             <a class="text-muted" data-toggle="collapse" href="#collapseInfo${extTicket.ticket.ID}" aria-expanded="false" aria-controls="collapseExample">
-            //                 Расширить информацию ▼
-            //             </a>
-                        
-            //             <div class="collapse" id="collapseInfo${extTicket.ticket.ID}">
-            //                 <p class="font-weight-bold mb-0">Время: <span class="font-weight-normal">${getTime( new Date(extTicket.time) )}</span></p>
-            //                 <p class="font-weight-bold mb-0">Отправитель: <span class="font-weight-normal">${extTicket.ticket.Sender}</span></p>
-            //                 <p class="font-weight-bold mb-0">Статус: <span class="font-weight-normal">${extTicket.ticket.Status}</span></p>
-            //             </div>
-            //         </div>
-            //     </li>
-            // `;
             extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            // if (myUserData.ID == extTicket.ticket.Sender) extTicket.ticket.Sender = `${myUserData.Name} ${myUserData.Surname}`;
+            if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
+            else extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+
+            let isSentLi = (extTicket.forwardFrom == myUserData.ID || extTicket.ticket.Sender == myUserData.ID);
 
             let ticket = `
                 <li>
@@ -78,18 +65,20 @@ const myEvents = {
                             <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
                             <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
                         </div>
+                        
+                        ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn" style="position: absolute; bottom: 15px; left: 15px" onclick="forwardTicket(' + extTicket.ticket.ID + ')">' +
+                            '<i class="material-icons left">forward</i>' +
+                            'переслать' +
+                        '</a>' : ''}
                     </div>
                 </li>
             `;
 
-            if (extTicket.forwardFrom == myUserData.ID || extTicket.ticket.Sender == myUserData.ID) {
+
+            if (isSentLi)
                 sentLi += ticket;
-                sentCount++;
-            }
-            else {
+            else
                 incomingLi += ticket;
-                incomingCount++;
-            }
         }
         // if (incomingLi.length == 0) {
         //     incomingLi = `<h2 class="text-center">У вас нет тикетов!</h2>`
@@ -104,8 +93,10 @@ const myEvents = {
         $('.sentTicketsUl').html(sentLi);
 
         // Set counters
-        $('#sentHeader').html(`<h5>У вас <b>${sentCount}</b> отправленных тикетов</h5>`);
-        $('#incomingHeader').html(`<h5>У вас <b>${incomingCount}</b> полученных тикетов</h5>`);
+        /*$('#sentHeader').html(`<h5>У вас <b>${sentCount}</b> отправленных тикетов</h5>`);
+        $('#incomingHeader').html(`<h5>У вас <b>${incomingCount}</b> полученных тикетов</h5>`);*/
+        // $('#sentCounter').html(sentCount);
+        // $('#receivedCounter').html(incomingCount);
     },
     "create": (extTicket) => {
         swal('Успешно!', 'Тикет был отправлен!', 'success');
@@ -117,8 +108,11 @@ const myEvents = {
         //     sentNeedsToBeEmpty = false;
         // }
 
-        let li = $('.sentTicketsUl').html();
-        li += `
+        extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
+        else extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+
+        let li = `
             <li>
                 <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
                 <div class="collapsible-body">
@@ -126,10 +120,10 @@ const myEvents = {
                     <br><br><br>
                     <span class="right">Информация:</span><br><br>
                     <div>
-                        <span class="right">Время: ${getTime(new Date(extTicket.time))}</span><br>
+                        <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
                         <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
                         <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
-                    </div>
+                    </div>                   
                 </div>
             </li>
         `;
@@ -137,7 +131,7 @@ const myEvents = {
 
         $('.sentTicketsUl').html(li);
         // Set counter
-        $('#sentHeader').html(`<h5>У вас <b>${++sentCount}</b> отправленных тикетов</h5>`);
+        $('#sentCounter').html(++sentCount).addClass('new');
     },
     "incoming": (extTicket) => {
         console.log("Got new ticket!", extTicket);
@@ -147,8 +141,11 @@ const myEvents = {
         //     incomingNeedsToBeEmpty = false;
         // }
 
-        let li = $('.incomingTicketsUl').html();
-        li += `
+        extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
+        else extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+
+        let li = `
             <li>
                 <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
                 <div class="collapsible-body">
@@ -156,17 +153,23 @@ const myEvents = {
                     <br><br><br>
                     <span class="right">Информация:</span><br><br>
                     <div>
-                        <span class="right">Время: ${getTime(new Date(extTicket.time))}</span><br>
+                        <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
                         <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
                         <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
                     </div>
+                    
+                    ${!isUser ? '<a class="waves-effect waves-light btn" style="position: absolute; bottom: 15px; left: 15px" onclick="forwardTicket(' + extTicket.ticket.ID + ')">' +
+                        '<i class="material-icons left">forward</i>' +
+                        'переслать' +
+                    '</a>' : ''}
                 </div>
             </li>
-        `
+        `;
+        li += $('.incomingTicketsUl').html();
 
         $('.incomingTicketsUl').html(li);
         // Set counter
-        $('#incomingHeader').html(`<h4>У вас <b>${++incomingCount}</b> полученных тикетов</h4>`);
+        $('#receivedCounter').html(++incomingCount).addClass('new');
     }
 }
 // myEvents['get'](tickets);
