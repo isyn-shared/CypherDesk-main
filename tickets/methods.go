@@ -31,7 +31,7 @@ func sendModeratorTicket(chnMsg *chanMessage) {
 	args := make(map[string]string)
 	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
 	if err != nil {
-		sendResponse(false, "createM", "Ошибка на сервере", chnMsg.conn)
+		sendResponse(false, "createM", "Некорректный формат входных данных", chnMsg.conn)
 		return
 	}
 	caption, description, toIdStr := args["caption"], args["description"], args["id"]
@@ -56,7 +56,11 @@ func sendModeratorTicket(chnMsg *chanMessage) {
 		Sender:      id,
 		Status:      "opened",
 	}
-	mysql.CreateTicket(ticket)
+
+	tmpTicket := *ticket
+	ntID := mysql.CreateTicket(ticket)
+	tmpTicket.ID = ntID
+
 	log := &db.TicketLog{
 		Ticket:   mysql.GetLastTicketBySender(id),
 		UserFrom: id,
@@ -66,7 +70,7 @@ func sendModeratorTicket(chnMsg *chanMessage) {
 	}
 
 	extTicket := db.ExtTicket{
-		Ticket:      ticket,
+		Ticket:      &tmpTicket,
 		ForwardFrom: id,
 		ForwardTo:   toId,
 		Time:        time.Now(),

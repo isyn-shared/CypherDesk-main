@@ -5,11 +5,12 @@ import (
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/flosch/pongo2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 func accountHandler(c *gin.Context) {
@@ -48,8 +49,8 @@ func accountHandler(c *gin.Context) {
 					"login":       user.Login,
 					"department":  department.Name,
 					"departments": departments,
-					"phone": extUser.Phone,
-					"Address": extUser.Address,
+					"phone":       extUser.Phone,
+					"Address":     extUser.Address,
 				}, c)
 			} else if user.Role == "ticketModerator" {
 				department := user.GetDepartment()
@@ -57,7 +58,7 @@ func accountHandler(c *gin.Context) {
 				usersInDep := mysql.GetDepartmentUsers("id", department.ID)
 				admins := mysql.GetUsers("role", "admin")
 				moderators := mysql.GetUsers("role", "ticketModerator")
-				usersToTransfer := append(usersInDep, admins...,)
+				usersToTransfer := append(usersInDep, admins...)
 				usersToTransfer = append(usersToTransfer, moderators...)
 
 				for _, u := range usersToTransfer {
@@ -76,8 +77,8 @@ func accountHandler(c *gin.Context) {
 					"department":      department.Name,
 					"departments":     departments,
 					"usersToTransfer": usersToTransfer,
-					"phone": extUser.Phone,
-					"Address": extUser.Address,
+					"phone":           extUser.Phone,
+					"Address":         extUser.Address,
 				}, c)
 			} else {
 				department := user.GetDepartment()
@@ -91,8 +92,8 @@ func accountHandler(c *gin.Context) {
 					"mail":        user.Mail,
 					"login":       user.Login,
 					"department":  department.Name,
-					"phone": extUser.Phone,
-					"Address": extUser.Address,
+					"phone":       extUser.Phone,
+					"Address":     extUser.Address,
 				}, c)
 			}
 		}
@@ -333,4 +334,8 @@ func changeCredentialsHandler(c *gin.Context) {
 	session.Save()
 
 	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil, "redirect": "/"})
+}
+
+func uploadFileHandler(c *gin.Context) {
+
 }
