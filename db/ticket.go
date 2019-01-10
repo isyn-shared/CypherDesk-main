@@ -3,6 +3,7 @@ package db
 import (
 	"CypherDesk-main/alias"
 	"database/sql"
+	"log"
 	"reflect"
 	"time"
 )
@@ -127,14 +128,24 @@ func (m *MysqlUser) GetTicket(id int) *Ticket {
 }
 
 // CreateTicket creates new ticket in DB
-func (m *MysqlUser) CreateTicket(ticket *Ticket) sql.Result {
+func (m *MysqlUser) CreateTicket(ticket *Ticket) int {
+	ticket.refact(false)
 	db := m.connect()
 	defer db.Close()
 
 	stmt := prepare(db, "INSERT INTO tickets (caption, description, sender, status) VALUES (?, ?, ?, ?)")
 	defer stmt.Close()
 
-	res := exec(stmt, []interface{}{ticket.Caption, ticket.Description, ticket.Sender, ticket.Status})
+	exec(stmt, []interface{}{ticket.Caption, ticket.Description, ticket.Sender, ticket.Status})
+
+	var res int
+	stmt = prepare(db, "SELECT LAST_INSERT_ID()")
+	err := stmt.QueryRow().Scan(&res)
+
+	if err != nil {
+		log.Fatal("Error when insert new ticket in db.CreateTicket")
+	}
+
 	return res
 }
 

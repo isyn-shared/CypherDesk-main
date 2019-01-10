@@ -105,7 +105,12 @@ func sendTicket(chnMsg *chanMessage) {
 		Sender:      id,
 		Status:      "opened",
 	}
-	mysql.CreateTicket(ticket)
+
+	tmpTicket := *ticket
+	ntID := mysql.CreateTicket(ticket)
+
+	tmpTicket.ID = ntID
+
 	ticketAdmin := mysql.GetDepartmentTicketAdmin(user.Department)
 	log := &db.TicketLog{
 		Ticket:   mysql.GetLastTicketBySender(id),
@@ -116,7 +121,7 @@ func sendTicket(chnMsg *chanMessage) {
 	}
 
 	extTicket := db.ExtTicket{
-		Ticket:      ticket,
+		Ticket:      &tmpTicket,
 		ForwardFrom: id,
 		ForwardTo:   ticketAdmin.ID,
 		Time:        time.Now(),
