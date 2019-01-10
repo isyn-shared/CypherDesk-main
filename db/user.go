@@ -17,31 +17,31 @@ const (
 	StInfoKey        = "keys/userdatakey.toml"
 	PassKey          = "keys/passkey.toml"
 	ActivationKeyKey = "keys/activationKey.toml"
-	IDKey 			 = "keys/idkey.toml"
+	IDKey            = "keys/idkey.toml"
 )
 
 // User - struct describing the registered user
 type User struct {
-	ID             int    `json: "id"`
-	Login          string `json: "login"`
-	Pass           string `json: "pass"`
-	Mail           string `json: "mail"`
-	Name           string `json: "name"`
-	Surname        string `json: "surname"`
-	Partonymic     string `json: "partonymic"`
-	Recourse       string `json: "recourse"`
-	Role           string `json: "role"`
-	Department     int    `json: "department"`
-	Status         string `json: "status"`
+	ID         int    `json: "id"`
+	Login      string `json: "login"`
+	Pass       string `json: "pass"`
+	Mail       string `json: "mail"`
+	Name       string `json: "name"`
+	Surname    string `json: "surname"`
+	Partonymic string `json: "partonymic"`
+	Recourse   string `json: "recourse"`
+	Role       string `json: "role"`
+	Department int    `json: "department"`
+	Status     string `json: "status"`
 }
 
 type userNullFields struct {
-	Mail           interface{}
-	Name           interface{}
-	Surname        interface{}
-	Partonymic     interface{}
-	Recourse       interface{}
-	Status         interface{}
+	Mail       interface{}
+	Name       interface{}
+	Surname    interface{}
+	Partonymic interface{}
+	Recourse   interface{}
+	Status     interface{}
 }
 
 func DecID(encID string) int {
@@ -67,7 +67,6 @@ func BasicUser(mail, role, status string, department int) *User {
 	}
 	return user
 }
-
 
 // WriteIn fills empty fields fo user obj
 func (u *User) WriteIn(user *User) {
@@ -229,6 +228,14 @@ func (m *MysqlUser) GetUser(sqlParam string, key interface{}) *User {
 	user.chkNullFields(ns)
 	user.RefactStandartInfo(true)
 	return user
+}
+
+func (m *MysqlUser) GetUsersByDecField(sqlKey string, keyVal interface{}) []*User {
+	switch t := keyVal.(type) {
+	case string:
+		return m.GetUsers(sqlKey, alias.StandartRefact(t, false, StInfoKey))
+	}
+	return m.GetUsers(sqlKey, keyVal)
 }
 
 // GetUsers returns all users from db

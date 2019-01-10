@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	EncryptedUserValue = "mlRzUQ=="
+	EncryptedUserValue            = "mlRzUQ=="
 	EncryptedTicketModeratorValue = "m051SFq+sCAIltun3OPe"
+	EncryptedAdminValue           = "jkN7SlE="
 )
 
 // NullString - obj from sql package

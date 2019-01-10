@@ -40,24 +40,33 @@ func accountHandler(c *gin.Context) {
 			if user.Role == "admin" {
 				departments := mysql.GetDepartments()
 				department := user.GetDepartment()
+				users := mysql.GetUsersByDecField("role", "user")
+				admins := mysql.GetUsersByDecField("role", "admin")
+				tms := mysql.GetUsersByDecField("role", "ticketModerator")
+
+				users = append(users, admins...)
+				users = append(users, tms...)
+
 				writePongoTemplate("templates/adminPanel/index.html", pongo2.Context{
-					"name":        user.Name,
-					"surname":     user.Surname,
-					"partonymic":  user.Partonymic,
-					"recourse":    user.Recourse,
-					"mail":        user.Mail,
-					"login":       user.Login,
-					"department":  department.Name,
-					"departments": departments,
-					"phone":       extUser.Phone,
-					"Address":     extUser.Address,
+					"name":            user.Name,
+					"surname":         user.Surname,
+					"partonymic":      user.Partonymic,
+					"recourse":        user.Recourse,
+					"mail":            user.Mail,
+					"login":           user.Login,
+					"id":              user.ID,
+					"department":      department.Name,
+					"departments":     departments,
+					"phone":           extUser.Phone,
+					"Address":         extUser.Address,
+					"usersToTransfer": users,
 				}, c)
 			} else if user.Role == "ticketModerator" {
 				department := user.GetDepartment()
 				departments := mysql.GetDepartments()
 				usersInDep := mysql.GetDepartmentUsers("id", department.ID)
-				admins := mysql.GetUsers("role", "admin")
-				moderators := mysql.GetUsers("role", "ticketModerator")
+				admins := mysql.GetUsersByDecField("role", "admin")
+				moderators := mysql.GetUsersByDecField("role", "ticketModerator")
 				usersToTransfer := append(usersInDep, admins...)
 				usersToTransfer = append(usersToTransfer, moderators...)
 
