@@ -19,7 +19,7 @@ $('#sendTicketForm').submit(e => {
         cancelButtonText: 'Отмена'
     }).then(obj => {
         if (obj.value) {
-            sendEvent('createM', {caption, description, id: selectedUser});
+            sendEvent('createM', {caption, description, id: selectedUser.toString()});
             $('#sendTicketModal').modal('hide');
         }
     });

@@ -21,7 +21,7 @@
             <i class="large material-icons">menu</i>
         </a>
         <ul>
-            <li><a class="btn-floating red tooltipped" data-position="left" data-tooltip="Ваши Документы"><i class="material-icons">folder_open</i></a></li>
+            <li><a class="btn-floating red tooltipped modal-trigger" href="#uploadDocumentModal" data-position="left" data-tooltip="Ваши Документы"><i class="material-icons">folder_open</i></a></li>
             <li><a class="btn-floating green tooltipped" data-position="left" data-tooltip="Ваши Чаты"><i class="material-icons">chat</i></a></li>
             <li><a class="btn-floating blue darken-1 tooltipped" data-position="left" data-tooltip="Техническая поддержка"><i class="material-icons">contact_phone</i></a></li>
         </ul>
@@ -33,11 +33,37 @@
             <i class="large material-icons">menu</i>
         </a>
         <ul>
-            <li class="waves-effect waves-light"><a href="#!"><i class="material-icons">folder_open</i></a></li>
+            <li class="waves-effect waves-light"><a class="modal-trigger" href="#uploadDocumentModal"><i class="material-icons">folder_open</i></a></li>
             <li class="waves-effect waves-light"><a href="#!"><i class="material-icons">contact_phone</i></a></li>
             <li class="waves-effect waves-light"><a href="#!"><i class="material-icons">chat</i></a></li>
             <li class="waves-effect waves-light"><a href="#!" onclick="exitModal();"><i class="material-icons">exit_to_app</i></a></li>
         </ul>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="uploadDocumentModal" class="modal">
+        <div class="modal-content">
+            <h4>Выберите документ для загрузки</h4>
+            <p>Ваша страница перезагрузится</p>
+
+            <form id="documentUploadForm">
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>Ваш файл</span>
+                        <input required type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light right" type="submit" name="action">Загрузить
+                    <i class="material-icons right">cloud_upload</i>
+                </button>
+            </form>
+        </div>
+        <div class="modal-footer" style="margin-top: 2rem">
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Отмена</a>
+        </div>
     </div>
 
 

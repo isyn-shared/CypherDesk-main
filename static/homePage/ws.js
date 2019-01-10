@@ -34,7 +34,7 @@ function send(data) {
 }];*/
 
 // If it turns out to be empty, in 'create' event we need to clear UL
-var sentNeedsToBeEmpty = false,
+let sentNeedsToBeEmpty = false,
     incomingNeedsToBeEmpty = false;
 
 let incomingCount = 0, sentCount = 0;
@@ -45,11 +45,17 @@ const myEvents = {
         console.log("Got tickets!", tickets);
         let sentLi = '';
         let incomingLi = '';
+
+        let getSentCnt = 0, getIncomingCnt = 0;
         for (let extTicket of tickets) {
             extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
             // if (myUserData.ID == extTicket.ticket.Sender) extTicket.ticket.Sender = `${myUserData.Name} ${myUserData.Surname}`;
             if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
-            else extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+            else
+                if (isUser)
+                    extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+                else
+                    extTicket.ticket.Sender = '<span class="green-text">Администратор</span>';
 
             let isSentLi = (extTicket.forwardFrom == myUserData.ID || extTicket.ticket.Sender == myUserData.ID);
 
@@ -75,10 +81,14 @@ const myEvents = {
             `;
 
 
-            if (isSentLi)
+            if (isSentLi) {
                 sentLi += ticket;
-            else
+                getSentCnt++;
+            }
+            else {
+                getIncomingCnt++;
                 incomingLi += ticket;
+            }
         }
         // if (incomingLi.length == 0) {
         //     incomingLi = `<h2 class="text-center">У вас нет тикетов!</h2>`
@@ -95,8 +105,8 @@ const myEvents = {
         // Set counters
         /*$('#sentHeader').html(`<h5>У вас <b>${sentCount}</b> отправленных тикетов</h5>`);
         $('#incomingHeader').html(`<h5>У вас <b>${incomingCount}</b> полученных тикетов</h5>`);*/
-        // $('#sentCounter').html(sentCount);
-        // $('#receivedCounter').html(incomingCount);
+        $('#sentCounter').html(getSentCnt);
+        $('#receivedCounter').html(getIncomingCnt);
     },
     "create": (extTicket) => {
         swal('Успешно!', 'Тикет был отправлен!', 'success');
@@ -110,7 +120,11 @@ const myEvents = {
 
         extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
         if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
-        else extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+        else 
+            if (isUser)
+                extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+            else
+                extTicket.ticket.Sender = '<span class="green-text">Администратор</span>';
 
         let li = `
             <li>
@@ -143,7 +157,11 @@ const myEvents = {
 
         extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
         if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
-        else extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+        else
+            if (isUser)
+                extTicket.ticket.Sender = '<span class="green-text">Модератор</span>';
+            else
+                extTicket.ticket.Sender = '<span class="green-text">Администратор</span>';
 
         let li = `
             <li>

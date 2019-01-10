@@ -74,8 +74,17 @@
                             Partonymic: "{{partonymic}}",
                             Recourse: "{{recourse}}",
                             DepartmentName: "{{department}}",
-                            Department: departments["{{department}}"]
+                            Department: departments["{{department}}"],
+                            ID: {{id}}
                         };
+                    </script>
+                    <script>
+                        let usersToTransfer = {
+                            {% for user in usersToTransfer %}
+                                "{{user.ID}}": "{{user.Login}}",
+                                "{{user.Login}}": "{{user.ID}}",
+                            {% endfor %}
+                        }
                     </script>
 
                     <button class="btn btn-primary mt-2" data-toggle="modal" data-target="#editUserMod" 
@@ -636,6 +645,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
 
+    <!-- JavaScript for Materialize (god forgive me)
+    <script src="/static/homePage/materialize/js/materialize.min.js"></script>
+    <script src="/static/homePage/materialize/js/init.js"></script> -->
+
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
 
@@ -647,7 +660,7 @@
     <script src="/static/sendPOST.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="/static/adminPanel/main.js"></script>
-    <script src="/static/homePage/ws.js"></script>
+    <script src="/static/adminPanel/ws.js"></script>
     <script src="/static/adminPanel/tickets.js"></script>
 
     <!-- ISYN Software 2018 -->
