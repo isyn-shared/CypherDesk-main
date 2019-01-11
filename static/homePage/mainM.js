@@ -51,6 +51,8 @@ function selectSendUser(id, htmlElement) {
 }
 
 function forwardTicket(ticketID) {
+    if (DEBUG) console.log(`Forwarding ${ticketID}`);
+
     let html = `
         <div class="input-field col m6 s12" id="userSelectFieldSwal" style="margin-bottom: 20px">
             <select id="userSelectSwal">
@@ -93,4 +95,14 @@ $('#documentUploadForm').submit(function(e) {
     autoSendPOST('/account/uploadFile', this)
         .then(answer => console.log("New doc answer:", answer))
         .catch(console.error);
+});
+
+document.querySelectorAll('a.smoothScroll').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
 });

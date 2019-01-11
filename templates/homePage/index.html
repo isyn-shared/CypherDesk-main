@@ -118,7 +118,7 @@
                                 <p style="font-size: 20px;">Отдел: <b>«{{department}}»</b></p>
 
                                 <script>
-                                    var myUserData = {
+                                    const myUserData = {
                                         Login: "{{login}}",
                                         Name: "{{name}}",
                                         Surname: "{{surname}}",
@@ -151,8 +151,8 @@
                             <h2 class="center light-blue-text"><i class="material-icons">event_available</i></h2>
                             <h5 class="center">Ваши тикеты</h5>
 
-                            <p class="center">На данный момент у Вас <b>2</b> незакрытых администрацией тикетов</p>
-                            <p class="center"><a class="waves-effect waves-teal btn-flat">Перейти к тикетам</a></p>
+                            <p class="center">На данный момент у Вас <b id="ticketAmountB">...</b> незакрытых администрацией тикетов</p>
+                            <p class="center"><a href="#ticketsBlock" class="waves-effect waves-teal btn-flat smoothScroll">Перейти к тикетам</a></p>
                         </div>
                     </div>
 
@@ -173,7 +173,7 @@
                             <h5 class="center">Чат</h5>
 
                             <p class="center">Вы имеете <b>8</b> непрочитанных сообщений во всех чатах организации</p>
-                            <p class="center"><a class="waves-effect waves-teal btn-flat">Перейти в чат</a></p>
+                            <p class="center"><a href="#chatBlock" class="waves-effect waves-teal btn-flat smoothScroll">Перейти в чат</a></p>
                         </div>
                     </div>
                 </div>
@@ -194,9 +194,32 @@
                 <div class="row">
                     <div class="col s12">
                         <ul class="tabs">
-                        <li class="tab col s4"><a class="active" href="#sendTicket">Написать тикет</a></li>
-                        <li class="tab col s4"><a href="#sentTickets"><span class="badge" id="sentCounter">0</span>Отправленные тикеты</a></li>
-                        <li class="tab col s4"><a href="#receivedTickets"><span class="badge" id="receivedCounter">0</span>Полученные тикеты</a></li>
+                        <li class="tab col s4">
+                            <a class="active" href="#sendTicket">
+                                <!-- Desktop -->
+                                <span class="hide-on-small-and-down">Написать тикет</span>
+                                <!-- Mobile -->
+                                <span class="hide-on-med-and-up"><i class="material-icons">add</i></span>
+                            </a>
+                        </li>
+                        <li class="tab col s4">
+                            <a href="#sentTickets">
+                                <span class="badge" id="sentCounter">0</span>
+                                <!-- Desktop -->
+                                <span class="hide-on-small-and-down">Отправленные тикеты</span>
+                                <!-- Mobile -->
+                                <span class="hide-on-med-and-up"><i class="material-icons">send</i></span>
+                            </a>
+                        </li>
+                        <li class="tab col s4">
+                            <a href="#receivedTickets">
+                                <span class="badge" id="receivedCounter">0</span>
+                                <!-- Desktop -->
+                                <span class="hide-on-small-and-down">Полученные тикеты</span>
+                                <!-- Mobile -->
+                                <span class="hide-on-med-and-up"><i class="material-icons">inbox</i></span>
+                            </a>
+                        </li>
                         </ul>
                     </div>
                     <div id="sendTicket" class="col s12">

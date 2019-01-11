@@ -61,7 +61,15 @@ const myEvents = {
 
             let ticket = `
                 <li>
-                    <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
+                    <div class="collapsible-header">
+                        <i class="material-icons">folder</i>
+                        ${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»
+                        
+                        ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn-small forwardTicket hide-on-small-and-down" style="position: absolute; right: 15px;" ticketID="' + extTicket.ticket.ID + '">' +
+                                '<i class="material-icons left" style="margin: 0;">forward</i>' +
+                                '<span>переслать</span>' +
+                            '</a>' : ''}
+                    </div>
                     <div class="collapsible-body">
                         <span>${extTicket.ticket.Description}</span>
                         <br><br><br>
@@ -71,11 +79,14 @@ const myEvents = {
                             <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
                             <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
                         </div>
-                        
-                        ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn" style="position: absolute; bottom: 15px; left: 15px" onclick="forwardTicket(' + extTicket.ticket.ID + ')">' +
-                            '<i class="material-icons left">forward</i>' +
-                            'переслать' +
-                        '</a>' : ''}
+                       ${!isUser && !isSentLi ? '<a class="right waves-effect waves-light btn-small hide-on-med-and-up forwardTicket" ticketID="' + extTicket.ticket.ID + '" style="margin-top: 1rem; margin-bottom: 1rem">' +
+                                '<span>переслать</span>' +
+                            '</a><br><br><br>' : ''}
+                       ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1" style="margin-top: 1rem;" onclick="closeTicket(' + extTicket.ticket.ID + ')">' +
+                                '<span>закрыть тикет</span>' +
+                            '</a>' : ''}
+                       <br>
+                       <br>
                     </div>
                 </li>
             `;
@@ -107,11 +118,20 @@ const myEvents = {
         $('#incomingHeader').html(`<h5>У вас <b>${incomingCount}</b> полученных тикетов</h5>`);*/
         $('#sentCounter').html(getSentCnt);
         $('#receivedCounter').html(getIncomingCnt);
+
+        $('a.forwardTicket').click(function(e) {
+           e.stopPropagation();
+
+           forwardTicket($(this).attr('ticketID'));
+        });
+
+        $('#ticketAmountB').html(tickets.length);
     },
     "create": (extTicket) => {
         swal('Успешно!', 'Тикет был отправлен!', 'success');
+        const isSentLi = true;
 
-        console.log("Ticket was successfully created!", extTicket);
+        if (DEBUG) console.log("Ticket was successfully created!", extTicket);
 
         // if (sentNeedsToBeEmpty) {
         //     $('.sentTicketsUl').html('');
@@ -128,7 +148,15 @@ const myEvents = {
 
         let li = `
             <li>
-                <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
+                <div class="collapsible-header">
+                    <i class="material-icons">folder</i>
+                    ${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»
+                    
+                    ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn-small forwardTicket hide-on-small-and-down" style="position: absolute; right: 15px;" ticketID="' + extTicket.ticket.ID + '">' +
+                        '<i class="material-icons left" style="margin: 0;">forward</i>' +
+                        '<span>переслать</span>' +
+                    '</a>' : ''}
+                </div>
                 <div class="collapsible-body">
                     <span>${extTicket.ticket.Description}</span>
                     <br><br><br>
@@ -137,7 +165,15 @@ const myEvents = {
                         <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
                         <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
                         <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
-                    </div>                   
+                    </div>
+                   ${!isUser && !isSentLi ? '<a class="right waves-effect waves-light btn-small hide-on-med-and-up forwardTicket" ticketID="' + extTicket.ticket.ID + '" style="margin-top: 1rem; margin-bottom: 1rem">' +
+                        '<span>переслать</span>' +
+                    '</a><br><br><br>' : ''}
+                   ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1" style="margin-top: 1rem;" onclick="closeTicket(' + extTicket.ticket.ID + ')">' +
+                        '<span>закрыть тикет</span>' +
+                    '</a>' : ''}
+                   <br>
+                   <br>
                 </div>
             </li>
         `;
@@ -148,7 +184,8 @@ const myEvents = {
         $('#sentCounter').html(++sentCount).addClass('new');
     },
     "incoming": (extTicket) => {
-        console.log("Got new ticket!", extTicket);
+        if (DEBUG) console.log("Got new ticket!", extTicket);
+        const isSentLi = false;
 
         // if (incomingNeedsToBeEmpty) {
         //     $('.incomingTicketsUl').html('');
@@ -165,7 +202,15 @@ const myEvents = {
 
         let li = `
             <li>
-                <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
+                <div class="collapsible-header">
+                    <i class="material-icons">folder</i>
+                    ${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»
+                    
+                    ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn-small forwardTicket hide-on-small-and-down" style="position: absolute; right: 15px;" ticketID="' + extTicket.ticket.ID + '">' +
+                        '<i class="material-icons left" style="margin: 0;">forward</i>' +
+                        '<span>переслать</span>' +
+                    '</a>' : ''}
+                </div>
                 <div class="collapsible-body">
                     <span>${extTicket.ticket.Description}</span>
                     <br><br><br>
@@ -175,11 +220,14 @@ const myEvents = {
                         <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
                         <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
                     </div>
-                    
-                    ${!isUser ? '<a class="waves-effect waves-light btn" style="position: absolute; bottom: 15px; left: 15px" onclick="forwardTicket(' + extTicket.ticket.ID + ')">' +
-                        '<i class="material-icons left">forward</i>' +
-                        'переслать' +
+                   ${!isUser && !isSentLi ? '<a class="right waves-effect waves-light btn-small hide-on-med-and-up forwardTicket" ticketID="' + extTicket.ticket.ID + '" style="margin-top: 1rem; margin-bottom: 1rem">' +
+                        '<span>переслать</span>' +
+                    '</a><br><br><br>' : ''}
+                   ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1" style="margin-top: 1rem;" onclick="closeTicket(' + extTicket.ticket.ID + ')">' +
+                        '<span>закрыть тикет</span>' +
                     '</a>' : ''}
+                   <br>
+                   <br>
                 </div>
             </li>
         `;
@@ -188,6 +236,44 @@ const myEvents = {
         $('.incomingTicketsUl').html(li);
         // Set counter
         $('#receivedCounter').html(++incomingCount).addClass('new');
+    },
+    "forward": (data) => {
+        if (DEBUG) console.log("Forwarded!", data);
+
+        swal('Успешно!', 'Тикет был перенаправлен!', 'success');
+        let li = `
+            <li>
+                <div class="collapsible-header">
+                    <i class="material-icons">folder</i>
+                    ${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»
+                    
+                    ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn-small forwardTicket hide-on-small-and-down" style="position: absolute; right: 15px;" ticketID="' + extTicket.ticket.ID + '">' +
+                        '<i class="material-icons left" style="margin: 0;">forward</i>' +
+                        '<span>переслать</span>' +
+                    '</a>' : ''}
+                </div>
+                <div class="collapsible-body">
+                    <span>${extTicket.ticket.Description}</span>
+                    <br><br><br>
+                    <span class="right">Информация:</span><br><br>
+                    <div>
+                        <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
+                        <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
+                        <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
+                    </div>
+                   ${!isUser && !isSentLi ? '<a class="right waves-effect waves-light btn-small hide-on-med-and-up forwardTicket" ticketID="' + extTicket.ticket.ID + '" style="margin-top: 1rem; margin-bottom: 1rem">' +
+                        '<span>переслать</span>' +
+                    '</a><br><br><br>' : ''}
+                   ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1" style="margin-top: 1rem;" onclick="closeTicket(' + extTicket.ticket.ID + ')">' +
+                        '<span>закрыть тикет</span>' +
+                    '</a>' : ''}
+                   <br>
+                   <br>
+                </div>
+            </li>
+        `;
+
+        
     }
 }
 // myEvents['get'](tickets);
