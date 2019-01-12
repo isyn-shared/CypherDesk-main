@@ -52,6 +52,8 @@ func New() *gin.Engine {
 	router.POST("/admin/deleteUser", deleteUserHandler)
 	router.POST("/admin/changeDepartment", changeDepartment)
 
+	router.POST("/account/uploadFile", uploadFileHandler)
+
 	// Tickets
 	router.GET("/tickets/ws", func(c *gin.Context) {
 		tickets.HandleConnections(c)

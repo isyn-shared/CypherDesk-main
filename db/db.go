@@ -8,10 +8,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const (
-	EncryptedUserValue            = "mlRzUQ=="
-	EncryptedTicketModeratorValue = "m051SFq+sCAIltun3OPe"
-	EncryptedAdminValue           = "jkN7SlE="
+var (
+	EncryptedUserValue            = "user"
+	EncryptedTicketModeratorValue = "ticketModerator"
+	EncryptedAdminValue           = "admin"
 )
 
 // NullString - obj from sql package

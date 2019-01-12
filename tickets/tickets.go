@@ -106,8 +106,8 @@ func bindEvents() {
 	myEvents["get"] = func(chMsg *chanMessage) {
 		getTickets(chMsg)
 	}
-	myEvents["delete"] = func(chMsg *chanMessage) {
-		deleteTicket(chMsg)
+	myEvents["close"] = func(chMsg *chanMessage) {
+		closeTicket(chMsg)
 	}
 	myEvents["createM"] = func(chMsg *chanMessage) {
 		sendModeratorTicket(chMsg)

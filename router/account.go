@@ -346,5 +346,16 @@ func changeCredentialsHandler(c *gin.Context) {
 }
 
 func uploadFileHandler(c *gin.Context) {
+	isAuth, _ := getID(c)
+	if !isAuth {
+		c.String(http.StatusOK, "redirect")
+		fmt.Println("user doesn`t authorized")
+	}
+	if _, _, fileErr := c.Request.FormFile("fileInput"); fileErr != nil {
+		c.String(http.StatusOK, "something wrong with your file: "+fileErr.Error())
+		fmt.Println("Error with file" + fileErr.Error())
+	}
+	_, fileHeader, _ := c.Request.FormFile("fileInput")
 
+	fmt.Println(fileHeader.Filename, fileHeader.Size)
 }
