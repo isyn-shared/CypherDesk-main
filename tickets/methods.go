@@ -112,10 +112,9 @@ func sendTicket(chnMsg *chanMessage) {
 
 	tmpTicket := *ticket
 	ntID := mysql.CreateTicket(ticket)
-
 	tmpTicket.ID = ntID
-
 	ticketAdmin := mysql.GetDepartmentTicketAdmin(user.Department)
+
 	log := &db.TicketLog{
 		Ticket:   mysql.GetLastTicketBySender(id),
 		UserFrom: id,
@@ -185,26 +184,26 @@ func forwardTicket(chnMsg *chanMessage) {
 	sendResponse(true, "forward", "null", chnMsg.conn)
 }
 
-func deleteTicket(chnMsg *chanMessage) {
+func closeTicket(chnMsg *chanMessage) {
 	mysql := db.CreateMysqlUser()
 	id := chnMsg.Message.Account.ID
 	user := mysql.GetUser("id", id)
 	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "delete", "У Вас нет прав на это действие!", chnMsg.conn)
+		sendResponse(false, "close", "У Вас нет прав на это действие!", chnMsg.conn)
 		return
 	}
 	args := make(map[string]string)
 	err := json.Unmarshal([]byte(chnMsg.Message.Data), args)
 	if err != nil {
-		sendResponse(false, "delete", "Ошибка на сервере", chnMsg.conn)
+		sendResponse(false, "close", "Ошибка на сервере", chnMsg.conn)
 		return
 	}
 
 	ticketID := args["id"]
 	if alias.EmptyStr(ticketID) {
-		sendResponse(false, "delete", "Неправильный запрос", chnMsg.conn)
+		sendResponse(false, "close", "Неправильный запрос", chnMsg.conn)
 	}
 
-	mysql.UpdateTicketStatus(chk(alias.STI(ticketID)).(int), "deleted")
-	sendResponse(true, "delete", "null", chnMsg.conn)
+	mysql.UpdateTicketStatus(chk(alias.STI(ticketID)).(int), "closed")
+	sendResponse(true, "close", "null", chnMsg.conn)
 }

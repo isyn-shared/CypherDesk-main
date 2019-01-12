@@ -2,6 +2,7 @@ package alias
 
 import (
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"math/rand"
 	"strconv"
@@ -63,4 +64,12 @@ func StringWithCharset(length int, charset string) string {
 		b[i] = charset[seededRand.Intn(len(charset))]
 	}
 	return string(b)
+}
+
+func RandomHex(n int) (string, error) {
+	bytes := make([]byte, n)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }

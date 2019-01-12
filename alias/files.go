@@ -36,3 +36,7 @@ func ReadFile(path string) (string, error) {
 	}
 	return string(bs), nil
 }
+
+func WriteToFile(data []byte, path string) error {
+	return ioutil.WriteFile(build.Default.GOPATH+AnalyzePath("/src/CypherDesk-main/"+path), data, 0644)
+}
