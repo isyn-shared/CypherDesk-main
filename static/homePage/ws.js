@@ -33,10 +33,6 @@ function send(data) {
 	Time: "Когда-то"
 }];*/
 
-// If it turns out to be empty, in 'create' event we need to clear UL
-let sentNeedsToBeEmpty = false,
-    incomingNeedsToBeEmpty = false;
-
 let incomingCount = 0, sentCount = 0;
 const myEvents = {
     // Special multi-purpose event 
@@ -59,26 +55,7 @@ const myEvents = {
 
             let isSentLi = (extTicket.forwardFrom == myUserData.ID || extTicket.ticket.Sender == myUserData.ID);
 
-            let ticket = `
-                <li>
-                    <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
-                    <div class="collapsible-body">
-                        <span>${extTicket.ticket.Description}</span>
-                        <br><br><br>
-                        <span class="right">Информация:</span><br><br>
-                        <div>
-                            <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
-                            <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
-                            <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
-                        </div>
-                        
-                        ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn" style="position: absolute; bottom: 15px; left: 15px" onclick="forwardTicket(' + extTicket.ticket.ID + ')">' +
-                            '<i class="material-icons left">forward</i>' +
-                            'переслать' +
-                        '</a>' : ''}
-                    </div>
-                </li>
-            `;
+            let ticket = prepareTicket({extTicket, isSentLi});
 
 
             if (isSentLi) {
@@ -101,17 +78,25 @@ const myEvents = {
 
         $('.incomingTicketsUl').html(incomingLi);
         $('.sentTicketsUl').html(sentLi);
+        $('a.forwardTicket').click(function(e) {
+            e.stopPropagation();
+
+            forwardTicket($(this).attr('ticketID'));
+        });
 
         // Set counters
         /*$('#sentHeader').html(`<h5>У вас <b>${sentCount}</b> отправленных тикетов</h5>`);
         $('#incomingHeader').html(`<h5>У вас <b>${incomingCount}</b> полученных тикетов</h5>`);*/
         $('#sentCounter').html(getSentCnt);
         $('#receivedCounter').html(getIncomingCnt);
+
+        $('#ticketAmountB').html(tickets.length);
     },
     "create": (extTicket) => {
         swal('Успешно!', 'Тикет был отправлен!', 'success');
+        const isSentLi = true;
 
-        console.log("Ticket was successfully created!", extTicket);
+        if (DEBUG) console.log("Ticket was successfully created!", extTicket);
 
         // if (sentNeedsToBeEmpty) {
         //     $('.sentTicketsUl').html('');
@@ -126,29 +111,25 @@ const myEvents = {
             else
                 extTicket.ticket.Sender = '<span class="green-text">Администратор</span>';
 
-        let li = `
-            <li>
-                <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
-                <div class="collapsible-body">
-                    <span>${extTicket.ticket.Description}</span>
-                    <br><br><br>
-                    <span class="right">Информация:</span><br><br>
-                    <div>
-                        <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
-                        <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
-                        <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
-                    </div>                   
-                </div>
-            </li>
-        `;
+        let li = prepareTicket({ isSentLi, extTicket});
         li += $('.sentTicketsUl').html();
 
         $('.sentTicketsUl').html(li);
+        $('a.forwardTicket').click(function(e) {
+            e.stopPropagation();
+
+            forwardTicket($(this).attr('ticketID'));
+        });
         // Set counter
         $('#sentCounter').html(++sentCount).addClass('new');
     },
     "incoming": (extTicket) => {
-        console.log("Got new ticket!", extTicket);
+        if (DEBUG) console.log("Got new ticket!", extTicket);
+
+        M.toast({displayLength: 10000, html: '<span>Поступил новый тикет!</span><a class="btn-flat toast-action smoothScroll" href="#ticketsBlock">Посмотреть</a>'});
+        makeSmoothScrollable();
+
+        const isSentLi = false;
 
         // if (incomingNeedsToBeEmpty) {
         //     $('.incomingTicketsUl').html('');
@@ -163,31 +144,25 @@ const myEvents = {
             else
                 extTicket.ticket.Sender = '<span class="green-text">Администратор</span>';
 
-        let li = `
-            <li>
-                <div class="collapsible-header"><i class="material-icons">folder</i>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</div>
-                <div class="collapsible-body">
-                    <span>${extTicket.ticket.Description}</span>
-                    <br><br><br>
-                    <span class="right">Информация:</span><br><br>
-                    <div>
-                        <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
-                        <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
-                        <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
-                    </div>
-                    
-                    ${!isUser ? '<a class="waves-effect waves-light btn" style="position: absolute; bottom: 15px; left: 15px" onclick="forwardTicket(' + extTicket.ticket.ID + ')">' +
-                        '<i class="material-icons left">forward</i>' +
-                        'переслать' +
-                    '</a>' : ''}
-                </div>
-            </li>
-        `;
+        let li = prepareTicket({extTicket, isSentLi});
         li += $('.incomingTicketsUl').html();
 
         $('.incomingTicketsUl').html(li);
+        $('a.forwardTicket').click(function(e) {
+            e.stopPropagation();
+
+            forwardTicket($(this).attr('ticketID'));
+        });
         // Set counter
         $('#receivedCounter').html(++incomingCount).addClass('new');
+    },
+    "forward": (data) => {
+        if (DEBUG) console.log("Forwarded!", data);
+
+        swal('Успешно!', 'Тикет был перенаправлен!', 'success');
+        let li = prepareTicket({});
+
+
     }
 }
 // myEvents['get'](tickets);
@@ -233,4 +208,42 @@ ws.onclose = () => {
 function sendEvent(event, data) {
     let obj = { event, data: JSON.stringify(data) };
     send(JSON.stringify(obj));
+}
+
+function prepareTicket(info) {
+    let { extTicket, isSentLi } = info;
+
+    let ticket = `
+        <li>
+            <div class="collapsible-header">
+                <i class="material-icons">folder</i>
+                ${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»
+                
+                ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn-small forwardTicket hide-on-small-and-down" style="position: absolute; right: 15px;" ticketID="' + extTicket.ticket.ID + '">' +
+                    '<i class="material-icons left" style="margin: 0;">forward</i>' +
+                    '<span>переслать</span>' +
+                '</a>' : ''}
+            </div>
+            <div class="collapsible-body">
+                <span>${extTicket.ticket.Description}</span>
+                <br><br><br>
+                <span class="right">Информация:</span><br><br>
+                <div>
+                    <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
+                    <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
+                    <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
+                </div>
+               ${!isUser && !isSentLi ? '<a class="right waves-effect waves-light btn-small hide-on-med-and-up forwardTicket" ticketID="' + extTicket.ticket.ID + '" style="margin-top: 1rem; margin-bottom: 1rem">' +
+                    '<span>переслать</span>' +
+                '</a><br><br><br>' : ''}
+               ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1" style="margin-top: 1rem;" onclick="closeTicket(' + extTicket.ticket.ID + ')">' +
+                    '<span>закрыть тикет</span>' +
+                '</a>' : ''}
+               <br>
+               <br>
+            </div>
+        </li>
+    `;
+
+    return ticket;
 }

@@ -51,9 +51,11 @@ function selectSendUser(id, htmlElement) {
 }
 
 function forwardTicket(ticketID) {
+    if (DEBUG) console.log(`Forwarding ${ticketID}`);
+
     let html = `
-        <div class="input-field col m6 s12" id="userSelectFieldSwal" style="margin-bottom: 20px">
-            <select id="userSelectSwal">
+        <div class="input-field col m6 s12" style="margin-bottom: 20px">
+            <select id="userSelectFieldFT" required>
                 <option value="-1" disabled selected>Выберите пользователя</option>
     `;
 
@@ -62,27 +64,19 @@ function forwardTicket(ticketID) {
 
     html += `</select></div>`;
 
+    $('#forwardTicketSelectDiv').html(html);
+    $('#userSelectFieldFT').formSelect();
 
-    swal({
-        title: 'Переслать тикет?',
-        type: 'info',
-        html: html,
-        showCloseButton: true,
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: "Отправить!",
-        cancelButtonText: "Отмена",
-        showCancelButton: true,
-        focusConfirm: false,
-    }).then(obj => {
-        if (obj.value) {
-            let toID = $('#userSelectSwal').val();
-            if (!toID) return swal('Упс!', 'Вы не выбрали пользователя!', 'info');
+    $('#forwardTicketModalBtn').click();
+    $('#forwardTicketForm').submit(e => {
+       e.preventDefault();
 
-            sendEvent('forward', {ticketID: ticketID.toString(), to: toID});
-        }
+        let toID = $('#userSelectFieldFT').val();
+        if (!toID) return swal('Упс!', 'Вы не выбрали пользователя!', 'info');
+
+        sendEvent('forward', {ticketID: ticketID.toString(), to: toID});
     });
 
-    $('#userSelectSwal').formSelect();
     // const instance = M.FormSelect.getInstance($('#userSelectSwal')[0]);
     // instance.options.
 }
@@ -94,3 +88,20 @@ $('#documentUploadForm').submit(function(e) {
         .then(answer => console.log("New doc answer:", answer))
         .catch(console.error);
 });
+
+function makeSmoothScrollable() {
+    document.querySelectorAll('a.smoothScroll').forEach(anchor => {
+        anchor.removeEventListener('click', clickListener);
+        anchor.addEventListener('click', clickListener);
+
+        function clickListener(e) {
+            e.preventDefault();
+
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+}
+
+makeSmoothScrollable();

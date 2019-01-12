@@ -43,3 +43,13 @@ $('#documentUploadForm').submit(function(e) {
         .then(answer => console.log("New doc answer:", answer))
         .catch(console.error);
 });
+
+document.querySelectorAll('a.smoothScroll').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
