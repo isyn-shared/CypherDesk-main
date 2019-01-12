@@ -54,8 +54,8 @@ function forwardTicket(ticketID) {
     if (DEBUG) console.log(`Forwarding ${ticketID}`);
 
     let html = `
-        <div class="input-field col m6 s12" style="margin-bottom: 20px">
-            <select id="userSelectFieldFT" required>
+        <div class="input-field" style="margin-bottom: 20px">
+            <select id="userSelectFieldFT" class="browser-default" required>
                 <option value="-1" disabled selected>Выберите пользователя</option>
     `;
 

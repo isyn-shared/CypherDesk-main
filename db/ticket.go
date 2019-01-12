@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ticketKey = "keys/ticketKey.go"
+	ticketKey = "keys/ticketKey.toml"
 )
 
 // Ticket structure

@@ -34,6 +34,44 @@ function send(data) {
 }];*/
 
 let incomingCount = 0, sentCount = 0;
+
+function makeForwardable() {
+    $('a.forwardTicket').click(function (e) {
+        e.stopPropagation();
+
+        forwardTicket($(this).attr('ticketID'));
+    });
+}
+
+function closeTicket(ticketID) {
+    swal({
+        title: 'Закрыть тикет?',
+        text: 'Данное действие будет невозможно отменить',
+        type: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Да, закрыть',
+        cancelButtonText: 'Отмена'
+    }).then(e => {
+        if (e.value) {
+            if (DEBUG) console.log(`Closing ${ticketID}`);
+
+            sendEvent('close', {id: ticketID});
+        }
+    }).catch(console.error);
+}
+
+function makeClosable() {
+    $('a.closeTicket').click(function (e) {
+        closeTicket($(this).attr('ticketID'));
+    });
+}
+
+function flash(elementID) {
+    $('#tap-target').attr('data-target', elementID).tapTarget();
+}
+
 const myEvents = {
     // Special multi-purpose event 
     "error": (err) => { console.error(err); },
@@ -43,7 +81,9 @@ const myEvents = {
         let incomingLi = '';
 
         let getSentCnt = 0, getIncomingCnt = 0;
-        for (let extTicket of tickets) {
+        for (let i = tickets.length-1; i >= 0; i--) {
+            const extTicket = tickets[i];
+
             extTicket.ticket.Description = extTicket.ticket.Description.replace(/(?:\r\n|\r|\n)/g, '<br>');
             // if (myUserData.ID == extTicket.ticket.Sender) extTicket.ticket.Sender = `${myUserData.Name} ${myUserData.Surname}`;
             if (userNames[extTicket.ticket.Sender]) extTicket.ticket.Sender = userNames[extTicket.ticket.Sender];
@@ -78,11 +118,8 @@ const myEvents = {
 
         $('.incomingTicketsUl').html(incomingLi);
         $('.sentTicketsUl').html(sentLi);
-        $('a.forwardTicket').click(function(e) {
-            e.stopPropagation();
-
-            forwardTicket($(this).attr('ticketID'));
-        });
+        makeForwardable();
+        makeClosable();
 
         // Set counters
         /*$('#sentHeader').html(`<h5>У вас <b>${sentCount}</b> отправленных тикетов</h5>`);
@@ -115,18 +152,15 @@ const myEvents = {
         li += $('.sentTicketsUl').html();
 
         $('.sentTicketsUl').html(li);
-        $('a.forwardTicket').click(function(e) {
-            e.stopPropagation();
-
-            forwardTicket($(this).attr('ticketID'));
-        });
+        makeForwardable();
+        makeClosable();
         // Set counter
         $('#sentCounter').html(++sentCount).addClass('new');
     },
     "incoming": (extTicket) => {
         if (DEBUG) console.log("Got new ticket!", extTicket);
 
-        M.toast({displayLength: 10000, html: '<span>Поступил новый тикет!</span><a class="btn-flat toast-action smoothScroll" href="#ticketsBlock">Посмотреть</a>'});
+        M.toast({displayLength: 10000, html: `<span>Поступил новый тикет!</span><a class="btn-flat toast-action smoothScroll" href="#ticketsBlock" onclick="$('#receivedTicketsSpan').click()">Посмотреть</a>`});
         makeSmoothScrollable();
 
         const isSentLi = false;
@@ -148,11 +182,9 @@ const myEvents = {
         li += $('.incomingTicketsUl').html();
 
         $('.incomingTicketsUl').html(li);
-        $('a.forwardTicket').click(function(e) {
-            e.stopPropagation();
+        makeForwardable();
+        makeClosable();
 
-            forwardTicket($(this).attr('ticketID'));
-        });
         // Set counter
         $('#receivedCounter').html(++incomingCount).addClass('new');
     },
@@ -163,6 +195,19 @@ const myEvents = {
         let li = prepareTicket({});
 
 
+    },
+    "close": (ticket) => {
+        if (DEBUG) console.log("Closed!", ticket);
+
+        M.toast({displayLength: 2000, html: `<span>Тикет «<b class="yellow-text">${ticket.Caption}</b>» был закрыт</span>`});
+        $(`.ticketStatus${ticket.ID}`).html('Статус: <b>closed</b>');
+    },
+    "closedTicket": (ticket) => {
+        if (DEBUG) console.log("Somebody closed:", ticket);
+
+        M.toast({displayLength: 10000, html: `<span>Тикет «<b class="yellow-text">${ticket.Caption}</b>» был закрыт. </span><a class="btn-flat toast-action smoothScroll" href="#ticketsBlock" onclick="$('#sentTicketsSpan').click()">Посмотреть</a>`});
+        makeSmoothScrollable();
+        $(`.ticketStatus${ticket.ID}`).html('Статус: <b>closed</b>');
     }
 }
 // myEvents['get'](tickets);
@@ -217,7 +262,7 @@ function prepareTicket(info) {
         <li>
             <div class="collapsible-header">
                 <i class="material-icons">folder</i>
-                ${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»
+                <span>${extTicket.ticket.Sender}: «<b>${extTicket.ticket.Caption}</b>»</span>
                 
                 ${!isUser && !isSentLi ? '<a class="waves-effect waves-light btn-small forwardTicket hide-on-small-and-down" style="position: absolute; right: 15px;" ticketID="' + extTicket.ticket.ID + '">' +
                     '<i class="material-icons left" style="margin: 0;">forward</i>' +
@@ -231,12 +276,12 @@ function prepareTicket(info) {
                 <div>
                     <span class="right">Время: ${getTime( new Date(extTicket.time) )}</span><br>
                     <span class="right">Отправитель: ${extTicket.ticket.Sender}</span><br>
-                    <span class="right">Статус: ${extTicket.ticket.Status}</span><br>
+                    <span class="right ticketStatus${extTicket.ticket.ID}">Статус: ${extTicket.ticket.Status}</span><br>
                 </div>
                ${!isUser && !isSentLi ? '<a class="right waves-effect waves-light btn-small hide-on-med-and-up forwardTicket" ticketID="' + extTicket.ticket.ID + '" style="margin-top: 1rem; margin-bottom: 1rem">' +
                     '<span>переслать</span>' +
                 '</a><br><br><br>' : ''}
-               ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1" style="margin-top: 1rem;" onclick="closeTicket(' + extTicket.ticket.ID + ')">' +
+               ${!isSentLi ? '<a class="right waves-effect waves-light btn-small red lighten-1 closeTicket" style="margin-top: 1rem;" ticketID="' + extTicket.ticket.ID + '">' +
                     '<span>закрыть тикет</span>' +
                 '</a>' : ''}
                <br>

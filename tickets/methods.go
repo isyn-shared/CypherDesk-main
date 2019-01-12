@@ -185,25 +185,35 @@ func forwardTicket(chnMsg *chanMessage) {
 }
 
 func closeTicket(chnMsg *chanMessage) {
-	mysql := db.CreateMysqlUser()
-	id := chnMsg.Message.Account.ID
-	user := mysql.GetUser("id", id)
-	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "close", "У Вас нет прав на это действие!", chnMsg.conn)
-		return
-	}
-	args := make(map[string]string)
-	err := json.Unmarshal([]byte(chnMsg.Message.Data), args)
-	if err != nil {
-		sendResponse(false, "close", "Ошибка на сервере", chnMsg.conn)
-		return
-	}
+    mysql := db.CreateMysqlUser()
+    id := chnMsg.Message.Account.ID
+    user := mysql.GetUser("id", id)
+    if !user.Exist() || !user.Filled() {
+        sendResponse(false, "close", "У Вас нет прав на это действие!", chnMsg.conn)
+        return
+    }
+    args := make(map[string]string)
+    err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
+    if err != nil {
+        sendResponse(false, "close", "Ошибка на сервере", chnMsg.conn)
+        return
+    }
 
-	ticketID := args["id"]
-	if alias.EmptyStr(ticketID) {
-		sendResponse(false, "close", "Неправильный запрос", chnMsg.conn)
-	}
+    strTicketID := args["id"]
+    if alias.EmptyStr(strTicketID) {
+        sendResponse(false, "close", "Неправильный запрос", chnMsg.conn)
+    }
+    
+    ticketID := chk(alias.STI(strTicketID)).(int)
+    ticket := mysql.GetTicket(ticketID)
 
-	mysql.UpdateTicketStatus(chk(alias.STI(ticketID)).(int), "closed")
-	sendResponse(true, "close", "null", chnMsg.conn)
+    sender := mysql.GetUser("id", ticket.Sender)
+    mysql.UpdateTicketStatus(ticketID, "closed")
+
+    ticketStr := string(chk(json.Marshal(ticket)).([]byte))
+
+    if ClientsByLogin[sender.Login] != nil {
+        ClientsByLogin[sender.Login].Connection.WriteJSON(StandartResponse{"event": "closedTicket", "ok": true, "data": ticketStr})
+    }
+    sendResponse(true, "close", ticketStr, chnMsg.conn)
 }

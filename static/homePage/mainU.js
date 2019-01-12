@@ -44,12 +44,19 @@ $('#documentUploadForm').submit(function(e) {
         .catch(console.error);
 });
 
-document.querySelectorAll('a.smoothScroll').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
+function makeSmoothScrollable() {
+    document.querySelectorAll('a.smoothScroll').forEach(anchor => {
+        anchor.removeEventListener('click', clickListener);
+        anchor.addEventListener('click', clickListener);
 
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
+        function clickListener(e) {
+            e.preventDefault();
+
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
     });
-});
+}
+
+makeSmoothScrollable();
