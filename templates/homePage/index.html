@@ -309,7 +309,7 @@
                                 <div id="forwardTicketSelectDiv">
                                      <!--This is filled via JS -->
                                 </div>
-                                
+
                                 <button class="btn waves-effect waves-light" type="submit" name="action">Отправить
                                     <i class="material-icons right">send</i>
                                 </button>
@@ -348,13 +348,17 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
 
     <!-- Our JS -->
-    {% if isModerator %}
-        <script src="/static/homePage/mainM.js"></script>
-    {% else %}
-        <script src="/static/homePage/mainU.js"></script>
-    {% endif %}
-    <script src="/static/homePage/ws.js"></script>
     <script src="/static/publicVars.js"></script>
+    <script src="/static/homePage/ws.js"></script>
+
+    <script src="/static/cryptico.min.js"></script>
+
+    <script src="/static/homePage/encryption.js"></script>
+    {% if isModerator %}
+    <script src="/static/homePage/mainM.js"></script>
+    {% else %}
+    <script src="/static/homePage/mainU.js"></script>
+    {% endif %}
     <script src="/static/sendPOST.js"></script>
 
 </body>
