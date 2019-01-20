@@ -192,9 +192,6 @@ const myEvents = {
         if (DEBUG) console.log("Forwarded!", data);
 
         swal('Успешно!', 'Тикет был перенаправлен!', 'success');
-        let li = prepareTicket({});
-
-
     },
     "close": (ticket) => {
         if (DEBUG) console.log("Closed!", ticket);
@@ -208,6 +205,12 @@ const myEvents = {
         M.toast({displayLength: 10000, html: `<span>Тикет «<b class="yellow-text">${ticket.Caption}</b>» был закрыт. </span><a class="btn-flat toast-action smoothScroll" href="#ticketsBlock" onclick="$('#sentTicketsSpan').click()">Посмотреть</a>`});
         makeSmoothScrollable();
         $(`.ticketStatus${ticket.ID}`).html('Статус: <b>closed</b>');
+    },
+    "publicKey": (serverCipherText) => {
+        serverPublicKey = privateKey.decrypt(serverCipherText);
+
+        if (DEBUG) console.log("Got server's publicKey:", serverPublicKey);
+        sendEvent('get', {});
     }
 }
 // myEvents['get'](tickets);
@@ -220,7 +223,14 @@ function b(n) {
     return n < 10 ? "0" + n : n;
 }
 
-ws.onmessage = (event) => {
+ws.onmessage = (cipherText) => {
+    let event = null;
+
+    if (serverPublicKey) // If we already got server key we are switched to decrypt mode
+        event = cryptico.decrypt(cipherText, privateKey);
+    else
+        event = cipherText;
+
     console.log(event);
     let msg = JSON.parse(event.data);
     console.log(msg);
@@ -243,7 +253,7 @@ ws.onopen = () => {
     console.log("Connected successfully!");
 
     /* Sending initial events */
-    sendEvent('get', {});
+    sendEvent("publicKey", {key: publicKey});
 }
 
 ws.onclose = () => {
@@ -252,7 +262,12 @@ ws.onclose = () => {
 
 function sendEvent(event, data) {
     let obj = { event, data: JSON.stringify(data) };
-    send(JSON.stringify(obj));
+    let plainText = JSON.stringify(obj);
+
+    if (serverPublicKey)
+        plainText = cryptico.encrypt(plainText, serverPublicKey);
+
+    send(plainText);
 }
 
 function prepareTicket(info) {
