@@ -294,15 +294,15 @@ func (m *MysqlUser) FindUser(keys []string) []*User {
 		case "@admin":
 			checkModified()
 			delReservKey(&i)
-			sqlReq += "role = \"admin\" "
+			sqlReq += "role = \""+EncryptedAdminValue+"\" "
 		case "@user":
 			checkModified()
 			delReservKey(&i)
-			sqlReq += "role = \"user\" "
+			sqlReq += "role = \""+EncryptedUserValue+"\" "
 		case "@ticketModerator":
 			checkModified()
 			delReservKey(&i)
-			sqlReq += "role = \"ticketModerator\" "
+			sqlReq += "role = \""+EncryptedTicketModeratorValue+"\" "
 		case "@activated":
 			checkModified()
 			delReservKey(&i)
