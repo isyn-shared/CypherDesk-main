@@ -262,12 +262,12 @@ ws.onclose = () => {
 
 function sendEvent(event, data) {
     let obj = { event, data: JSON.stringify(data) };
-    let plainText = JSON.stringify(obj);
+    let text = JSON.stringify(obj);
 
     if (serverPublicKey)
-        plainText = cryptico.encrypt(plainText, serverPublicKey);
+        text = cryptico.encrypt(text, serverPublicKey);
 
-    send(plainText);
+    send(text);
 }
 
 function prepareTicket(info) {

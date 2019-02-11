@@ -1,0 +1,14 @@
+{
+  "name": "cypherdesk-main",
+  "version": "1.0.0",
+  "description": "A single dependency of Node-rsa",
+  "main": "none",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-rsa": "^1.0.3"
+  }
+}
