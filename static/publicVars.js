@@ -3,4 +3,4 @@ const PASSPHRASE = Math.round(Math.random() * 10e17).toString();
 
 let DEBUG = true;
 var serverPublicKey = null;
-var publicKey = null;
+var encryptionKey = null;

@@ -1,16 +1,15 @@
 const NodeRSA = require('node-rsa');
-const privateKey = new NodeRSA({b: RSA_BITS});
-if (DEBUG) console.log('privateKey', privateKey.exportKey());
+window.encryptionKey = new NodeRSA({b: RSA_BITS});
+if (DEBUG) console.log('privateKey', window.encryptionKey.exportKey());
 
 window.NodeRSA = NodeRSA;
 
 if (DEBUG) {
     console.log("RSA_BITS:", RSA_BITS);
-    console.log("PASSPHRASE", PASSPHRASE);
+    // console.log("PASSPHRASE", PASSPHRASE);
 }
 
-window.publicKey = privateKey.exportKey('pkcs8-public');
-if (DEBUG) console.log('publicKey', window.publicKey);
+if (DEBUG) console.log('publicKey', window.encryptionKey.exportKey('pkcs1-public'));
 
 // Moved to ws.js in initial events
 // sendEvent("publicKey", {key: publicKey});

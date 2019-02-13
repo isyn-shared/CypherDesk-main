@@ -207,9 +207,10 @@ const myEvents = {
         $(`.ticketStatus${ticket.ID}`).html('Статус: <b>closed</b>');
     },
     "publicKey": (serverCipherText) => {
-        serverPublicKey = privateKey.decrypt(serverCipherText);
+        serverPublicKey = new NodeRSA();
+        serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
 
-        if (DEBUG) console.log("Got server's publicKey:", serverPublicKey);
+        if (DEBUG) console.log("Got server's publicKey:", serverPublicKey.exportKey('pkcs1-public'));
         sendEvent('get', {});
     }
 }
@@ -227,7 +228,7 @@ ws.onmessage = (cipherText) => {
     let event = null;
 
     if (serverPublicKey) // If we already got server key we are switched to decrypt mode
-        event = cryptico.decrypt(cipherText, privateKey);
+        event = encryptionKey.decrypt(cipherText);
     else
         event = cipherText;
 
@@ -253,7 +254,7 @@ ws.onopen = () => {
     console.log("Connected successfully!");
 
     /* Sending initial events */
-    sendEvent("publicKey", {key: publicKey});
+    sendEvent("publicKey", {key: encryptionKey.exportKey('pkcs1-public')});
 }
 
 ws.onclose = () => {
@@ -265,7 +266,7 @@ function sendEvent(event, data) {
     let text = JSON.stringify(obj);
 
     if (serverPublicKey)
-        text = cryptico.encrypt(text, serverPublicKey);
+        text = serverPublicKey.encrypt(text);
 
     send(text);
 }
