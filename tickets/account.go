@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Client includes account structure and connection structure
 type Client struct {
 	Account    *Account
 	Connection *websocket.Conn

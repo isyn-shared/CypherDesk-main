@@ -98,7 +98,7 @@ var myEvents = make(map[string]func(*chanMessage))
 
 func bindEvents() {
 	myEvents["create"] = func(chMsg *chanMessage) {
-		sendTicket(chMsg)
+		sendUserTicket(chMsg)
 	}
 	myEvents["forward"] = func(chMsg *chanMessage) {
 		forwardTicket(chMsg)
@@ -111,6 +111,9 @@ func bindEvents() {
 	}
 	myEvents["createM"] = func(chMsg *chanMessage) {
 		sendModeratorTicket(chMsg)
+	}
+	myEvents["publicKey"] = func(chMsg *chanMessage) {
+		// exchangePublicKeys(chMsg)
 	}
 }
 

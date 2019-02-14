@@ -57,9 +57,9 @@ func authorizeHandler(c *gin.Context) {
 func createTemporaryHandler(c *gin.Context) {
 	m := db.CreateMysqlUser()
 	u := &db.User{
-		Login: "admin",
-		Pass:  "admin",
-		Role:  "admin",
+		Login:      "admin",
+		Pass:       "admin",
+		Role:       "admin",
 		Department: 4,
 	}
 	u.HashPass()
@@ -69,19 +69,17 @@ func createTemporaryHandler(c *gin.Context) {
 	u = m.GetUserByDecField("login", "admin")
 
 	eu := &db.ExtendedUser{
-		ID: u.ID,
-		Phone: "+79782568334",
-		Address: "Simferopol",
-		ActivationType: "0",
+		ID:                  u.ID,
+		Phone:               "+79782568334",
+		Address:             "Simferopol",
+		ActivationType:      "0",
 		AccountCreationDate: time.Now(),
-		ActivationDate: time.Now(),
+		ActivationDate:      time.Now(),
 	}
 	m.InsertExtendedUser(eu)
 	c.String(http.StatusOK, "OK")
 }
 
 func testHandler(c *gin.Context) {
-	nt := time.Now()
-	tt := time.Now().Local().Add(time.Hour * time.Duration(12))
-	c.String(http.StatusOK, nt.String() + " " + tt.String())
+
 }

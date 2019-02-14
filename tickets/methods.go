@@ -4,56 +4,47 @@ import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
 	"encoding/json"
+	"log"
 	"time"
 )
 
+type EventArguments map[string]string
+
+func ticketMethodsRecovery(chnMsg *chanMessage, eventName string) {
+	if err := recover(); err != nil {
+		log.Fatal("Error in event " + eventName + ": " + err.(string))
+		sendResponse(false, eventName, err.(string), chnMsg.conn)
+	}
+}
+
+func getEventArgs(chnMsg *chanMessage) EventArguments {
+	var args EventArguments
+	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
+	if err != nil {
+		panic("Некорректный формат входных данных")
+	}
+	return args
+}
+
 func getTickets(chnMsg *chanMessage) {
+	defer ticketMethodsRecovery(chnMsg, "get")
 	mysql := db.CreateMysqlUser()
-	id := chnMsg.Message.Account.ID
-	user := mysql.GetUser("id", id)
+	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
 	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "get", "У Вас нет прав на это действие!", chnMsg.conn)
 		return
 	}
-	tickets := mysql.GetUserTickets(id, true)
+	tickets := mysql.GetUserTickets(user.ID, true)
 	byteJSONTickets := chk(json.Marshal(tickets)).([]byte)
 	sendResponse(true, "get", string(byteJSONTickets), chnMsg.conn)
 }
 
-func sendModeratorTicket(chnMsg *chanMessage) {
+func sendTicket(userFrom *db.User, userTo *db.User, args EventArguments, chnMsg *chanMessage) {
 	mysql := db.CreateMysqlUser()
-	id := chnMsg.Message.Account.ID
-	user := mysql.GetUser("id", id)
-	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "createM", "У Вас нет прав на это действие!", chnMsg.conn)
-		return
-	}
-	args := make(map[string]string)
-	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
-	if err != nil {
-		sendResponse(false, "createM", "Некорректный формат входных данных", chnMsg.conn)
-		return
-	}
-	caption, description, toIdStr := args["caption"], args["description"], args["id"]
-	if alias.EmptyStr(caption) || alias.EmptyStr(description) || alias.EmptyStr(toIdStr) {
-		sendResponse(false, "createM", "Неправильный запрос", chnMsg.conn)
-		return
-	}
-	toId, err := alias.STI(toIdStr)
-	if err != nil {
-		sendResponse(false, "createM", "Невозможное значение ID", chnMsg.conn)
-		return
-	}
-
-	toUser := mysql.GetUser("id", toId)
-	if !user.Exist() {
-		sendResponse(false, "createM", "Такого пользователя не существует", chnMsg.conn)
-	}
 
 	ticket := &db.Ticket{
-		Caption:     caption,
-		Description: description,
-		Sender:      id,
+		Caption:     args["caption"],
+		Description: args["description"],
+		Sender:      userFrom.ID,
 		Status:      "opened",
 	}
 
@@ -62,114 +53,94 @@ func sendModeratorTicket(chnMsg *chanMessage) {
 	tmpTicket.ID = ntID
 
 	log := &db.TicketLog{
-		Ticket:   mysql.GetLastTicketBySender(id),
-		UserFrom: id,
-		UserTo:   toId,
+		Ticket:   mysql.GetLastTicketBySender(userFrom.ID),
+		UserFrom: userFrom.ID,
+		UserTo:   userTo.ID,
 		Action:   "send",
 		Time:     time.Now(),
 	}
 
 	extTicket := db.ExtTicket{
 		Ticket:      &tmpTicket,
-		ForwardFrom: id,
-		ForwardTo:   toId,
+		ForwardFrom: userFrom.ID,
+		ForwardTo:   userTo.ID,
 		Time:        time.Now(),
 	}
 
 	mysql.TransferTicket(log)
 
-	if ClientsByLogin[toUser.Login] != nil {
-		sendResponse(true, "incoming", string(chk(json.Marshal(extTicket)).([]byte)), ClientsByLogin[toUser.Login].Connection)
+	if ClientsByLogin[userTo.Login] != nil {
+		sendResponse(true, "incoming", string(chk(json.Marshal(extTicket)).([]byte)), ClientsByLogin[userTo.Login].Connection)
 	}
 	sendResponse(true, "create", string(chk(json.Marshal(extTicket)).([]byte)), chnMsg.conn)
 }
 
-func sendTicket(chnMsg *chanMessage) {
+func sendModeratorTicket(chnMsg *chanMessage) {
+	defer ticketMethodsRecovery(chnMsg, "createM")
+
 	mysql := db.CreateMysqlUser()
-	id := chnMsg.Message.Account.ID
-	user := mysql.GetUser("id", id)
+	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
 	if !user.Exist() || !user.Filled() {
-		sendResponse(false, "create", "У Вас нет прав на это действие!", chnMsg.conn)
-		return
+		panic("У Вас нет прав на это действие!")
 	}
-	args := make(map[string]string)
-	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
+
+	args := getEventArgs(chnMsg)
+	if args["caption"] == "" || args["description"] == "" || args["id"] == "" {
+		panic("Неправильный запрос")
+	}
+	toID, err := alias.STI(args["id"])
 	if err != nil {
-		sendResponse(false, "create", "Ошибка на сервере", chnMsg.conn)
-		return
-	}
-	caption, description := args["caption"], args["description"]
-	if alias.EmptyStr(caption) || alias.EmptyStr(description) {
-		sendResponse(false, "create", "Неправильный запрос", chnMsg.conn)
-		return
-	}
-	ticket := &db.Ticket{
-		Caption:     caption,
-		Description: description,
-		Sender:      id,
-		Status:      "opened",
+		panic("Невозможное значение ID")
 	}
 
-	tmpTicket := *ticket
-	ntID := mysql.CreateTicket(ticket)
-	tmpTicket.ID = ntID
+	toUser := mysql.GetUser("id", toID)
+	if !user.Exist() {
+		panic("Такого пользователя не существует")
+	}
+
+	sendTicket(user, toUser, args, chnMsg)
+}
+
+func sendUserTicket(chnMsg *chanMessage) {
+	defer ticketMethodsRecovery(chnMsg, "create")
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
+	if !user.Exist() || !user.Filled() {
+		panic("У Вас нет прав на это действие!")
+	}
+	args := getEventArgs(chnMsg)
+	if args["caption"] == "" || args["description"] == "" {
+		panic("Неправильный запрос")
+	}
+
 	ticketAdmin := mysql.GetDepartmentTicketAdmin(user.Department)
-
-	log := &db.TicketLog{
-		Ticket:   mysql.GetLastTicketBySender(id),
-		UserFrom: id,
-		UserTo:   ticketAdmin.ID,
-		Action:   "send",
-		Time:     time.Now(),
-	}
-
-	extTicket := db.ExtTicket{
-		Ticket:      &tmpTicket,
-		ForwardFrom: id,
-		ForwardTo:   ticketAdmin.ID,
-		Time:        time.Now(),
-	}
-
-	mysql.TransferTicket(log)
-
-	if ClientsByLogin[ticketAdmin.Login] != nil {
-		sendResponse(true, "incoming", string(chk(json.Marshal(extTicket)).([]byte)), ClientsByLogin[ticketAdmin.Login].Connection)
-	}
-	sendResponse(true, "create", string(chk(json.Marshal(extTicket)).([]byte)), chnMsg.conn)
+	sendTicket(user, ticketAdmin, args, chnMsg)
 }
 
 func forwardTicket(chnMsg *chanMessage) {
+	defer ticketMethodsRecovery(chnMsg, "forward")
 	mysql := db.CreateMysqlUser()
-	id := chnMsg.Message.Account.ID
-	user := mysql.GetUser("id", id)
+	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
 	if !user.Exist() || !user.Filled() || user.Role != "ticketModerator" {
-		sendResponse(false, "forward", "У Вас нет прав на это действие!", chnMsg.conn)
-		return
+		panic("У Вас нет прав на это действие!")
 	}
-	args := make(map[string]string)
-	err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
-	if err != nil {
-		sendResponse(false, "forward", "Ошибка на сервере"+err.Error(), chnMsg.conn)
-		return
-	}
+	args := getEventArgs(chnMsg)
 	// TODO: rights to send ticket to this user
 
 	to, ticketID := args["to"], args["ticketID"]
-	if alias.EmptyStr(to) || alias.EmptyStr(ticketID) {
-		sendResponse(false, "forward", "Неправильный запрос!", chnMsg.conn)
-		return
+	if args["to"] == "" || args["ticketID"] == "" {
+		panic("Неправильный закон!")
 	}
 	tID := chk(alias.STI(ticketID)).(int)
 	ticket := mysql.GetTicket(tID)
 
 	if !ticket.Exist() {
-		sendResponse(false, "forward", "Неправильный запрос!", chnMsg.conn)
-		return
+		panic("Неправильный запрос!")
 	}
 
 	log := &db.TicketLog{
 		Ticket:   tID,
-		UserFrom: id,
+		UserFrom: user.ID,
 		UserTo:   chk(alias.STI(to)).(int),
 		Action:   "forward",
 		Time:     time.Now(),
@@ -185,35 +156,28 @@ func forwardTicket(chnMsg *chanMessage) {
 }
 
 func closeTicket(chnMsg *chanMessage) {
-    mysql := db.CreateMysqlUser()
-    id := chnMsg.Message.Account.ID
-    user := mysql.GetUser("id", id)
-    if !user.Exist() || !user.Filled() {
-        sendResponse(false, "close", "У Вас нет прав на это действие!", chnMsg.conn)
-        return
-    }
-    args := make(map[string]string)
-    err := json.Unmarshal([]byte(chnMsg.Message.Data), &args)
-    if err != nil {
-        sendResponse(false, "close", "Ошибка на сервере", chnMsg.conn)
-        return
-    }
+	defer ticketMethodsRecovery(chnMsg, "close")
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
+	if !user.Exist() || !user.Filled() {
+		panic("У Вас нет прав на это действие!")
+	}
+	args := getEventArgs(chnMsg)
 
-    strTicketID := args["id"]
-    if alias.EmptyStr(strTicketID) {
-        sendResponse(false, "close", "Неправильный запрос", chnMsg.conn)
-    }
-    
-    ticketID := chk(alias.STI(strTicketID)).(int)
-    ticket := mysql.GetTicket(ticketID)
+	if args["id"] == "" {
+		sendResponse(false, "close", "Неправильный запрос", chnMsg.conn)
+	}
 
-    sender := mysql.GetUser("id", ticket.Sender)
-    mysql.UpdateTicketStatus(ticketID, "closed")
+	ticketID := chk(alias.STI(args["id"])).(int)
+	ticket := mysql.GetTicket(ticketID)
 
-    ticketStr := string(chk(json.Marshal(ticket)).([]byte))
+	sender := mysql.GetUser("id", ticket.Sender)
+	mysql.UpdateTicketStatus(ticketID, "closed")
 
-    if ClientsByLogin[sender.Login] != nil {
-        ClientsByLogin[sender.Login].Connection.WriteJSON(StandartResponse{"event": "closedTicket", "ok": true, "data": ticketStr})
-    }
-    sendResponse(true, "close", ticketStr, chnMsg.conn)
+	ticketStr := string(chk(json.Marshal(ticket)).([]byte))
+
+	if ClientsByLogin[sender.Login] != nil {
+		ClientsByLogin[sender.Login].Connection.WriteJSON(StandartResponse{"event": "closedTicket", "ok": true, "data": ticketStr})
+	}
+	sendResponse(true, "close", ticketStr, chnMsg.conn)
 }
