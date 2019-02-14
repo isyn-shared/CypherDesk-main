@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>CypherDesk - Чат</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/homePage/materialize/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="/static/homePage/materialize/css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+
+    <link rel="stylesheet" href="/static/chat/main.css">
+</head>
+
+<body>
+
+
+    <div class="row h100">
+        <div class="col m3 h100 p0" style="border-right: solid 2px">
+            <div class="card-panel grey lighten-5 z-depth-1" style="margin-bottom: 2px">
+                <div class="row valign-wrapper">
+                    <div class="col l3 m4 s4">
+                        <img src="/static/images/avatar_default.jpg" alt="" class="circle responsive-img">
+                        <!-- notice the "circle" class -->
+                    </div>
+                    <div class="col l9 m8 s8">
+                        <span class="header truncate tooltipped" data-position="right" data-tooltip="Илья Завьялов Владиславович" >Илья <a href="#!"><i class="material-icons circle red white-text" style="padding: 0.4rem">edit</i></a></span>
+                    </div>
+                </div>
+            </div>
+            <ul class="collection with-header" style="margin-top: 0">
+                <li class="collection-item selectable" onclick="selectUser(this)" userid="Alvin1">
+                    <div>Alvin
+                        <a href="#!" class="secondary-content">
+                            <i class="material-icons tooltipped" data-position="right" data-tooltip="Быстрое сообщение">send</i>
+                        </a>
+                    </div>
+                </li>
+                <li class="collection-item selectable" onclick="selectUser(this)" userid="Alvin2">
+                    <div>Alvin
+                        <a href="#!" class="secondary-content">
+                            <i class="material-icons tooltipped" data-position="right" data-tooltip="Быстрое сообщение">send</i>
+                        </a>
+                    </div>
+                </li>
+                <li class="collection-item selectable" onclick="selectUser(this)" userid="Alvin3">
+                    <div>Alvin
+                        <a href="#!" class="secondary-content">
+                            <i class="material-icons tooltipped" data-position="right" data-tooltip="Быстрое сообщение">send</i>
+                        </a>
+                    </div>
+                </li>
+                <li class="collection-item selectable" onclick="selectUser(this)" userid="Alvin4">
+                    <div>Alvin
+                        <a href="#!" class="secondary-content">
+                            <i class="material-icons tooltipped" data-position="right" data-tooltip="Быстрое сообщение">send</i>
+                        </a>
+                    </div>
+                </li>    
+            </ul>
+        </div>
+        <div class="col m9 gray h100" id="chatBody">
+            
+        </div>
+    </div>
+
+
+
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="/static/homePage/materialize/js/materialize.min.js"></script>
+    <script src="/static/homePage/materialize/js/init.js"></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Our JS -->
+    <script src="/static/publicVars.js"></script>
+    <script src="/static/chat/ws.js"></script>
+
+    <script src="/static/cryptico.min.js"></script>
+
+    <!-- <script src="/static/homePage/encryption.js"></script> -->
+    <script src="/static/chat/main.js"></script>
+    <script src="/static/chat/ws.js"></script>
+    <script src="/static/sendPOST.js"></script>
+
+    <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+    <!-- Load our React component. -->
+    <script src="/static/chat/chatBody.js"></script>
+
+</body>

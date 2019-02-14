@@ -30,9 +30,12 @@
                 <a class="nav-item nav-link head-link" id="ticketsA" onclick="showWindow('#tickets')" href="#">Тикеты</a>
                 
                 <!-- This will hide on mobile -->
+                <a class="nav-item nav-link d-none d-sm-block head-link" style="position: absolute; right: 80px;"
+                    onclick="location = '/out'" href="#">Режим "Клиент"</a>
                 <a class="nav-item nav-link text-danger d-none d-sm-block head-link" style="position: absolute; right: 10px"
                     onclick="location = '/out'" href="#">Выход</a>
                 <!-- This will appear on mobile -->
+                <a class="nav-item nav-link d-block d-sm-none head-link" onclick="location = '/out'" href="#">Режим "Клиент"</a>
                 <a class="nav-item nav-link text-danger d-block d-sm-none head-link" onclick="location = '/out'" href="#">Выход</a>
             </div>
         </div>
