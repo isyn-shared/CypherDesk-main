@@ -8,6 +8,8 @@ import (
 type Client struct {
 	Account    *Account
 	Connection *websocket.Conn
+	ClientKey  []byte
+	ServerKey  []byte
 }
 
 type Account struct {

@@ -3,6 +3,7 @@ package router
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -81,5 +82,7 @@ func createTemporaryHandler(c *gin.Context) {
 }
 
 func testHandler(c *gin.Context) {
-
+	aesKey := alias.GenAESKey()
+	fmt.Println(aesKey)
+	c.String(http.StatusOK, string(aesKey))
 }

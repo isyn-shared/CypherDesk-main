@@ -4,6 +4,7 @@ import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 )
@@ -24,6 +25,24 @@ func getEventArgs(chnMsg *chanMessage) EventArguments {
 		panic("Некорректный формат входных данных")
 	}
 	return args
+}
+
+func exchangePublicKeys(chnMsg *chanMessage) {
+	defer ticketMethodsRecovery(chnMsg, "publicKey")
+	args := getEventArgs(chnMsg)
+	clientPubKey := getPublicKeyFromPem(args["key"])
+
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
+
+	response := make(map[string][]byte)
+	response["server"] = encryptWithPublicKey(ClientsByLogin[user.Login].ServerKey, clientPubKey)
+	response["client"] = encryptWithPublicKey(ClientsByLogin[user.Login].ClientKey, clientPubKey)
+
+	fmt.Println(response["server"])
+	fmt.Println(response["client"])
+
+	sendResponse(true, "publicKey", string(chk(json.Marshal(response)).([]byte)), chnMsg.conn)
 }
 
 func getTickets(chnMsg *chanMessage) {

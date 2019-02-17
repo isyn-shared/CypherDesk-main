@@ -206,15 +206,22 @@ const myEvents = {
         makeSmoothScrollable();
         $(`.ticketStatus${ticket.ID}`).html('Статус: <b>closed</b>');
     },
-    "publicKey": (serverCipherText) => {
-        serverPublicKey = new NodeRSA();
-        serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
+    "publicKey": (keys) => {
+        // serverPublicKey = new NodeRSA();
+        // serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
 
-        if (DEBUG) console.log("Got server's publicKey:", serverPublicKey.exportKey('pkcs1-public'));
+        if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( _base64ToUint8Array(keys.client) ));
+
+        serverKeys = {
+            client: new aesjs.AES( encryptionKey.decrypt( _base64ToUint8Array(keys.client) ) ),
+            server: new aesjs.AES( encryptionKey.decrypt( _base64ToUint8Array(keys.server) ) )
+        };
         sendEvent('get', {});
     }
 }
 // myEvents['get'](tickets);
+
+if (DEBUG) console.log(aesjs);
 
 function getTime(date) {
     return `${b( date.getHours() )}:${b( date.getMinutes() )} ${b( date.getDate() )}.${b( date.getMonth() + 1 )}`;
@@ -224,25 +231,23 @@ function b(n) {
     return n < 10 ? "0" + n : n;
 }
 
-ws.onmessage = (cipherText) => {
-    let event = null;
+ws.onmessage = (event) => {
+    if (serverKeys) // If we already got server key we are switched to AES decrypt mode
+        event = aesDecrypt(serverKeys.server, cipher);
+    // else    // Else we just use RSA to retrieve info (first time only)
+    //     event = encryptionKey.decrypt(cipher);
 
-    if (serverPublicKey) // If we already got server key we are switched to decrypt mode
-        event = encryptionKey.decrypt(cipherText);
-    else
-        event = cipherText;
-
-    console.log(event);
+    if (DEBUG) console.log(event);
     let msg = JSON.parse(event.data);
-    console.log(msg);
+    if (DEBUG) console.log(msg);
 
     if (msg.ok === false) {
-        console.warn("Ошибка!", msg.data);
+        if (DEBUG) console.warn("Ошибка!", msg.data);
         swal('Упс!', `Что-то пошло не так: ${msg.data}`, 'error');
         return;
     }
 
-    console.log(`Attempt to execute '${msg.event}' with data:`, msg.data);
+    if (DEBUG) console.log(`Attempt to execute '${msg.event}' with data:`, JSON.parse(msg.data));
 
     if (!myEvents[msg.event])
         return console.error("No event " + msg.event);
@@ -265,10 +270,25 @@ function sendEvent(event, data) {
     let obj = { event, data: JSON.stringify(data) };
     let text = JSON.stringify(obj);
 
-    if (serverPublicKey)
-        text = serverPublicKey.encrypt(text);
+    if (serverKeys)
+        text = aesEncrypt(serverKeys.client, text);
 
     send(text);
+}
+
+function aesEncrypt(key, text) {
+    // Step 1: Convert to byte array
+    text = key.encrypt(text);
+    // Step 2: Convert to string
+    text = String.fromCharCode(...a);
+
+    return text;
+}
+
+function aesDecrypt(key, byteArray) {
+    let decrBytes = key.decrypt(byteArray);
+
+    return aesjs.utils.utf8.fromBytes(decrBytes);
 }
 
 function prepareTicket(info) {
@@ -307,4 +327,17 @@ function prepareTicket(info) {
     `;
 
     return ticket;
+}
+
+function _base64ToUint8Array(base64) {
+    var binary_string =  window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array( len );
+    for (var i = 0; i < len; i++)        {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+
+    if (DEBUG) console.log('Finished converting; The Base64->array is', bytes);
+
+    return bytes;
 }

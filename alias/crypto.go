@@ -58,14 +58,6 @@ func StandartRefact(val string, dec bool, stInfoKey string) string {
 	return enc
 }
 
-//func URLEncode(u string) string {
-//
-//}
-//
-//func URLDecode(u string) string {
-//
-//}
-
 func Base32Encode(data string) string {
 	return base32.StdEncoding.EncodeToString([]byte(data))
 }

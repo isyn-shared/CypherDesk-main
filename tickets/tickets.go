@@ -1,6 +1,7 @@
 package tickets
 
 import (
+	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
 	"fmt"
 	"net/http"
@@ -86,9 +87,12 @@ func deleteClient(client *Client) {
 }
 
 func addClient(conn *websocket.Conn, acc *Account) {
+	serverKey, clientKey := alias.GenAESKey(), alias.GenAESKey()
 	client := &Client{
 		Account:    acc,
 		Connection: conn,
+		ClientKey:  clientKey,
+		ServerKey:  serverKey,
 	}
 	clientsBySocket[conn] = client
 	ClientsByLogin[acc.Login] = client
@@ -113,7 +117,7 @@ func bindEvents() {
 		sendModeratorTicket(chMsg)
 	}
 	myEvents["publicKey"] = func(chMsg *chanMessage) {
-		// exchangePublicKeys(chMsg)
+		exchangePublicKeys(chMsg)
 	}
 }
 

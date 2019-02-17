@@ -1,6 +1,6 @@
-const RSA_BITS = 1024;
+const RSA_BITS = 2048;
 const PASSPHRASE = Math.round(Math.random() * 10e17).toString();
 
 let DEBUG = true;
-var serverPublicKey = null;
+var serverKeys = null;
 var encryptionKey = null;

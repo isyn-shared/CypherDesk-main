@@ -3,7 +3,9 @@ package alias
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"fmt"
 	"log"
+	"math/rand"
 
 	"github.com/BurntSushi/toml"
 )
@@ -46,4 +48,11 @@ func DecryptAES(src []byte, ak *AesKey) []byte {
 	stream := cipher.NewCTR(blockCipher, iv)
 	stream.XORKeyStream(src, src)
 	return src
+}
+
+func GenAESKey() []byte {
+	key := make([]byte, 32)
+	rand.Read(key)
+	fmt.Println("DEBUG2: ", key)
+	return key
 }
