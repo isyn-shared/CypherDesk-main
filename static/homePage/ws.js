@@ -210,11 +210,12 @@ const myEvents = {
         // serverPublicKey = new NodeRSA();
         // serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
 
-        if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( _base64ToUint8Array(keys.client) ));
+        if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( keys.client ));
+        // if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( keys.client ));
 
         serverKeys = {
-            client: new aesjs.AES( encryptionKey.decrypt( _base64ToUint8Array(keys.client) ) ),
-            server: new aesjs.AES( encryptionKey.decrypt( _base64ToUint8Array(keys.server) ) )
+            client: new aesjs.AES( encryptionKey.decrypt( keys.client )),
+            server: new aesjs.AES( encryptionKey.decrypt( keys.server ))
         };
         sendEvent('get', {});
     }

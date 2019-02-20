@@ -1,7 +1,6 @@
 const NodeRSA = require('node-rsa');
-window.encryptionKey = new NodeRSA({b: RSA_BITS}, 'pkcs1-private-pem', {
-    'encryptionScheme': 'pkcs1'
-});
+window.encryptionKey = new NodeRSA({b: RSA_BITS});
+encryptionKey.setOptions({encryptionScheme: 'pkcs1'});
 if (DEBUG) console.log('privateKey', window.encryptionKey.exportKey());
 
 window.NodeRSA = NodeRSA;
@@ -14,7 +13,7 @@ if (DEBUG) {
 if (DEBUG) console.log('publicKey', window.encryptionKey.exportKey('pkcs1-public'));
 if (DEBUG) {
     console.log("Testing key;");
-    let plainText = "CYKA BLYAT";
+    let plainText = "TEST";
     let encText = encryptionKey.encrypt(plainText);
     console.log('encText', encText);
     let decText = encryptionKey.decrypt(encText);
