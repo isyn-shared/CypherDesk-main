@@ -3,7 +3,6 @@ package alias
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"fmt"
 	"log"
 	"math/rand"
 
@@ -53,6 +52,5 @@ func DecryptAES(src []byte, ak *AesKey) []byte {
 func GenAESKey() []byte {
 	key := make([]byte, 32)
 	rand.Read(key)
-	fmt.Println("DEBUG2: ", key)
 	return key
 }

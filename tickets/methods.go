@@ -35,12 +35,14 @@ func exchangePublicKeys(chnMsg *chanMessage) {
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
 
+	fmt.Println("Decrypted client key: ", ClientsByLogin[user.Login].ClientKey, len(ClientsByLogin[user.Login].ClientKey))
+	fmt.Println("ServerKey: ", ClientsByLogin[user.Login].ServerKey)
+	fmt.Println("ClientKey: ", ClientsByLogin[user.Login].ClientKey)
+
 	response := make(map[string][]byte)
 	response["server"] = encryptWithPublicKey(ClientsByLogin[user.Login].ServerKey, clientPubKey)
 	response["client"] = encryptWithPublicKey(ClientsByLogin[user.Login].ClientKey, clientPubKey)
-
-	fmt.Println(response["server"])
-	fmt.Println(response["client"])
+	fmt.Println("Encrypted client key", response["client"], len(response["client"]))
 
 	sendResponse(true, "publicKey", string(chk(json.Marshal(response)).([]byte)), chnMsg.conn)
 }

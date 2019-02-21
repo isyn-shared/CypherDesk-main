@@ -29,7 +29,6 @@ func main() {
 	defer rec()
 
 	model.Debug()
-	return
 
 	fmt.Print(initPkg.TextColorTitle)
 	fmt.Println(" ___ ______   ___   _   ____         __ _                          ")

@@ -1,3 +1,10 @@
+require("pidcrypt/seedrandom");
+
+var pidCrypt = require('pidcrypt');
+require("pidcrypt/rsa");
+
+window.pidCrypt = pidCrypt;
+
 const NodeRSA = require('node-rsa');
 window.encryptionKey = new NodeRSA({b: RSA_BITS});
 encryptionKey.setOptions({encryptionScheme: 'pkcs1'});
