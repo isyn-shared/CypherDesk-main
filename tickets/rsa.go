@@ -4,7 +4,7 @@ import (
 	"CypherDesk-main/alias"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha256"
+	"crypto/sha512"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -13,18 +13,18 @@ import (
 
 func getPublicKeyFromPem(pemPubKey string) *rsa.PublicKey {
 	block, _ := pem.Decode([]byte(pemPubKey))
-	pubKey, err := x509.ParsePKCS1PublicKey(block.Bytes)
+	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
-		panic(err.Error)
+		panic(err.Error())
 	}
-	return pubKey
+	return pubKey.(*rsa.PublicKey)
 }
 
 func getPrivateKeyFromPem(pemPrivKey string) *rsa.PrivateKey {
 	block, _ := pem.Decode([]byte(pemPrivKey))
 	privKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		panic(err.Error)
+		panic(err.Error())
 	}
 	return privKey
 }
@@ -69,7 +69,7 @@ func getPemPrivKey(fileName string) string {
 /* Methods that encrypts using random hash string */
 // EncryptWithPublicKey encrypts data with public key
 func encryptWithPublicKey(msg []byte, pub *rsa.PublicKey) []byte {
-	hash := sha256.New()
+	hash := sha512.New()
 	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, pub, msg, nil)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -80,7 +80,7 @@ func encryptWithPublicKey(msg []byte, pub *rsa.PublicKey) []byte {
 
 // DecryptWithPrivateKey decrypts data with private key
 func decryptWithPrivateKey(ciphertext []byte, priv *rsa.PrivateKey) []byte {
-	hash := sha256.New()
+	hash := sha512.New()
 	plaintext, err := rsa.DecryptOAEP(hash, rand.Reader, priv, ciphertext, nil)
 	if err != nil {
 		panic("Error on server (error code: 12335)")

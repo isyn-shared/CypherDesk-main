@@ -8,8 +8,55 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
 )
+
+func adminsUserModeHandler(c *gin.Context) {
+	defer rec(c)
+	isAuthorized, id := getID(c)
+	if !isAuthorized {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	mysql := db.CreateMysqlUser()
+	user := mysql.GetUser("id", id)
+	extUser := mysql.GetExtenedUser(user)
+
+	if !user.Filled() || user.Role != "admin" || (extUser.ActivationKey != "" && extUser.ActivationType == "1") {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+
+	department := user.GetDepartment()
+	departments := mysql.GetDepartments()
+	usersInDep := mysql.GetDepartmentUsers("id", department.ID)
+	admins := mysql.GetUsersByDecField("role", "admin")
+	moderators := mysql.GetUsersByDecField("role", "ticketModerator")
+	usersToTransfer := append(usersInDep, admins...)
+	usersToTransfer = append(usersToTransfer, moderators...)
+
+	for _, u := range usersToTransfer {
+		u.HidePrivateInfo()
+	}
+
+	writePongoTemplate("templates/homePage/index.html", pongo2.Context{
+		"isModerator":     true,
+		"isAdmin":         true,
+		"id":              user.ID,
+		"name":            user.Name,
+		"surname":         user.Surname,
+		"partonymic":      user.Partonymic,
+		"recourse":        user.Recourse,
+		"mail":            user.Mail,
+		"login":           user.Login,
+		"department":      department.Name,
+		"departments":     departments,
+		"usersToTransfer": usersToTransfer,
+		"phone":           extUser.Phone,
+		"Address":         extUser.Address,
+	}, c)
+}
 
 func createUserHandler(c *gin.Context) {
 	defer rec(c)

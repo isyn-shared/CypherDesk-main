@@ -12,9 +12,10 @@ import (
 type EventArguments map[string]string
 
 func ticketMethodsRecovery(chnMsg *chanMessage, eventName string) {
-	if err := recover(); err != nil {
-		log.Fatal("Error in event " + eventName + ": " + err.(string))
-		sendResponse(false, eventName, err.(string), chnMsg.conn)
+	if r := recover(); r != nil {
+		fmt.Printf("%T\n %q", r, r)
+		log.Fatal("Error in event " + eventName + ": ")
+		// sendResponse(false, eventName, r.(string), chnMsg.conn)
 	}
 }
 
@@ -32,16 +33,21 @@ func exchangePublicKeys(chnMsg *chanMessage) {
 	args := getEventArgs(chnMsg)
 	clientPubKey := getPublicKeyFromPem(args["key"])
 
-	mysql := db.CreateMysqlUser()
-	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
+	// mysql := db.CreateMysqlUser()
+	// user := mysql.GetUser("id", chnMsg.Message.Account.ID)
 
-	fmt.Println("Decrypted client key: ", ClientsByLogin[user.Login].ClientKey, len(ClientsByLogin[user.Login].ClientKey))
-	fmt.Println("ServerKey: ", ClientsByLogin[user.Login].ServerKey)
-	fmt.Println("ClientKey: ", ClientsByLogin[user.Login].ClientKey)
+	// fmt.Println("ServerKey: ", ClientsByLogin[user.Login].ServerKey)
+	// fmt.Println("ClientKey: ", ClientsByLogin[user.Login].ClientKey)
 
-	response := make(map[string][]byte)
-	response["server"] = encryptWithPublicKey(ClientsByLogin[user.Login].ServerKey, clientPubKey)
-	response["client"] = encryptWithPublicKey(ClientsByLogin[user.Login].ClientKey, clientPubKey)
+	// response := make(map[string][]byte)
+	// response["server"] = encryptWithPublicKey(ClientsByLogin[user.Login].ServerKey, clientPubKey)
+	// // response["client"] = encryptWithPublicKey(ClientsByLogin[user.Login].ClientKey, clientPubKey)
+	// response["client"] = encryptWithPublicKey([]byte("RSA"), clientPubKey)
+
+	response := make(map[string]string)
+	response["server"] = alias.Base64Enc(string(encryptWithPublicKey([]byte("RSA"), clientPubKey)))
+	response["client"] = alias.Base64Enc(string(encryptWithPublicKey([]byte("RSA"), clientPubKey)))
+
 	fmt.Println("Encrypted client key", response["client"], len(response["client"]))
 
 	sendResponse(true, "publicKey", string(chk(json.Marshal(response)).([]byte)), chnMsg.conn)

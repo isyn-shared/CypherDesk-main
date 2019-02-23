@@ -19,7 +19,7 @@ func printDense(d *mat.Dense) {
 	}
 }
 
-func (nn *neuralNet) Print() {
+func (nn *ClassificationNeuralNet) Print() {
 	fmt.Println("******** HIDDEN LAYOUT *********")
 	printDense(nn.wHidden)
 	fmt.Println("BIOS")

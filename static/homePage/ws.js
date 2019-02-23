@@ -208,11 +208,13 @@ const myEvents = {
     },
     "publicKey": (keys) => {
         // serverPublicKey = new NodeRSA();
+        let encryptedValue = encryptionKey.encrypt( "RSA" );
+        console.log("ENCRYPTED TEST MESSAGE: ", encryptedValue)
         // serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
-
         let cl = encryptionKey.decrypt( keys.client );
         let sv = encryptionKey.decrypt( keys.server );
-        if (DEBUG) console.log("Client key is:", (String.fromCharCode(...cl)), cl);
+        if (DEBUG) console.log("Client key is:", cl);
+        if (DEBUG) console.log("Server key is:", sv);
         // if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( keys.client ));
 
         serverKeys = {
@@ -262,7 +264,7 @@ ws.onopen = () => {
     console.log("Connected successfully!");
 
     /* Sending initial events */
-    sendEvent("publicKey", {key: encryptionKey.exportKey('pkcs1-public')});
+    sendEvent("publicKey", {key: publicKey});
 }
 
 ws.onclose = () => {
