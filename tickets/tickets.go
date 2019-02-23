@@ -3,6 +3,7 @@ package tickets
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -69,13 +70,30 @@ func HandleConnections(c *gin.Context) {
 
 	for {
 		var msg Message
-		err := conn.ReadJSON(&msg)
-
-		if err != nil {
-			fmt.Println("error: " + err.Error())
-			deleteClient(clientsBySocket[conn])
-			break
+		if clientsBySocket[conn].SecureConnection {
+			_, p, err := conn.ReadMessage()
+			if err != nil {
+				deleteClient(clientsBySocket[conn])
+				break
+			}
+			decryptedMsg := alias.DecryptAESWithRandomIV(clientsBySocket[conn].ClientKey, p)
+			err = json.Unmarshal(decryptedMsg, msg)
+			if err != nil {
+				fmt.Println("Error in secure connection: ", err.Error())
+				fmt.Println(string(decryptedMsg))
+				sendResponse(false, "undefinded", "Invalid data", conn)
+				continue
+			}
+		} else {
+			err := conn.ReadJSON(&msg)
+			fmt.Println(msg.Event)
+			if err != nil {
+				deleteClient(clientsBySocket[conn])
+				break
+			}
+			clientsBySocket[conn].SecureConnection = true
 		}
+
 		messages <- chanMessage{&msg, conn}
 	}
 }
@@ -96,6 +114,7 @@ func addClient(conn *websocket.Conn, acc *Account) {
 	}
 	clientsBySocket[conn] = client
 	ClientsByLogin[acc.Login] = client
+	ClientsByLogin[acc.Login].SecureConnection = false
 }
 
 var myEvents = make(map[string]func(*chanMessage))
@@ -130,6 +149,7 @@ func handleMessages() {
 			sendResponse(false, "error", "Обращение к несуществующему event-у", ChanMsg.conn)
 			continue
 		}
+
 		myEvents[ChanMsg.Message.Event](&ChanMsg)
 	}
 }

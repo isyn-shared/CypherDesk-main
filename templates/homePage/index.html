@@ -75,6 +75,9 @@
                 <a id="logo-container" href="http://ссылка-на-наш-домашний.site" class="brand-logo">CypherDesk - Ваш Аккаунт
             </a>
                 <ul class="right hide-on-med-and-down">
+                    {% if isAdmin %}
+                        <li><a href="/">Перейти в Админ-Панель</a></li>
+                    {% endif %}
                     <li><a href="#!" onclick="exitModal();">Выход из системы</a></li>
                 </ul>
 
@@ -348,7 +351,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.26.11/dist/sweetalert2.all.min.js"></script>
 
     <!-- Encryption -->
-    <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
     <script src="/static/jsencrypt.min.js"></script>
 
     <!-- Our JS -->

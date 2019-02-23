@@ -69,8 +69,7 @@ func getPemPrivKey(fileName string) string {
 /* Methods that encrypts using random hash string */
 // EncryptWithPublicKey encrypts data with public key
 func encryptWithPublicKey(msg []byte, pub *rsa.PublicKey) []byte {
-	hash := sha512.New()
-	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, pub, msg, nil)
+	ciphertext, err := rsa.EncryptPKCS1v15(rand.Reader, pub, msg)
 	if err != nil {
 		fmt.Println(err.Error())
 		panic("Error on server (error code: 12334)")
@@ -88,3 +87,11 @@ func decryptWithPrivateKey(ciphertext []byte, priv *rsa.PrivateKey) []byte {
 	}
 	return plaintext
 }
+
+// func decryptRecievedJSON(data string) interface{} {
+// 	json.Unmarshal()
+// }
+
+// func encryptReadyToSendJSON(obj interface{}) string {
+
+// }

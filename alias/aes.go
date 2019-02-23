@@ -3,8 +3,10 @@ package alias
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
+	"encoding/base64"
+	"io"
 	"log"
-	"math/rand"
 
 	"github.com/BurntSushi/toml"
 )
@@ -53,4 +55,33 @@ func GenAESKey() []byte {
 	key := make([]byte, 32)
 	rand.Read(key)
 	return key
+}
+
+func EncryptAESWithRandomIV(key []byte, message string) (encMsg string, err error) {
+	plainText := []byte(message)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return
+	}
+
+	cipherText := make([]byte, aes.BlockSize+len(plainText))
+	iv := cipherText[:aes.BlockSize]
+	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
+		return
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+
+	encMsg = base64.URLEncoding.EncodeToString(cipherText)
+	return
+}
+
+func DecryptAESWithRandomIV(key []byte, cipherText []byte) []byte {
+	ak := &AesKey{
+		Key: string(key),
+		IV:  "104dd450a8536365",
+	}
+	return DecryptAES(cipherText, ak)
 }

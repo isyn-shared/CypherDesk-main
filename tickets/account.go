@@ -6,10 +6,11 @@ import (
 
 // Client includes account structure and connection structure
 type Client struct {
-	Account    *Account
-	Connection *websocket.Conn
-	ClientKey  []byte
-	ServerKey  []byte
+	Account          *Account
+	Connection       *websocket.Conn
+	ClientKey        []byte
+	ServerKey        []byte
+	SecureConnection bool
 }
 
 type Account struct {

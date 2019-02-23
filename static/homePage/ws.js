@@ -212,21 +212,23 @@ const myEvents = {
         console.log("ENCRYPTED TEST MESSAGE: ", encryptedValue)
         // serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
         let cl = encryptionKey.decrypt( keys.client );
+            let clArr = _base64ToUint8Array(cl);
         let sv = encryptionKey.decrypt( keys.server );
-        if (DEBUG) console.log("Client key is:", cl);
-        if (DEBUG) console.log("Server key is:", sv);
+            let svArr = _base64ToUint8Array(sv);
+        if (DEBUG) console.log("Client key is:", cl, clArr);
+        if (DEBUG) console.log("Server key is:", sv, svArr);
         // if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( keys.client ));
 
         serverKeys = {
-            client: new aesjs.AES(cl),
-            server: new aesjs.AES(sv)
+            client: String.fromCharCode(...clArr),
+            server: String.fromCharCode(...svArr)
         };
         sendEvent('get', {});
     }
 }
 // myEvents['get'](tickets);
 
-if (DEBUG) console.log(aesjs);
+// if (DEBUG) console.log(aesjs);
 
 function getTime(date) {
     return `${b( date.getHours() )}:${b( date.getMinutes() )} ${b( date.getDate() )}.${b( date.getMonth() + 1 )}`;
@@ -238,7 +240,7 @@ function b(n) {
 
 ws.onmessage = (event) => {
     if (serverKeys) // If we already got server key we are switched to AES decrypt mode
-        event = aesDecrypt(serverKeys.server, cipher);
+        event.data = code.decryptMessage(event.data, serverKeys.server);
     // else    // Else we just use RSA to retrieve info (first time only)
     //     event = encryptionKey.decrypt(cipher);
 
@@ -275,13 +277,31 @@ function sendEvent(event, data) {
     let obj = { event, data: JSON.stringify(data) };
     let text = JSON.stringify(obj);
 
+    if (DEBUG && serverKeys)
+        console.log('About to encrypt:', text);
+
     if (serverKeys)
-        text = aesEncrypt(serverKeys.client, text);
+        text = code.encryptMessage(text, serverKeys.client);
 
     send(text);
 }
 
-function aesEncrypt(key, text) {
+let code = (function() {
+    return {
+        encryptMessage: function(messageToencrypt = '', secretkey = '') {
+            var encryptedMessage = CryptoJS.AES.encrypt(messageToencrypt, secretkey);
+            return encryptedMessage.toString();
+        },
+        decryptMessage: function(encryptedMessage = '', secretkey = ''){
+            var decryptedBytes = CryptoJS.AES.decrypt(encryptedMessage, secretkey);
+            var decryptedMessage = decryptedBytes.toString(CryptoJS.enc.Utf8);
+
+            return decryptedMessage;
+        }
+    }
+})();
+
+/*function aesEncrypt(key, text) {
     // Step 1: Convert to byte array
     text = key.encrypt(text);
     // Step 2: Convert to string
@@ -294,7 +314,7 @@ function aesDecrypt(key, byteArray) {
     let decrBytes = key.decrypt(byteArray);
 
     return aesjs.utils.utf8.fromBytes(decrBytes);
-}
+}*/
 
 function prepareTicket(info) {
     let { extTicket, isSentLi } = info;
