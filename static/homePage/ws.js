@@ -208,8 +208,8 @@ const myEvents = {
     },
     "publicKey": (keys) => {
         // serverPublicKey = new NodeRSA();
-        let encryptedValue = encryptionKey.encrypt( "RSA" );
-        console.log("ENCRYPTED TEST MESSAGE: ", encryptedValue)
+        // let encryptedValue = encryptionKey.encrypt( "RSA" );
+        // console.log("ENCRYPTED TEST MESSAGE: ", encryptedValue)
         // serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
         let cl = encryptionKey.decrypt( keys.client );
             let clArr = _base64ToUint8Array(cl);
@@ -220,10 +220,10 @@ const myEvents = {
         // if (DEBUG) console.log("Test debase64: ", encryptionKey.decrypt( keys.client ));
 
         serverKeys = {
-            client: String.fromCharCode(...clArr),
-            server: String.fromCharCode(...svArr)
+            client: clArr,
+            server: svArr
         };
-        sendEvent('get', {});
+        //setTimeout(sendEvent('get', {}), 500)
     }
 }
 // myEvents['get'](tickets);
@@ -240,7 +240,7 @@ function b(n) {
 
 ws.onmessage = (event) => {
     if (serverKeys) // If we already got server key we are switched to AES decrypt mode
-        event.data = code.decryptMessage(event.data, serverKeys.server);
+        event.data = aes.decryptMessage(event.data, serverKeys.server);
     // else    // Else we just use RSA to retrieve info (first time only)
     //     event = encryptionKey.decrypt(cipher);
 
@@ -280,23 +280,29 @@ function sendEvent(event, data) {
     if (DEBUG && serverKeys)
         console.log('About to encrypt:', text);
 
-    if (serverKeys)
-        text = code.encryptMessage(text, serverKeys.client);
-
+    if (serverKeys) {
+        text = aes.encryptMessage(text, serverKeys.client);
+        // text = String.fromCharCode(..._base64ToUint8Array(text)).substr(8);
+        // text = btoa(text);
+    }
+    
     send(text);
 }
 
-let code = (function() {
+let aes = (function() {
+    const iv = new Array(21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36);
+    
     return {
-        encryptMessage: function(messageToencrypt = '', secretkey = '') {
-            var encryptedMessage = CryptoJS.AES.encrypt(messageToencrypt, secretkey);
-            return encryptedMessage.toString();
+        encryptMessage: function(messageToEncrypt, secretkey) {
+            let aesCBC = new aesjs.ModeOfOperation.cbc(secretkey, iv);
+            let encBytes = aesCBC.encrypt(aesjs.padding.pkcs7.pad( new Array(...messageToEncrypt).map(x => x.charCodeAt(0))) );
+            return btoa( String.fromCharCode(...iv) + String.fromCharCode(...encBytes) );
         },
-        decryptMessage: function(encryptedMessage = '', secretkey = ''){
-            var decryptedBytes = CryptoJS.AES.decrypt(encryptedMessage, secretkey);
-            var decryptedMessage = decryptedBytes.toString(CryptoJS.enc.Utf8);
-
-            return decryptedMessage;
+        decryptMessage: function(encryptedMessage, secretkey) {
+            encryptedMessage = _base64ToUint8Array(encryptedMessage).slice(16, encryptMessage.length - 1);
+            let aesCBC = new aesjs.ModeOfOperation.cbc(secretkey, iv);
+            let decBytes = aesCBC.decrypt(encryptedMessage)
+            return aesjs.utils.utf8.fromBytes(decBytes)
         }
     }
 })();

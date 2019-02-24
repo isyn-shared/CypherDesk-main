@@ -12,3 +12,8 @@ type Message struct {
 	RecipientLogin string    `json:"reclogin"`
 	Time           time.Time `json:"time"`
 }
+
+type systemMessage struct {
+	Event string
+	Value interface{}
+}

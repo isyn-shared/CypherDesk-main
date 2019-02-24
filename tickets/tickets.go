@@ -3,6 +3,7 @@ package tickets
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -21,7 +22,13 @@ type chanMessage struct {
 	conn    *websocket.Conn
 }
 
+type systemChanMessage struct {
+	systemMessage *systemMessage
+	conn          *websocket.Conn
+}
+
 var messages = make(chan chanMessage)
+var systemMessages = make(chan systemChanMessage)
 var wsupgrader = websocket.Upgrader{
 	ReadBufferSize:  0,
 	WriteBufferSize: 0,
@@ -33,6 +40,7 @@ var wsupgrader = websocket.Upgrader{
 func Start() {
 	bindEvents()
 	go handleMessages()
+	// go handleSystemMessages()
 }
 
 func HandleConnections(c *gin.Context) {
@@ -76,22 +84,20 @@ func HandleConnections(c *gin.Context) {
 				deleteClient(clientsBySocket[conn])
 				break
 			}
-			decryptedMsg := alias.DecryptAESWithRandomIV(clientsBySocket[conn].ClientKey, p)
-			err = json.Unmarshal(decryptedMsg, msg)
+			decryptedMsg, _ := alias.DecryptAESCBC(string(p), clientsBySocket[conn].ClientKey)
+			decryptedMsg = bytes.Trim(decryptedMsg, "\x05")
+			err = json.Unmarshal(decryptedMsg, &msg)
 			if err != nil {
-				fmt.Println("Error in secure connection: ", err.Error())
-				fmt.Println(string(decryptedMsg))
 				sendResponse(false, "undefinded", "Invalid data", conn)
 				continue
 			}
 		} else {
+			fmt.Println("READJSON")
 			err := conn.ReadJSON(&msg)
-			fmt.Println(msg.Event)
 			if err != nil {
 				deleteClient(clientsBySocket[conn])
 				break
 			}
-			clientsBySocket[conn].SecureConnection = true
 		}
 
 		messages <- chanMessage{&msg, conn}
@@ -154,8 +160,31 @@ func handleMessages() {
 	}
 }
 
+func handleSystemMessages() {
+	for {
+		SysMsg := <-systemMessages
+		switch SysMsg.systemMessage.Event {
+		case "SecureConnectionStatus":
+			clientsBySocket[SysMsg.conn].SecureConnection = SysMsg.systemMessage.Value.(bool)
+		}
+	}
+}
+
 func sendResponse(ok bool, event string, message string, conn *websocket.Conn) {
-	err := conn.WriteJSON(StandartResponse{"ok": ok, "data": message, "event": event})
+	var err error
+	if !clientsBySocket[conn].SecureConnection {
+		err = conn.WriteJSON(StandartResponse{"ok": ok, "data": message, "event": event})
+		fmt.Println("PUBKEY")
+		clientsBySocket[conn].SecureConnection = true
+	} else {
+		response, err := json.Marshal(&StandartResponse{"ok": ok, "data": message, "event": event})
+		if err != nil {
+			fmt.Println("Error in marshaling StandartResponse object!!!")
+			return
+		}
+		encResp, _ := alias.EncryptAESCBC(response, clientsBySocket[conn].ServerKey)
+		err = conn.WriteMessage(1, encResp)
+	}
 	if err != nil {
 		fmt.Println("handleMessage error: " + err.Error())
 		deleteClient(clientsBySocket[conn])

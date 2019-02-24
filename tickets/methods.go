@@ -42,9 +42,6 @@ func exchangePublicKeys(chnMsg *chanMessage) {
 	response["server"] = encryptWithPublicKey(base64ServerKey, clientPubKey)
 	response["client"] = encryptWithPublicKey(base64ClientKey, clientPubKey)
 
-	fmt.Println("IM HERE!")
-	clientsBySocket[chnMsg.conn].SecureConnection = true
-
 	sendResponse(true, "publicKey", string(chk(json.Marshal(response)).([]byte)), chnMsg.conn)
 }
 
