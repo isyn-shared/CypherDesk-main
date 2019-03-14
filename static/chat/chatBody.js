@@ -29,7 +29,7 @@ function selectUser(domElement) {
 }
 
 let messages = {};
-class MessageList extends React.Component {
+class MessageList extends React.Component { 
     constructor(props) {
         super(props);
     }
@@ -42,9 +42,19 @@ class MessageList extends React.Component {
     }
 
     static receiveMessage(chatID, msg) {
-        let msgObj =    e('div', {className: 'row'/*, key: 'MESSAGE_ID_HERE'*/},
+        let msgObj =    e('div', {className: 'row'/*, key: 'MESSAGE_ID_HERE'*/, style: {marginBottom: 0}},
                             e('div', {className: 'col s5'},
-                                e('h3', null, msg)
+                                //e('h3', null, msg)
+                                e('div', {className: 'left', style: {paddingLeft: '1.5rem'}}, 
+                                    e('div', {className: 'card blue lighten-5', style: {marginBottom: 0}},
+                                        e('div', {className: 'card-content'},
+                                            e('span', {className: 'card-title activator grey-text text-darken-4'}, msg)
+                                        ),
+                                        e('div', {className: 'card-reveal'},
+                                            e('span', {className: 'card-title grey-text text-darken-4'}, "Управление сообщениями кнопками")
+                                        )
+                                    )
+                                )
                             )
                         );
 
@@ -53,9 +63,19 @@ class MessageList extends React.Component {
     static sendMessage(chatID, msg) {
         if (!msg.length) return;
 
-        let msgObj =    e('div', {className: 'row'/*, key: 'MESSAGE_ID_HERE'*/},
+        let msgObj =    e('div', {className: 'row'/*, key: 'MESSAGE_ID_HERE'*/, style: {marginBottom: 0}},
                             e('div', {className: 'col offset-s7 s5'},
-                                e('h3', {className: 'right', style: {paddingRight: '1.5rem'}}, msg)
+                                // e('h3', {className: 'right', style: {paddingRight: '1.5rem'}}, msg)
+                                e('div', {className: 'right', style: {paddingRight: '1.5rem'}}, 
+                                    e('div', {className: 'card blue lighten-5', style: {marginBottom: 0}},
+                                        e('div', {className: 'card-content'},
+                                            e('span', {className: 'card-title activator grey-text text-darken-4'}, msg)
+                                        ),
+                                        e('div', {className: 'card-reveal'},
+                                            e('span', {className: 'card-title grey-text text-darken-4'}, "Управление сообщениями кнопками")
+                                        )
+                                    )
+                                )
                             )
                         );
 
