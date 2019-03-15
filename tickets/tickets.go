@@ -85,14 +85,13 @@ func HandleConnections(c *gin.Context) {
 				break
 			}
 			decryptedMsg, _ := alias.DecryptAESCBC(string(p), clientsBySocket[conn].ClientKey)
-			decryptedMsg = bytes.Trim(decryptedMsg, "\x05")
+			decryptedMsg = decryptedMsg[:bytes.LastIndex(decryptedMsg, []byte("}"))+1]
 			err = json.Unmarshal(decryptedMsg, &msg)
 			if err != nil {
-				sendResponse(false, "undefinded", "Invalid data", conn)
+				sendResponse(false, "null", "Invalid data", conn)
 				continue
 			}
 		} else {
-			fmt.Println("READJSON")
 			err := conn.ReadJSON(&msg)
 			if err != nil {
 				deleteClient(clientsBySocket[conn])
@@ -101,6 +100,7 @@ func HandleConnections(c *gin.Context) {
 		}
 
 		messages <- chanMessage{&msg, conn}
+		clientsBySocket[conn].SecureConnection = true
 	}
 }
 
@@ -172,17 +172,19 @@ func handleSystemMessages() {
 
 func sendResponse(ok bool, event string, message string, conn *websocket.Conn) {
 	var err error
-	if !clientsBySocket[conn].SecureConnection {
+	if event == "publicKey" {
 		err = conn.WriteJSON(StandartResponse{"ok": ok, "data": message, "event": event})
-		fmt.Println("PUBKEY")
-		clientsBySocket[conn].SecureConnection = true
 	} else {
 		response, err := json.Marshal(&StandartResponse{"ok": ok, "data": message, "event": event})
 		if err != nil {
 			fmt.Println("Error in marshaling StandartResponse object!!!")
 			return
 		}
-		encResp, _ := alias.EncryptAESCBC(response, clientsBySocket[conn].ServerKey)
+		encResp, err := alias.EncryptAESCBC(response, clientsBySocket[conn].ServerKey)
+		if err != nil {
+			fmt.Println("Error when decrypting", err.Error())
+		}
+		fmt.Println("ENCRYPTED: ", string(encResp))
 		err = conn.WriteMessage(1, encResp)
 	}
 	if err != nil {

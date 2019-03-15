@@ -211,7 +211,7 @@ const myEvents = {
         // let encryptedValue = encryptionKey.encrypt( "RSA" );
         // console.log("ENCRYPTED TEST MESSAGE: ", encryptedValue)
         // serverPublicKey = serverPublicKey.importKey(encryptionKey.decrypt(serverCipherText), 'pkcs1-public');
-        let cl = encryptionKey.decrypt( keys.client );
+        let cl = encryptionKey.decrypt( keys.client );''
             let clArr = _base64ToUint8Array(cl);
         let sv = encryptionKey.decrypt( keys.server );
             let svArr = _base64ToUint8Array(sv);
@@ -223,7 +223,7 @@ const myEvents = {
             client: clArr,
             server: svArr
         };
-        //setTimeout(sendEvent('get', {}), 500)
+        sendEvent('get', {})
     }
 }
 // myEvents['get'](tickets);
@@ -239,13 +239,20 @@ function b(n) {
 }
 
 ws.onmessage = (event) => {
-    if (serverKeys) // If we already got server key we are switched to AES decrypt mode
-        event.data = aes.decryptMessage(event.data, serverKeys.server);
-    // else    // Else we just use RSA to retrieve info (first time only)
-    //     event = encryptionKey.decrypt(cipher);
+    if (DEBUG) console.log('Got raw event', event);
+    let msg = null;
+    if (serverKeys) { // If we already got server key we are switched to AES decrypt mode
+        msg = aes.decryptMessage(event.data, serverKeys.server);
+        // if (DEBUG) console.log('msg.length', msg.length, msg.length % AES_BLOCKSIZE, msg.length - (msg.length % AES_BLOCKSIZE));
+        // Get rid of padding characters on the end
+        msg = msg.substring(0, msg.lastIndexOf('}') + 1);
+    }
+    else    // Else we just retrieve info (first time only)
+        msg = event.data;
 
+    if (DEBUG) console.log('Received msg:', msg);
     if (DEBUG) console.log(event);
-    let msg = JSON.parse(event.data);
+    msg = JSON.parse(msg);
     if (DEBUG) console.log(msg);
 
     if (msg.ok === false) {
@@ -299,7 +306,7 @@ let aes = (function() {
             return btoa( String.fromCharCode(...iv) + String.fromCharCode(...encBytes) );
         },
         decryptMessage: function(encryptedMessage, secretkey) {
-            encryptedMessage = _base64ToUint8Array(encryptedMessage).slice(16, encryptMessage.length - 1);
+            encryptedMessage = _base64ToUint8Array(encryptedMessage).slice(16, encryptedMessage.length - 1);
             let aesCBC = new aesjs.ModeOfOperation.cbc(secretkey, iv);
             let decBytes = aesCBC.decrypt(encryptedMessage)
             return aesjs.utils.utf8.fromBytes(decBytes)

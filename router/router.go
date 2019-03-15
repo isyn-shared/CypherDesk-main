@@ -1,6 +1,7 @@
 package router
 
 import (
+	"CypherDesk-main/chat"
 	"CypherDesk-main/db"
 	"CypherDesk-main/tickets"
 	"log"
@@ -58,6 +59,11 @@ func New() *gin.Engine {
 	// Tickets
 	router.GET("/tickets/ws", func(c *gin.Context) {
 		tickets.HandleConnections(c)
+	})
+
+	// Chat
+	router.GET("/chat/ws", func(c *gin.Context) {
+		chat.HandleConnections(c)
 	})
 
 	router.GET("/ctu", createTemporaryHandler)

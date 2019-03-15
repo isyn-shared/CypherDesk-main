@@ -140,7 +140,7 @@ func forwardTicket(chnMsg *chanMessage) {
 	defer ticketMethodsRecovery(chnMsg, "forward")
 	mysql := db.CreateMysqlUser()
 	user := mysql.GetUser("id", chnMsg.Message.Account.ID)
-	if !user.Exist() || !user.Filled() || user.Role != "ticketModerator" {
+	if !user.Exist() || !user.Filled() || (user.Role != "ticketModerator" && user.Role != "admin") {
 		panic("У Вас нет прав на это действие!")
 	}
 	args := getEventArgs(chnMsg)
@@ -148,7 +148,7 @@ func forwardTicket(chnMsg *chanMessage) {
 
 	to, ticketID := args["to"], args["ticketID"]
 	if args["to"] == "" || args["ticketID"] == "" {
-		panic("Неправильный закон!")
+		panic("Неправильный запрос!")
 	}
 	tID := chk(alias.STI(ticketID)).(int)
 	ticket := mysql.GetTicket(tID)

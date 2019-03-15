@@ -82,7 +82,25 @@ func createTemporaryHandler(c *gin.Context) {
 }
 
 func testHandler(c *gin.Context) {
-	aesKey := alias.GenAESKey()
-	fmt.Println(aesKey)
-	c.String(http.StatusOK, string(aesKey))
+	isAuth, id := getID(c)
+	if !isAuth {
+		c.String(http.StatusOK, "You are not authorized")
+		return
+	}
+	chatMsg := &db.ChatMsg{
+		From:   id,
+		To:     id,
+		Text:   "KEKLol",
+		Date:   time.Now(),
+		Status: 1,
+	}
+	mysql := db.CreateMysqlUser()
+	mysql.InsertChatMessage(chatMsg)
+
+	chatMessages := mysql.GetUsersChatMessages(&db.User{ID: id})
+	fmt.Println(chatMessages)
+
+	for _, chm := range chatMessages {
+		fmt.Println(chm.Text, chm.Date)
+	}
 }
