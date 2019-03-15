@@ -218,6 +218,10 @@ ul.withLowerButton> :last-child {
     .mobilePadding {
         padding: auto;
     }
+
+    .mt-2-desktop {
+        margin-top: 2rem;
+    }
 }
 
 .bg-none {
