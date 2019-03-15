@@ -80,7 +80,7 @@ func (t *Ticket) refact(dec bool) {
 			input = value.String()
 
 			var enc string
-			enc = refactDepartmentField(input, dec)
+			enc = refactTicketKey(input, dec)
 
 			reflect.ValueOf(t).Elem().FieldByName(field.Name).SetString(enc)
 		case reflect.Int:

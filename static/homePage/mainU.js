@@ -36,13 +36,13 @@ $('#sendTicketForm').submit(e => {
     });
 });
 
-$('#documentUploadForm').submit(function(e) {
-    e.preventDefault();
+// $('#documentUploadForm').submit(function(e) {
+//     e.preventDefault();
 
-    autoSendPOST('/account/uploadFile', this)
-        .then(answer => console.log("New doc answer:", answer))
-        .catch(console.error);
-});
+//     autoSendPOST('/account/uploadFile', this)
+//         .then(answer => console.log("New doc answer:", answer))
+//         .catch(console.error);
+// });
 
 function makeSmoothScrollable() {
     document.querySelectorAll('a.smoothScroll').forEach(anchor => {

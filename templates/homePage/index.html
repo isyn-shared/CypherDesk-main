@@ -15,6 +15,38 @@
 </head>
 
 <body>
+    <!-- Preloader -->
+    <div id="preloaderDiv" class="grey darken-1" style="position: fixed; width: 100%; height: 100%; z-index: 10000">
+            <div class="row">
+                <div class="col s12 m6 offset-m3">
+                    <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span id="preloaderHeader" class="card-title flow-text center">Загрузка...</span>
+                        <p id="preloaderStatus" class="center flow-text">Устанавливаем безопасное соединение...</p>
+
+                        <div class="progress">
+                            <div class="indeterminate"></div>
+                        </div>
+
+                    </div>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue">
+                <div class="circle-clipper left">
+                <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                <div class="circle"></div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+    <!-- Preloader End -->
+
     <!-- Desktop -->
     <div class="fixed-action-btn click-to-toggle direction-top hide-on-small-only" style="bottom: 45px; right: 24px">
         <a class="btn-floating btn-large red">
@@ -22,7 +54,7 @@
         </a>
         <ul>
             <li><a class="btn-floating red tooltipped modal-trigger" href="#uploadDocumentModal" data-position="left" data-tooltip="Ваши Документы"><i class="material-icons">folder_open</i></a></li>
-            <li><a class="btn-floating green tooltipped" data-position="left" data-tooltip="Ваши Чаты"><i class="material-icons">chat</i></a></li>
+            <li><a class="btn-floating green tooltipped" href="/account/chat" data-position="left" data-tooltip="Ваши Чаты"><i class="material-icons">chat</i></a></li>
             <li><a class="btn-floating blue darken-1 tooltipped" data-position="left" data-tooltip="Техническая поддержка"><i class="material-icons">contact_phone</i></a></li>
         </ul>
     </div>
@@ -44,7 +76,7 @@
     <div id="uploadDocumentModal" class="modal">
         <div class="modal-content">
             <h4>Выберите документ для загрузки</h4>
-            <p>Ваша страница перезагрузится</p>
+            <p>Вы можете получить доступ ко всем документам <a href="#!">здесь</a></p>
 
             <form id="documentUploadForm">
                 <div class="file-field input-field">
@@ -55,6 +87,10 @@
                     <div class="file-path-wrapper">
                         <input class="file-path validate" type="text">
                     </div>
+                </div>
+                <div class="input-field col s6">
+                    <input name="keywords" id="last_name" type="text" class="validate">
+                    <label for="last_name">Ключевые слова (через пробел)</label>
                 </div>
                 <button class="btn waves-effect waves-light right" type="submit" name="action">Загрузить
                     <i class="material-icons right">cloud_upload</i>
@@ -337,6 +373,7 @@
             <h3 class="center" style="margin-top: 0">Ваши чаты</h3>
             <div class="row center">
                 <h1>Coming soon ;)</h1>
+                <a href="/account/chat" class="waves-effect waves-light btn"><i class="material-icons left">cloud</i>Перейти в полный чат</a>
             </div>
         </div>
 
@@ -369,6 +406,32 @@
     <script src="/static/homePage/mainU.js"></script>
     {% endif %}
     <script src="/static/sendPOST.js"></script>
+
+    <script>
+            console.log("Тест", $("#documentUploadForm"));
+            $("#documentUploadForm").submit(function(e){
+                e.preventDefault();
+
+                console.log('Creating Form Data');
+                let formData = new FormData($(this)[0]);
+                console.log(formData);
+            
+                $.ajax({
+                    url: '/account/uploadFile',
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    success: function (data) {
+                        console.log('Документ отправлен успешно;', data);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            
+                return false;
+            });
+        </script>
 
 </body>
 

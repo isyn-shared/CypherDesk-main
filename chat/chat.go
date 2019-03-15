@@ -3,8 +3,6 @@ package chat
 import (
 	"CypherDesk-main/alias"
 	"CypherDesk-main/db"
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -16,6 +14,7 @@ type StandartResponse map[string]interface{}
 
 var ClientsByLogin = make(map[string]*Client)
 var clientsBySocket = make(map[*websocket.Conn]*Client)
+var myEvents = make(map[string]func(*chanMessage))
 
 type chanMessage struct {
 	Message *Message
@@ -34,7 +33,29 @@ var wsupgrader = websocket.Upgrader{
 func Start() {
 	bindEvents()
 	go handleMessages()
-	// go handleSystemMessages()
+}
+
+func bindEvents() {
+	myEvents["send"] = func(chMsg *chanMessage) {
+		sendUserChatMessage(chMsg)
+	}
+	myEvents["get"] = func(chMsg *chanMessage) {
+		getChatUserMessages(chMsg)
+	}
+}
+
+func handleMessages() {
+	for {
+		ChanMsg := <-messages
+		ChanMsg.Message.Account = clientsBySocket[ChanMsg.conn].Account
+
+		if myEvents[ChanMsg.Message.Event] == nil {
+			sendResponse(false, "error", "Обращение к несуществующему event-у", ChanMsg.conn)
+			continue
+		}
+
+		myEvents[ChanMsg.Message.Event](&ChanMsg)
+	}
 }
 
 func HandleConnections(c *gin.Context) {
@@ -72,28 +93,41 @@ func HandleConnections(c *gin.Context) {
 
 	for {
 		var msg Message
-		if clientsBySocket[conn].SecureConnection {
-			_, p, err := conn.ReadMessage()
-			if err != nil {
-				deleteClient(clientsBySocket[conn])
-				break
-			}
-			decryptedMsg, _ := alias.DecryptAESCBC(string(p), clientsBySocket[conn].ClientKey)
-			decryptedMsg = decryptedMsg[:bytes.LastIndex(decryptedMsg, []byte("}"))+1]
-			err = json.Unmarshal(decryptedMsg, &msg)
-			if err != nil {
-				sendResponse(false, "null", "Invalid data", conn)
-				continue
-			}
-		} else {
-			err := conn.ReadJSON(&msg)
-			if err != nil {
-				deleteClient(clientsBySocket[conn])
-				break
-			}
+		err := conn.ReadJSON(&msg)
+		if err != nil {
+			deleteClient(clientsBySocket[conn])
+			break
 		}
 
 		messages <- chanMessage{&msg, conn}
 		clientsBySocket[conn].SecureConnection = true
+	}
+}
+
+func deleteClient(client *Client) {
+	delete(ClientsByLogin, client.Account.Login)
+	delete(clientsBySocket, client.Connection)
+	// updateFriendsStat(client)
+}
+
+func addClient(conn *websocket.Conn, acc *Account) {
+	serverKey, clientKey := alias.GenAESKey(), alias.GenAESKey()
+	client := &Client{
+		Account:    acc,
+		Connection: conn,
+		ClientKey:  clientKey,
+		ServerKey:  serverKey,
+	}
+	clientsBySocket[conn] = client
+	ClientsByLogin[acc.Login] = client
+	ClientsByLogin[acc.Login].SecureConnection = false
+}
+
+func sendResponse(ok bool, event string, message string, conn *websocket.Conn) {
+	err := conn.WriteJSON(StandartResponse{"ok": ok, "data": message, "event": event})
+
+	if err != nil {
+		fmt.Println("handleMessage error: " + err.Error())
+		deleteClient(clientsBySocket[conn])
 	}
 }

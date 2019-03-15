@@ -2,6 +2,7 @@ package initPkg
 
 import (
 	"CypherDesk-main/alias"
+	"CypherDesk-main/chat"
 	"CypherDesk-main/db"
 	"CypherDesk-main/tickets"
 	"fmt"
@@ -54,6 +55,7 @@ func ProjectInit() {
 	initImg()
 	db.MysqlInit()
 	tickets.Start()
+	chat.Start()
 
 	db.EncryptedAdminValue = alias.StandartRefact("admin", false, db.StInfoKey)
 	db.EncryptedTicketModeratorValue = alias.StandartRefact("ticketModerator", false, db.StInfoKey)

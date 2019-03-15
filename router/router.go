@@ -55,6 +55,7 @@ func New() *gin.Engine {
 	router.POST("/admin/changeDepartment", changeDepartment)
 
 	router.POST("/account/uploadFile", uploadFileHandler)
+	router.GET("/account/chat", chatHandler)
 
 	// Tickets
 	router.GET("/tickets/ws", func(c *gin.Context) {

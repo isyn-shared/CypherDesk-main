@@ -5,7 +5,12 @@ import (
 	"CypherDesk-main/db"
 	"CypherDesk-main/feedback"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/flosch/pongo2"
@@ -91,18 +96,22 @@ func accountHandler(c *gin.Context) {
 				}, c)
 			} else {
 				department := user.GetDepartment()
+				usersInDep := mysql.GetDepartmentUsers("id", department.ID)
+				admins := mysql.GetUsersByDecField("role", "admin")
+				usersToTransfer := append(usersInDep, admins...)
 				writePongoTemplate("templates/homePage/index.html", pongo2.Context{
-					"isModerator": false,
-					"id":          user.ID,
-					"name":        user.Name,
-					"surname":     user.Surname,
-					"partonymic":  user.Partonymic,
-					"recourse":    user.Recourse,
-					"mail":        user.Mail,
-					"login":       user.Login,
-					"department":  department.Name,
-					"phone":       extUser.Phone,
-					"Address":     extUser.Address,
+					"isModerator":     false,
+					"id":              user.ID,
+					"name":            user.Name,
+					"surname":         user.Surname,
+					"partonymic":      user.Partonymic,
+					"recourse":        user.Recourse,
+					"mail":            user.Mail,
+					"login":           user.Login,
+					"department":      department.Name,
+					"phone":           extUser.Phone,
+					"Address":         extUser.Address,
+					"usersToTransfer": usersToTransfer,
 				}, c)
 			}
 		}
@@ -346,7 +355,7 @@ func changeCredentialsHandler(c *gin.Context) {
 }
 
 func uploadFileHandler(c *gin.Context) {
-	isAuth, _ := getID(c)
+	isAuth, id := getID(c)
 	if !isAuth {
 		c.String(http.StatusOK, "redirect")
 		fmt.Println("user doesn`t authorized")
@@ -355,7 +364,30 @@ func uploadFileHandler(c *gin.Context) {
 		c.String(http.StatusOK, "something wrong with your file: "+fileErr.Error())
 		fmt.Println("Error with file" + fileErr.Error())
 	}
-	_, fileHeader, _ := c.Request.FormFile("fileInput")
+	file, fileHeader, _ := c.Request.FormFile("fileInput")
+	keywords := strings.Split(c.PostForm("keywords"), " ")
 
-	fmt.Println(fileHeader.Filename, fileHeader.Size)
+	r, _ := alias.RandomHex(5)
+	fileName := r + "_" + strconv.Itoa(id) + "_" + string(fileHeader.Filename)
+
+	out, err := os.Create("./dataStorage/" + fileName)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	doc := &db.Document{
+		UserID:   id,
+		Name:     fileName,
+		Keywords: keywords,
+		Date:     time.Now(),
+	}
+	mysql := db.CreateMysqlUser()
+	mysql.InsertDocument(doc)
+
+	fmt.Println("HEEEEEEYYYYYYYYYYY!!!", fileName, fileHeader.Filename, fileHeader.Size)
 }

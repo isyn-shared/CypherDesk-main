@@ -223,7 +223,16 @@ const myEvents = {
             client: clArr,
             server: svArr
         };
-        sendEvent('get', {})
+        sendEvent('get', {});
+
+
+        $('#preloaderHeader').text('Успешно!');
+        $('#preloaderStatus').text('Обновляем информацию...');
+        // $('#preloaderProgress').css('width', '50%');
+        setTimeout(() => {
+            // $('#preloaderProgress').css('width', '100%');
+            $('#preloaderDiv').fadeOut(500)
+        }, 1000);
     }
 }
 // myEvents['get'](tickets);
