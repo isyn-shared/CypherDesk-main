@@ -3,6 +3,7 @@ package alias
 import (
 	"go/build"
 	"io/ioutil"
+	"mime/multipart"
 	"runtime"
 	"strings"
 )
@@ -39,4 +40,19 @@ func ReadFile(path string) (string, error) {
 
 func WriteToFile(data []byte, path string) error {
 	return ioutil.WriteFile(build.Default.GOPATH+AnalyzePath("/src/CypherDesk-main/"+path), data, 0644)
+}
+
+func ChkFileSize(fh *multipart.FileHeader, maxSize int64) bool {
+	return fh.Size <= maxSize
+}
+
+func ChkFileExt(fh *multipart.FileHeader, allowedExt []string) bool {
+	divName := strings.Split(fh.Filename, ".")
+	fe := divName[len(divName)-1]
+	for _, ext := range allowedExt {
+		if ext == fe {
+			return true
+		}
+	}
+	return false
 }

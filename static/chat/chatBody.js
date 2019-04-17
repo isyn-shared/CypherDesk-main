@@ -109,11 +109,11 @@ class MessageList extends React.Component {
 
         if (chatID == selectedUserID) {
             console.log("Yes");
-            setTimeout(() => { 
-                document.querySelector(`#msgID${messageID}`).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }, 100);
+            // setTimeout(() => { 
+            //     document.querySelector(`#msgID${messageID}`).scrollIntoView({
+            //         behavior: 'smooth'
+            //     });
+            // }, 100);
         }
     }
 }

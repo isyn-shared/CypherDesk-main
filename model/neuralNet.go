@@ -139,7 +139,7 @@ func (nn *ClassificationNeuralNet) backPropagation(x *mat.Dense) {
 
 func (nn *ClassificationNeuralNet) train(x, y *mat.Dense) {
 	for i := 0; i < nn.config.NumEpochs; i++ {
-		fmt.Printf("Epoch number %d was started", i + 1)
+		fmt.Printf("Epoch number %d was started", i+1)
 		nn.feedForward(x)
 		nn.calcErrors(y)
 		fmt.Println("Sigma output layer error:")
@@ -149,6 +149,13 @@ func (nn *ClassificationNeuralNet) train(x, y *mat.Dense) {
 }
 
 func Debug() {
+	text := "The Early English Text Society is a text publication society founded in 1864 which is dedicated to the editing and publication of early English texts, especially those only available in manuscript. Most of its volumes contain editions of Middle English or Old English texts"
+	unigram := new(Unigram)
+	unigram.init(text)
+	fmt.Println(unigram.unigrams)
+}
+
+/* func Debug() {
 	PrepareClassConfig()
 	nnConf := &ClassificationNetConfiguration{
 		InputNeurons:   10,
@@ -183,4 +190,4 @@ func Debug() {
 	printDense(nn.outputLayerError)
 	fmt.Println("hiddenLayerError: ")
 	printDense(nn.hiddenLayerError)
-}
+} */

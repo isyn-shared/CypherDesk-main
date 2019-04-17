@@ -2,6 +2,7 @@ package main
 
 import (
 	initPkg "CypherDesk-main/init"
+	"CypherDesk-main/model"
 	//	"CypherDesk-main/model"
 	"CypherDesk-main/router"
 	"bufio"
@@ -27,8 +28,9 @@ func rec() {
 
 func main() {
 	defer rec()
-	// model.Debug()
+	model.Debug()
 
+	return
 	fmt.Print(initPkg.TextColorTitle)
 	fmt.Println(" ___ ______   ___   _   ____         __ _                          ")
 	fmt.Println("|_ _/ ___\\ \\ / / \\ | | / ___|  ___  / _| |___      ____ _ _ __ ___ ")

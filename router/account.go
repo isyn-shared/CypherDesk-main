@@ -357,8 +357,7 @@ func changeCredentialsHandler(c *gin.Context) {
 func uploadFileHandler(c *gin.Context) {
 	isAuth, id := getID(c)
 	if !isAuth {
-		c.String(http.StatusOK, "redirect")
-		fmt.Println("user doesn`t authorized")
+		c.JSON(http.StatusOK, gin.H{"ok": false, "err": "You are not authorized", "redirect": "/"})
 	}
 	if _, _, fileErr := c.Request.FormFile("fileInput"); fileErr != nil {
 		c.String(http.StatusOK, "something wrong with your file: "+fileErr.Error())
@@ -366,6 +365,16 @@ func uploadFileHandler(c *gin.Context) {
 	}
 	file, fileHeader, _ := c.Request.FormFile("fileInput")
 	keywords := strings.Split(c.PostForm("keywords"), " ")
+
+	if !alias.ChkFileExt(fileHeader, []string{"doc", "docx", "jpg", "png", "jpeg", "gif", "ptx"}) {
+		c.JSON(http.StatusOK, gin.H{"ok": true, "err": "Данное расширение запрещено"})
+		return
+	}
+
+	if !alias.ChkFileSize(fileHeader, 1000000) {
+		c.JSON(http.StatusOK, gin.H{"ok": true, "err": "Файл слишком тяжелый"})
+		return
+	}
 
 	r, _ := alias.RandomHex(5)
 	fileName := r + "_" + strconv.Itoa(id) + "_" + string(fileHeader.Filename)
@@ -390,4 +399,5 @@ func uploadFileHandler(c *gin.Context) {
 	mysql.InsertDocument(doc)
 
 	fmt.Println("HEEEEEEYYYYYYYYYYY!!!", fileName, fileHeader.Filename, fileHeader.Size)
+	c.JSON(http.StatusOK, gin.H{"ok": true, "err": nil})
 }
